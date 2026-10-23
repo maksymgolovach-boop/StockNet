@@ -1,0 +1,8 @@
+ecd73ba092a8f0b97387d95aa5d2a978  src/mocks/lots.ts
+706141c8c0fb3866a7138836c83d5b07  src/mocks/catalog/extra.ts
+63174f94d8d45e9ea97f7d2ed124646a  src/mocks/index.ts
+b8510d20643e6f1435778e9093aea790  src/features/search/engine.ts
+06630a53aba732e607315df50880f819  src/features/product/ProductPage.tsx
+f472f6f871711df6fb1d73a95c64068a  src/features/product/ProductCard.tsx
+d5d4cb2b2dd876c4716fd46ddd200fea  src/features/map/PinCard.tsx
+5ed160de754afb8ffc4e7a16bbe236c8  src/features/map/MapResultRow.tsx

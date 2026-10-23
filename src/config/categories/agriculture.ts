@@ -1,0 +1,77 @@
+import type { CategoryConfig } from '@/types/models'
+
+export const agriMachinery: CategoryConfig = {
+  slug: 'agri-machinery',
+  icon: 'Tractor',
+  perishable: false,
+  allowedUnits: ['piece'],
+  defaultUnit: 'piece',
+  lots: { allowedSaleModes: ['measure', 'lot'], lotTypes: ['mixed', 'container', 'other'], requiresExpiry: false, requiresBatch: false, requiresCertificate: false },
+  certifications: ['ce', 'iso9001', 'euStageV', 'isobus', 'oecdTractor'],
+  logistics: {
+    deliveryModes: ['pickup', 'truck'],
+    coldChain: false,
+    heavyFreight: true,
+    bulk: false,
+    timeLimited: false,
+    incoterms: ['EXW', 'FCA', 'DAP'],
+    shippingEstimateEUR: { base: 250, perKm: 2.4, loadSize: 1 },
+  },
+  attributes: [
+    { key: 'model', type: 'text', filterable: false, showOnCard: true, searchable: true },
+    { key: 'condition', type: 'enum', options: ['new', 'used', 'demo'], display: 'translate', filterable: true, showOnCard: true },
+    { key: 'enginePowerHp', type: 'number', unit: 'hp', min: 20, max: 700, filterable: true, showOnCard: true },
+    { key: 'requiredPowerHp', type: 'number', unit: 'hp', min: 10, max: 600, filterable: true },
+    { key: 'workingWidthM', type: 'number', unit: 'm', min: 0.5, max: 60, step: 0.1, filterable: true, showOnCard: true },
+    { key: 'capacity', type: 'text', filterable: false, searchable: true },
+    { key: 'drive', type: 'enum', options: ['2wd', '4wd', 'tracked', 'trailed', 'mounted', 'self_propelled'], display: 'translate', filterable: true },
+    { key: 'yearOfManufacture', type: 'number', min: 1990, max: 2026, filterable: true },
+    { key: 'operatingHours', type: 'number', unit: 'h', min: 0, max: 30000, filterable: true },
+    { key: 'isobusReady', type: 'boolean', filterable: true },
+    { key: 'warrantyMonths', type: 'number', unit: 'mo', min: 0, max: 60, filterable: false },
+  ],
+  children: [
+    { slug: 'farm-vehicles', children: [{ slug: 'tractors' }, { slug: 'combine-harvesters' }, { slug: 'telehandlers' }] },
+    {
+      slug: 'farm-implements',
+      children: [{ slug: 'seeders-planters' }, { slug: 'tillage' }, { slug: 'sprayers' }, { slug: 'farm-trailers' }, { slug: 'loaders-attachments' }, { slug: 'hay-forage' }],
+    },
+  ],
+}
+
+export const agroInputs: CategoryConfig = {
+  slug: 'agro-inputs',
+  icon: 'Sprout',
+  perishable: false,
+  allowedUnits: ['t', 'kg', 'l', 'bag', 'pallet'],
+  defaultUnit: 't',
+  lots: { allowedSaleModes: ['measure', 'lot'], lotTypes: ['pallet', 'truckload', 'container', 'other'], requiresExpiry: false, requiresBatch: true, requiresCertificate: false },
+  certifications: ['organic', 'reach', 'iso9001', 'euFertilizer', 'pppAuthorised', 'certifiedSeed'],
+  logistics: {
+    deliveryModes: ['pickup', 'truck', 'bulk'],
+    coldChain: false,
+    heavyFreight: true,
+    bulk: true,
+    timeLimited: false,
+    incoterms: ['EXW', 'FCA', 'DAP'],
+    shippingEstimateEUR: { base: 90, perKm: 1.5, loadSize: 24 },
+  },
+  attributes: [
+    { key: 'activeIngredient', type: 'text', filterable: false, showOnCard: true, searchable: true },
+    { key: 'formulation', type: 'enum', options: ['granules', 'prilled', 'powder', 'liquid', 'ec', 'sc', 'wg', 'seed'], display: 'translate', filterable: true, showOnCard: true },
+    { key: 'nitrogenPct', type: 'number', unit: '%', min: 0, max: 46, step: 0.1, filterable: true },
+    { key: 'phosphorusPct', type: 'number', unit: '%', min: 0, max: 52, step: 0.1, filterable: true },
+    { key: 'potassiumPct', type: 'number', unit: '%', min: 0, max: 60, step: 0.1, filterable: true },
+    { key: 'cropType', type: 'enum', options: ['cereals', 'maize', 'sunflower', 'rapeseed', 'vegetables', 'orchards', 'vineyards', 'all_crops'], display: 'translate', filterable: true },
+    { key: 'germinationPct', type: 'number', unit: '%', min: 50, max: 100, filterable: true },
+    { key: 'packSize', type: 'text', filterable: false, searchable: true },
+    { key: 'organicApproved', type: 'boolean', filterable: true },
+    { key: 'hazardClass', type: 'enum', options: ['none', 'GHS07', 'GHS08', 'GHS09', 'GHS03'], display: 'verbatim', filterable: true },
+    { key: 'sdsAvailable', type: 'boolean', filterable: true },
+  ],
+  children: [
+    { slug: 'fertilizers', children: [{ slug: 'mineral-fertilizers' }, { slug: 'organic-fertilizers' }, { slug: 'liquid-fertilizers' }] },
+    { slug: 'crop-protection', children: [{ slug: 'herbicides' }, { slug: 'fungicides' }, { slug: 'insecticides' }] },
+    { slug: 'seeds' },
+  ],
+}
