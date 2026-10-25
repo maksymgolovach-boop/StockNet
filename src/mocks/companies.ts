@@ -12,3 +12,6 @@ export const COMPANY_SEEDS: Company[] = [
   },
 ]
 export const currentCompany = COMPANY_SEEDS.find((c) => c.id === CURRENT_COMPANY_ID) as Company
+
+/** True when the buyer and the producer belong to the same company (a company cannot trade with itself). */
+export const isSameCompany = (buyerId: string, producerId: string) => COMPANY_SEEDS.some((c) => c.buyerId === buyerId && c.producerId === producerId)

@@ -5,6 +5,7 @@ import { CURRENCIES } from '@/config/currencies'
 import { computeTrustScore } from '@/features/trust/trustScore'
 import { validateAttributes } from '@/features/categories/attributeSchema'
 import { monthsBetween, now } from '@/shared/lib/dates'
+import { avg, round1 } from '@/shared/lib/math'
 import { createRng } from '@/shared/lib/random'
 import { cityById } from './cities'
 import { PRODUCER_SEEDS, verificationChecks } from './producers'
@@ -70,8 +71,6 @@ export function syncLotOnlyFields(products: Product[]) {
   }
 }
 
-const avg = (xs: number[]) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0)
-const round1 = (n: number) => Math.round(n * 10) / 10
 
 function buildDatabase(): MockDatabase {
   const products = buildProducts()

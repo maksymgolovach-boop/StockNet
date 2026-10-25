@@ -1,7 +1,8 @@
 import type { Attachment, LanguageCode, Message, PartyRole, Thread } from '@/types/models'
 import { db } from '@/mocks'
 import { liveNow } from '@/shared/lib/dates'
-import { NotFoundError, mockRequest } from './client'
+import { isSameCompany } from '@/mocks/companies'
+import { ApiError, NotFoundError, mockRequest } from './client'
 import { buildReply, detectIntent } from './chatReplies'
 
 export type ChatEvent =
@@ -117,6 +118,7 @@ function scheduleCounterpart(thread: Thread, senderRole: PartyRole, text: string
 /** Server-side: finds or creates the buyer–producer thread and pins the product. */
 export function ensureThread({ buyerId, producerId, productId }: { buyerId: string; producerId: string; productId?: string }): Thread {
   if (!db.producers.some((p) => p.id === producerId) || !db.buyers.some((b) => b.id === buyerId)) throw new NotFoundError('Partner')
+  if (isSameCompany(buyerId, producerId)) throw new ApiError('A company cannot open a conversation with itself', 422)
   const existing = db.threads.find((t) => t.buyerId === buyerId && t.producerId === producerId)
   const validProduct = productId && db.products.some((p) => p.id === productId && p.producerId === producerId) ? productId : undefined
   if (existing) {

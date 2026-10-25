@@ -21,7 +21,7 @@ export interface DealRow {
 export function useDealRows(filters: DealFilters) {
   const { buyerId, producerId } = useCompanyIds()
   const deals = useMyDeals()
-  const partners = usePartners()
+  const { resolve, isPending: partnersPending } = usePartners()
   const { convert } = useCurrency()
 
   const all: DealRow[] = useMemo(
@@ -30,13 +30,13 @@ export function useDealRows(filters: DealFilters) {
         const side = sideForDeal(deal, { buyerId, producerId })!
         return {
           deal,
-          partner: partners.resolve(deal),
+          partner: resolve(deal),
           counterpartyId: side === 'buyer' ? deal.producerId : deal.buyerId,
           displayTotal: convert(deal.total, deal.currency),
           rootCategories: [...new Set(deal.lineItems.map((li) => getCategory(li.categorySlug)?.rootSlug ?? li.categorySlug))],
         }
       }),
-    [deals.data, partners.isPending, buyerId, producerId, convert],
+    [deals.data, resolve, buyerId, producerId, convert],
   )
 
   const rows = useMemo(() => {
@@ -66,5 +66,5 @@ export function useDealRows(filters: DealFilters) {
     return out.sort(by)
   }, [all, filters])
 
-  return { all, rows, isPending: deals.isPending || partners.isPending, error: deals.error, refetch: deals.refetch }
+  return { all, rows, isPending: deals.isPending || partnersPending, error: deals.error, refetch: deals.refetch }
 }

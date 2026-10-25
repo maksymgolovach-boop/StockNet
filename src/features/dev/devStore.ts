@@ -48,3 +48,8 @@ export function useCompany(): Company {
 export function useCompanyIds(): CompanyIds {
   return { buyerId: currentCompany.buyerId, producerId: currentCompany.producerId }
 }
+
+/** True when the producer is the logged-in company's own seller identity. */
+export function useIsOwnProducer(producerId: string | undefined): boolean {
+  return !!producerId && producerId === currentCompany.producerId
+}

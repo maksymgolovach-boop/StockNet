@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Heart, MessageSquare, Star } from 'lucide-react'
+import { Boxes, Heart, MessageSquare, Star } from 'lucide-react'
 import type { MapPin } from '@/features/search/types'
 import { Price } from '@/features/currency/Price'
 import { useFormat } from '@/features/i18n/useFormat'
@@ -8,6 +8,7 @@ import { AvailabilityBadge, ExpiryBadge } from '@/features/product/StatusBadges'
 import { LotBadge } from '@/features/lots/LotBadge'
 import { LotSummaryLine } from '@/features/lots/LotSummaryLine'
 import { useLotFormat } from '@/features/lots/useLotFormat'
+import { useIsOwnProducer } from '@/features/dev/devStore'
 import { useSaved } from '@/features/saved/savedStore'
 import { VerificationBadge } from '@/features/trust/VerificationBadge'
 import { buttonClass } from '@/shared/ui/Button'
@@ -23,6 +24,7 @@ export function PinCard({ pin, className, closeGap = false }: { pin: MapPin; cla
   const toggleSaved = useSaved((s) => s.toggleProducer)
   const markVisited = useMapUi((s) => s.markVisited)
   const lf = useLotFormat()
+  const isOwn = useIsOwnProducer(producer.id)
   const tier = p.saleModes.includes('measure') ? p.pricing.tiers[0] : undefined
   const lot = pin.best.lot ? p.lots.find((l) => l.id === pin.best.lot?.lotId) : undefined
 
@@ -74,10 +76,17 @@ export function PinCard({ pin, className, closeGap = false }: { pin: MapPin; cla
         <Link to={`/product/${p.id}`} onClick={() => markVisited(producer.id)} className={cn(buttonClass('primary', 'sm'), 'h-8')}>
           {t('map.view')}
         </Link>
-        <Link to={`/messages?producer=${producer.id}&product=${p.id}`} className={cn(buttonClass('secondary', 'sm'), 'h-8')}>
-          <MessageSquare className="size-3.5" aria-hidden />
-          {t('map.chat')}
-        </Link>
+        {isOwn ? (
+          <Link to="/stock" className={cn(buttonClass('secondary', 'sm'), 'h-8')}>
+            <Boxes className="size-3.5" aria-hidden />
+            {t('nav.stock')}
+          </Link>
+        ) : (
+          <Link to={`/messages?producer=${producer.id}&product=${p.id}`} className={cn(buttonClass('secondary', 'sm'), 'h-8')}>
+            <MessageSquare className="size-3.5" aria-hidden />
+            {t('map.chat')}
+          </Link>
+        )}
       </div>
     </div>
   )

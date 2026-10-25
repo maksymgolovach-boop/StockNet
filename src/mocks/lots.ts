@@ -379,11 +379,14 @@ export function convertDealsToLots(deals: Deal[], products: Product[]) {
   }
 }
 
+/** Confirmed deals hold their lots until delivery, including while an undelivered deal is disputed. */
+export const reservesLots = (deal: Pick<Deal, 'status' | 'deliveredAt'>) => RESERVING.has(deal.status) || (deal.status === 'disputed' && !deal.deliveredAt)
+
 /** Recomputes each lot's reserved count from confirmed, not yet delivered deals. */
 export function refreshReservations(products: Product[], deals: Deal[]) {
   const reserved = new Map<string, number>()
   for (const d of deals) {
-    if (!RESERVING.has(d.status)) continue
+    if (!reservesLots(d)) continue
     for (const li of d.lineItems) if (li.lot) reserved.set(li.lot.lotId, (reserved.get(li.lot.lotId) ?? 0) + li.quantity)
   }
   for (const p of products) for (const lot of p.lots) lot.reservedCount = Math.min(lot.stockCount, reserved.get(lot.id) ?? 0)

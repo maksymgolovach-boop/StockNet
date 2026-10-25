@@ -782,7 +782,8 @@
     "showImage": "Bild {{index}} anzeigen",
     "placeholderImages": "Platzhalterbilder in dieser Demo.",
     "stockPhotos": "Symbolische Stockfotos von Pexels und Unsplash. Die tatsächliche Ware kann abweichen.",
-    "similar": "Ähnliche Produkte"
+    "similar": "Ähnliche Produkte",
+    "ownListing": "Das ist Ihr Angebot. Käufer sehen hier die Schaltflächen für Anfrage und Kontakt."
   },
   "map": {
     "showMap": "Karte",
@@ -1543,7 +1544,8 @@
       "lotMin": "Mindestens {{min}}",
       "lotMax": "Nur {{max}} verfügbar",
       "lotStep": "Schritte von {{step}} Los verwenden",
-      "lotWhole": "Unteilbares Los: nur ganze Lose"
+      "lotWhole": "Unteilbares Los: nur ganze Lose",
+      "ownProducer": "Sie können kein Angebot bei Ihrem eigenen Unternehmen anfragen."
     },
     "itemCount_one": "{{count}} Position",
     "itemCount_other": "{{count}} Positionen"

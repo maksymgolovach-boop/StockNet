@@ -1,4 +1,4 @@
-import { useEffect, useId, type ReactNode } from 'react'
+import { useId, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Bell, Globe2, MapPin, RotateCcw, ShieldCheck, Sparkles } from 'lucide-react'
 import type { ThemePreference, UserPreferences } from '@/types/models'
@@ -8,11 +8,11 @@ import { CurrencySwitcher } from '@/features/currency/CurrencySwitcher'
 import { useFormat } from '@/features/i18n/useFormat'
 import { LanguageSwitcher } from '@/features/i18n/LanguageSwitcher'
 import { TuningPanel } from '@/features/recommendations/TuningPanel'
-import { clearStoredDeals } from '@/mocks/dealStorage'
-import { clearStoredLots } from '@/mocks/lotStorage'
 import { Button } from '@/shared/ui/Button'
 import { RadioChips, Switch } from '@/shared/ui/form'
 import { RADIUS_STEPS } from '@/features/search/filters/LocationFilter'
+import { usePageTitle } from '@/shared/hooks/usePageTitle'
+import { resetDemoData } from '@/services/demoData'
 import { LocationPicker } from './LocationPicker'
 import { usePreferences } from './preferencesStore'
 
@@ -45,9 +45,7 @@ export function SettingsPage() {
   const privacy = (patch: Partial<UserPreferences['privacy']>) => set({ privacy: { ...prefs.privacy, ...patch } })
   const radiusIndex = Math.max(0, RADIUS_STEPS.findIndex((r) => r >= prefs.radiusKm))
 
-  useEffect(() => {
-    document.title = `${t('pages.settings')} · Stocknet`
-  }, [t])
+  usePageTitle(t('pages.settings'))
 
   return (
     <div className="mx-auto grid max-w-[90rem] gap-6 px-4 py-6 lg:grid-cols-[14rem_minmax(0,1fr)] lg:px-6">
@@ -170,11 +168,7 @@ export function SettingsPage() {
             </Button>
             <Button
               variant="danger"
-              onClick={() => {
-                clearStoredLots()
-                clearStoredDeals()
-                window.location.reload()
-              }}
+              onClick={resetDemoData}
             >
               {t('dev.resetLots')}
             </Button>

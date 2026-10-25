@@ -26,7 +26,7 @@ export interface RfqValues {
 const E = 'rfq.errors.'
 const num = (s: string) => Number(s.replace(',', '.'))
 
-export function rfqSchema(products: Product[]) {
+export function rfqSchema(products: Product[], ownProducerId?: string) {
   return z
     .object({
       producerId: z.string().min(1, `${E}producer`),
@@ -44,6 +44,7 @@ export function rfqSchema(products: Product[]) {
       const issue = (path: (string | number)[], message: string) => ctx.addIssue({ code: 'custom', path, message: `${E}${message}` })
       const tomorrow = new Date(liveNow().getTime() + 86_400_000).toISOString().slice(0, 10)
       if (v.date && v.date < tomorrow) issue(['date'], 'dateFuture')
+      if (ownProducerId && v.producerId === ownProducerId) issue(['producerId'], 'ownProducer')
       const seen = new Set<string>()
       v.items.forEach((item, i) => {
         const product = products.find((p) => p.id === item.productId)

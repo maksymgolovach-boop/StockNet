@@ -4,6 +4,7 @@ import { FileSignature, Info, Minus, Plus } from 'lucide-react'
 import type { Lot, Product } from '@/types/models'
 import { Price } from '@/features/currency/Price'
 import { useFormat } from '@/features/i18n/useFormat'
+import { useIsOwnProducer } from '@/features/dev/devStore'
 import { ButtonLink } from '@/shared/ui/Button'
 import { availableLots, clampLotQuantity, lotMeasure, lotQuantityRule, normalizedLotPrice, pricePerLotFor } from './lotMath'
 import { useLotFormat } from './useLotFormat'
@@ -22,6 +23,7 @@ export function LotOrderPanel({ product, lot }: { product: Product; lot: Lot }) 
   const norm = normalizedLotPrice({ ...lot, pricePerLot: perLot }, product.unit)
   const cur = product.pricing.currency
   const step = (dir: 1 | -1) => setQty(clampLotQuantity(lot, quantity + dir * rule.step))
+  const isOwner = useIsOwnProducer(product.producerId)
 
   return (
     <div className="flex flex-col gap-3">
@@ -97,9 +99,11 @@ export function LotOrderPanel({ product, lot }: { product: Product; lot: Lot }) 
           <Price amount={total} currency={cur} />
         </span>
       </div>
-      <ButtonLink to={`/deals/new?product=${product.id}&lot=${lot.id}&lots=${quantity}`} size="lg" icon={<FileSignature className="size-4" aria-hidden />}>
-        {t('lots.requestLotQuote')}
-      </ButtonLink>
+      {!isOwner && (
+        <ButtonLink to={`/deals/new?product=${product.id}&lot=${lot.id}&lots=${quantity}`} size="lg" icon={<FileSignature className="size-4" aria-hidden />}>
+          {t('lots.requestLotQuote')}
+        </ButtonLink>
+      )}
     </div>
   )
 }

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Handshake, Search } from 'lucide-react'
 import type { Partnership } from '@/types/models'
@@ -10,6 +10,7 @@ import { normalize } from '@/features/search/normalize'
 import { Select } from '@/shared/ui/Select'
 import { EmptyState, ErrorState, LoadingRegion, Skeleton } from '@/shared/ui/states'
 import { cn } from '@/shared/lib/cn'
+import { usePageTitle } from '@/shared/hooks/usePageTitle'
 import { PartnerCard } from './PartnerCard'
 
 type View = 'all' | 'favorites' | 'active' | 'dormant'
@@ -25,9 +26,7 @@ export function PartnersPage() {
   const [sort, setSort] = useState<Sort>('last')
   const [query, setQuery] = useState('')
 
-  useEffect(() => {
-    document.title = `${t('pages.partners')} · Stocknet`
-  }, [t])
+  usePageTitle(t('pages.partners'))
 
   const list = data.data ?? []
   const threadFor = (p: Partnership) => threadForPartnership(p, ids)

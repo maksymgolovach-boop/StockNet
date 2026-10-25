@@ -799,7 +799,8 @@
     "showImage": "Arată imaginea {{index}}",
     "placeholderImages": "Imagini de substituție în această versiune demo.",
     "stockPhotos": "Fotografii de stoc ilustrative de pe Pexels și Unsplash. Marfa reală poate diferi.",
-    "similar": "Produse similare"
+    "similar": "Produse similare",
+    "ownListing": "Acesta este anunțul dvs. Cumpărătorii văd aici butoanele de cerere de ofertă și contact."
   },
   "map": {
     "showMap": "Hartă",
@@ -1587,7 +1588,8 @@
       "lotMin": "Minimum {{min}}",
       "lotMax": "Doar {{max}} disponibile",
       "lotStep": "Folosiți pași de {{step}} lot",
-      "lotWhole": "Lot indivizibil: doar loturi întregi"
+      "lotWhole": "Lot indivizibil: doar loturi întregi",
+      "ownProducer": "Nu puteți cere o ofertă de la propria companie."
     },
     "itemCount_one": "{{count}} poziție",
     "itemCount_few": "{{count}} poziții",

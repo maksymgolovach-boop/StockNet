@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { CheckCircle2, MessageSquare, OctagonAlert, Repeat2 } from 'lucide-react'
@@ -15,6 +15,7 @@ import { Breadcrumbs } from '@/shared/ui/Breadcrumbs'
 import { Button, ButtonLink } from '@/shared/ui/Button'
 import { Modal } from '@/shared/ui/Modal'
 import { ErrorState, LoadingRegion, Skeleton } from '@/shared/ui/states'
+import { usePageTitle } from '@/shared/hooks/usePageTitle'
 import { canDispute, transitionsFor, type DealTransition } from './dealRules'
 import { DealStatusBadge } from './DealStatusBadge'
 import { DealDetails, DealDocuments, DealThreadCard } from './DealSidePanels'
@@ -40,9 +41,7 @@ export function DealDetailPage() {
   const location = useLocation()
   const [notice, setNotice] = useState(() => (location.state as { notice?: string } | null)?.notice ?? '')
 
-  useEffect(() => {
-    document.title = `${dealId} · Stocknet`
-  }, [dealId])
+  usePageTitle(dealId)
 
   if (deal.error instanceof NotFoundError) return <NotFoundPage />
   if (deal.isPending)

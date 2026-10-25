@@ -16,6 +16,7 @@ import { Select } from '@/shared/ui/Select'
 import { EmptyState, ErrorState, LoadingRegion, Skeleton } from '@/shared/ui/states'
 import { cn } from '@/shared/lib/cn'
 import { now } from '@/shared/lib/dates'
+import { usePageTitle } from '@/shared/hooks/usePageTitle'
 import { availableLots, lotStatus } from '../lotMath'
 import { LotForm } from './LotForm'
 import { StockTable } from './StockTable'
@@ -46,9 +47,7 @@ export function StockPage() {
   const [notice, setNotice] = useState('')
   const busyId = (m.setStock.isPending && m.setStock.variables?.lotId) || (m.setStatus.isPending && m.setStatus.variables?.lotId) || (m.duplicate.isPending && m.duplicate.variables) || undefined
 
-  useEffect(() => {
-    document.title = `${t('lots.stock.title')} · Stocknet`
-  }, [t])
+  usePageTitle(t('lots.stock.title'))
 
   const requestedNew = params.get('new')
   useEffect(() => {

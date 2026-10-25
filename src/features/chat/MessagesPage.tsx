@@ -7,6 +7,7 @@ import { chatTransport } from '@/services/chatTransport'
 import { useMyThreads } from '@/services/queries'
 import { cn } from '@/shared/lib/cn'
 import { EmptyState, ErrorState, LoadingRegion, Skeleton } from '@/shared/ui/states'
+import { usePageTitle } from '@/shared/hooks/usePageTitle'
 import { Conversation } from './Conversation'
 import { ThreadList } from './ThreadList'
 import { usePartners } from './usePartner'
@@ -42,9 +43,7 @@ export function MessagesPage() {
   const opening = useOpenFromQuery()
   const thread = threads.data?.find((x) => x.id === threadId)
 
-  useEffect(() => {
-    document.title = `${t('pages.messages')} · Stocknet`
-  }, [t])
+  usePageTitle(t('pages.messages'))
 
   const loading = threads.isPending || partners.isPending || opening
   return (

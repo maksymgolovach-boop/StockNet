@@ -10,12 +10,14 @@ import { useCompanyIds } from '@/features/dev/devStore'
 import { useDeal, useDealMutations } from '@/features/deals/useDeals'
 import { useFormat } from '@/features/i18n/useFormat'
 import { isSellable, lotQuantityRule, pricePerLotFor, sellableLots } from '@/features/lots/lotMath'
+import { tierFor } from '@/features/product/pricing'
 import { CITIES } from '@/mocks/cities'
 import { useBuyers, useProducers, useProducts } from '@/services/queries'
 import { Breadcrumbs } from '@/shared/ui/Breadcrumbs'
 import { Button } from '@/shared/ui/Button'
 import { LoadingRegion, Skeleton } from '@/shared/ui/states'
 import { liveNow } from '@/shared/lib/dates'
+import { usePageTitle } from '@/shared/hooks/usePageTitle'
 import { RfqItemRow } from './RfqItemRow'
 import { rfqSchema, type RfqItemValues, type RfqValues } from './rfqSchema'
 
@@ -48,7 +50,8 @@ function RfqForm({ initial, products, producerFixed, reorderOf }: { initial: Rfq
   const navigate = useNavigate()
   const producers = useProducers()
   const { createQuote } = useDealMutations()
-  const resolver: Resolver<RfqValues> = (values, ctx, opts) => (zodResolver(rfqSchema(products)) as unknown as Resolver<RfqValues>)(values, ctx, opts)
+  const { producerId: ownProducerId } = useCompanyIds()
+  const resolver: Resolver<RfqValues> = (values, ctx, opts) => (zodResolver(rfqSchema(products, ownProducerId)) as unknown as Resolver<RfqValues>)(values, ctx, opts)
   const { register, handleSubmit, control, setValue, formState } = useForm<RfqValues>({ defaultValues: initial, resolver })
   const items = useFieldArray({ control, name: 'items' })
   const values = useWatch({ control })
@@ -66,7 +69,7 @@ function RfqForm({ initial, products, producerFixed, reorderOf }: { initial: Rfq
       const q = Number((it.quantity ?? '').replace(',', '.'))
       if (!p || !(q > 0)) continue
       const lot = it.mode === 'lot' ? p.lots.find((l) => l.id === it.lotId) : undefined
-      const unit = lot ? pricePerLotFor(lot, q) : ([...p.pricing.tiers].reverse().find((tr) => q >= tr.minQty) ?? p.pricing.tiers[0])?.unitPrice
+      const unit = lot ? pricePerLotFor(lot, q) : tierFor(p.pricing.tiers, q)?.unitPrice
       if (unit !== undefined) byCurrency.set(p.pricing.currency, (byCurrency.get(p.pricing.currency) ?? 0) + unit * q)
     }
     return [...byCurrency.entries()]
@@ -112,7 +115,7 @@ function RfqForm({ initial, products, producerFixed, reorderOf }: { initial: Rfq
             className={input}
           >
             <option value="">{t('rfq.chooseProducer')}</option>
-            {(producers.data ?? []).map((p) => (
+            {(producers.data ?? []).filter((p) => p.id !== ownProducerId).map((p) => (
               <option key={p.id} value={p.id}>
                 {p.name} · {p.address.city}
               </option>
@@ -222,19 +225,23 @@ function RfqForm({ initial, products, producerFixed, reorderOf }: { initial: Rfq
   )
 }
 
+/** Remounts the form when the URL changes (e.g. another product's "Request quote"), so it never keeps stale values. */
 export function RfqPage() {
+  const [params] = useSearchParams()
+  return <RfqLoader key={params.toString()} />
+}
+
+function RfqLoader() {
   const { t } = useTranslation()
   const [params] = useSearchParams()
-  const { buyerId } = useCompanyIds()
+  const { buyerId, producerId: ownProducerId } = useCompanyIds()
   const products = useProducts()
   const buyers = useBuyers()
   const reorderId = params.get('reorder') ?? ''
   const reorder = useDeal(reorderId)
   const [initial, setInitial] = useState<{ values: RfqValues; fixed: boolean } | null>(null)
 
-  useEffect(() => {
-    document.title = `${t('pages.rfq')} · Stocknet`
-  }, [t])
+  usePageTitle(t('pages.rfq'))
 
   useEffect(() => {
     if (initial || !products.data || !buyers.data || (reorderId && reorder.isPending)) return
@@ -242,12 +249,14 @@ export function RfqPage() {
     const productId = params.get('product')
     const product = products.data.find((p) => p.id === productId)
     const deal = reorder.data
-    const producerId = deal?.producerId ?? product?.producerId ?? params.get('producer') ?? ''
-    const items = deal ? fromDeal(deal, products.data) : product ? [itemFor(product, params.get('lot'), params.get('lots'))] : [{ productId: '', mode: 'measure' as const, lotId: '', quantity: '' }]
+    const requested = deal?.producerId ?? product?.producerId ?? params.get('producer') ?? ''
+    const own = requested === ownProducerId
+    const producerId = own ? '' : requested
+    const items = own ? [] : deal ? fromDeal(deal, products.data) : product ? [itemFor(product, params.get('lot'), params.get('lots'))] : []
     const address = deal?.deliveryAddress ?? buyer?.address
     const date = new Date(liveNow().getTime() + 14 * 86_400_000).toISOString().slice(0, 10)
     setInitial({
-      fixed: !!(deal || product),
+      fixed: !own && !!(deal || product),
       values: {
         producerId,
         items: items.length ? items : [{ productId: '', mode: 'measure', lotId: '', quantity: '' }],
@@ -261,7 +270,7 @@ export function RfqPage() {
         attachments: [],
       },
     })
-  }, [initial, products.data, buyers.data, reorder.isPending, reorder.data, reorderId, params, buyerId, t])
+  }, [initial, products.data, buyers.data, reorder.isPending, reorder.data, reorderId, params, buyerId, ownProducerId, t])
 
   return (
     <div className="mx-auto flex max-w-[90rem] flex-col gap-5 px-4 py-6 lg:px-6">

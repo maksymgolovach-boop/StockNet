@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
-import { FileSignature, Heart, MessageSquare } from 'lucide-react'
+import { Boxes, FileSignature, Heart, MessageSquare } from 'lucide-react'
 import type { Product } from '@/types/models'
+import { useIsOwnProducer } from '@/features/dev/devStore'
 import { useSaved } from '@/features/saved/savedStore'
 import { ReportButton } from '@/features/trust/ReportDialog'
 import { ButtonLink, Button } from '@/shared/ui/Button'
@@ -10,6 +11,16 @@ export function ProductActions({ product, showQuote = true }: { product: Product
   const { t } = useTranslation()
   const saved = useSaved((s) => s.productIds.includes(product.id))
   const toggle = useSaved((s) => s.toggleProduct)
+  const isOwner = useIsOwnProducer(product.producerId)
+  if (isOwner)
+    return (
+      <div className="flex flex-col gap-2">
+        <p className="text-sm text-ink-muted">{t('product.ownListing')}</p>
+        <ButtonLink to="/stock" variant="secondary" icon={<Boxes className="size-4" aria-hidden />}>
+          {t('nav.stock')}
+        </ButtonLink>
+      </div>
+    )
   return (
     <div className="flex flex-col gap-2">
       {showQuote && (

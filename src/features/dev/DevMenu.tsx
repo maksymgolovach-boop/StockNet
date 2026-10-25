@@ -4,14 +4,13 @@ import { useTranslation } from 'react-i18next'
 import { useQueryClient } from '@tanstack/react-query'
 import { Wrench } from 'lucide-react'
 import { db } from '@/mocks'
-import { clearStoredDeals } from '@/mocks/dealStorage'
-import { clearStoredLots } from '@/mocks/lotStorage'
 import { usePreferences } from '@/features/settings/preferencesStore'
 import { safeStorage } from '@/shared/lib/storage'
 import { cn } from '@/shared/lib/cn'
 import { Button } from '@/shared/ui/Button'
 import { Drawer } from '@/shared/ui/Drawer'
 import { Select } from '@/shared/ui/Select'
+import { resetDemoData } from '@/services/demoData'
 import { useCompany, useCompanyIds, useDevStore } from './devStore'
 
 const LATENCIES = [0, 150, 350, 800, 1500]
@@ -110,11 +109,7 @@ export function DevMenu() {
           </Button>
           <Button
             variant="secondary"
-            onClick={() => {
-              clearStoredLots()
-              clearStoredDeals()
-              window.location.reload()
-            }}
+            onClick={resetDemoData}
           >
             {t('dev.resetLots')}
           </Button>

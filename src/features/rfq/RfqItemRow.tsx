@@ -5,6 +5,7 @@ import type { Product } from '@/types/models'
 import { Price } from '@/features/currency/Price'
 import { useFormat } from '@/features/i18n/useFormat'
 import { availableLots, lotQuantityRule, pricePerLotFor, sellableLots } from '@/features/lots/lotMath'
+import { tierFor } from '@/features/product/pricing'
 import { useLotFormat } from '@/features/lots/useLotFormat'
 import { cn } from '@/shared/lib/cn'
 import type { RfqValues } from './rfqSchema'
@@ -32,7 +33,7 @@ export function RfqItemRow({ index: i, products, control, register, setValue, er
   const q = Number((item?.quantity ?? '').replace(',', '.'))
   const e = errors.items?.[i]
   const msg = (k: 'productId' | 'quantity' | 'lotId' | 'mode') => e?.[k]?.message
-  const measureTier = product && item?.mode === 'measure' ? ([...product.pricing.tiers].reverse().find((tr) => q >= tr.minQty) ?? product.pricing.tiers[0]) : undefined
+  const measureTier = product && item?.mode === 'measure' ? tierFor(product.pricing.tiers, q) : undefined
   const unitPrice = item?.mode === 'lot' && lot ? pricePerLotFor(lot, q || 1) : measureTier?.unitPrice
   const rule = lot ? lotQuantityRule(lot) : undefined
   const id = (k: string) => `rfq-${i}-${k}`

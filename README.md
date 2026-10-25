@@ -4,12 +4,16 @@ React + TypeScript (strict) + Vite + Tailwind v4. No backend: a typed mock datab
 
 ## Setup
 
+Requires **Node.js 20.19+ or 22.12+** (Vite 8). `.nvmrc` pins Node 22 for nvm / fnm users.
+
 ```bash
 npm install
 npm run dev        # http://localhost:5173
-npm run check      # type-check + locale coverage + mock-data validation + search tests
+npm run check      # type-check + lint + locale coverage + mock-data validation + search and deal tests
 npm run build      # type-check and production build
 ```
+
+GitHub Actions (`.github/workflows/check.yml`) runs `npm run check` and `npm run build` on every push and pull request.
 
 The demo runs against a fixed date (**16 Oct 2026**, `src/shared/lib/dates.ts`) so expiry badges, document states and deal timelines stay coherent with the mock data.
 
@@ -37,7 +41,7 @@ src/
                        + TanStack Query hooks
   shared/              UI primitives, hooks, libs (geo, storage, random, dates)
   types/models.ts      Domain model
-scripts/               check-case.ts, check-locales.ts, validate-mocks.ts, test-search.ts
+scripts/               check-case.ts, check-locales.ts, validate-mocks.ts, test-search.ts, test-deals.ts
 ```
 
 ## Active industries
@@ -136,8 +140,10 @@ Each service in `src/services` is an interface plus a mock implementation built 
 
 - **`/deals`**: table (cards on mobile) with ID, partner, products (lot items marked), total in the deal currency plus the converted amount, status and last update. URL filters: status chips, partner, category, created date range, amount range (display currency), transaction currency, text search (ID, partner, product, lot number) and sort. Summary cards (deals, volume, active, average, on-time). **Export CSV** downloads the filtered list client-side (UTF-8 with BOM; comma in English, semicolon in German/Romanian for Excel).
 - **`/deals/:id`**: timeline with timestamps and actor, line items (lots show lot number and type), converted total, delivery terms, notes and attachments, documents (generated as the deal progresses; UI only), linked chat. Actions depend on your side in the deal and its status (`src/features/deals/dealRules.ts`): as the producer you send a quote, dispatch and mark delivered; as the buyer you accept, negotiate, cancel (with confirmation), confirm receipt and close. **Reorder** pre-fills a new request. **Open dispute** (from order confirmation to 30 days after delivery) records reason, affected items and their lot numbers, description, desired resolution and evidence; the buyer can mark it resolved. Completed deals show a review form (5 criteria); the review updates the producer's rating and trust score.
-- **Lots and deals**: accepting a quote reserves the lots; delivery takes them out of stock.
-- **`/deals/new`** (quote request): one producer, items by measure or by lot (with MOQ and lot rules), delivery address, Incoterm, requested date, notes and attachments. Pre-filled from `?product=&lot=&lots=`, `?producer=` or `?reorder=<dealId>`. It creates a deal in "Quote request", posts the request in the chat thread, and the mock producer answers with a quote about 6 seconds later (pushed live to open pages).
+- **Lots and deals**: accepting a quote reserves the lots (it fails if a lot no longer has enough unreserved stock); delivery takes them out of stock. Lots stay reserved while an undelivered deal is disputed.
+- **Disputes**: only the buyer can mark a dispute resolved; the deal then returns to the status it had before the dispute (e.g. "In delivery"), so it can still be delivered and closed.
+- **Your own listings**: the company cannot request quotes from or chat with its own producer identity. On your own products, producer page and map pins, the quote and contact buttons are replaced by a link to Stock & lots.
+- **`/deals/new`** (quote request): one producer, items by measure or by lot (with MOQ and lot rules), delivery address, Incoterm, requested date, notes and attachments. Pre-filled from `?product=&lot=&lots=`, `?producer=` or `?reorder=<dealId>`. It creates a deal in "Quote request", posts the request in the chat thread, and the mock producer answers with a quote about 6 seconds later (pushed live to open pages). If the page is reloaded before that, the reply is scheduled again on start-up.
 - **`/partners`**: one card per counterparty: first and last deal, deals, volume, average rating given as a buyer (or received as a seller), on-time rate, disputes, active/dormant, quarterly volume bars, favorite, tag and private notes, plus "Request new quote", "Message" and "View deals".
 - **Persistence**: new deals, status changes, disputes, reviews, partner notes and the threads they create are saved in the browser (`sy-deals`). "Reset lots & deals" in the dev menu restores the mock data.
 

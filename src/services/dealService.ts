@@ -15,15 +15,19 @@ import type {
   Thread,
 } from '@/types/models'
 import { CURRENCIES } from '@/config/currencies'
+import { LANGUAGES } from '@/config/languages'
 import { db } from '@/mocks'
+import { isSameCompany } from '@/mocks/companies'
 import { persistDeal, persistPartnerMeta, persistReview, persistThread } from '@/mocks/dealStorage'
 import { refreshReservations } from '@/mocks/lots'
 import { persistLot } from '@/mocks/lotStorage'
 import { roundPrice } from '@/mocks/products'
 import { DOCUMENT_ON, TRANSITIONS, canDispute, type DealActionId } from '@/features/deals/dealRules'
-import { clampLotQuantity, isSellable, lotQuantityRule, pricePerLotFor } from '@/features/lots/lotMath'
+import { availableLots, clampLotQuantity, isSellable, lotQuantityRule, pricePerLotFor } from '@/features/lots/lotMath'
+import { tierFor } from '@/features/product/pricing'
 import { computeTrustScore } from '@/features/trust/trustScore'
-import { liveNow } from '@/shared/lib/dates'
+import { DEMO_NOW, liveNow } from '@/shared/lib/dates'
+import { avg, round1, round2, round3 } from '@/shared/lib/math'
 import { ApiError, NotFoundError, mockRequest } from './client'
 import { emitDealChanged, ensureThread, serverPost, threadLanguage } from './chatTransport'
 
@@ -65,8 +69,6 @@ export interface ReviewInput {
 
 const toEUR = (amount: number, currency: Deal['currency']) => amount / CURRENCIES[currency].mockRateFromEUR
 const convert = (amount: number, from: Deal['currency'], to: Deal['currency']) => (amount / CURRENCIES[from].mockRateFromEUR) * CURRENCIES[to].mockRateFromEUR
-const round2 = (n: number) => Math.round(n * 100) / 100
-const round1 = (n: number) => Math.round(n * 10) / 10
 
 function findDeal(role: PartyRole, partyId: string, dealId: string): Deal {
   const d = db.deals.find((x) => x.id === dealId && isParty(role, partyId)(x))
@@ -92,10 +94,26 @@ function settleLots(deal: Deal) {
     if (!li.lot) continue
     const lot = db.products.find((p) => p.id === li.productId)?.lots.find((l) => l.id === li.lot?.lotId)
     if (!lot) continue
-    lot.stockCount = Math.max(0, Math.round((lot.stockCount - li.quantity) * 1000) / 1000)
+    lot.stockCount = Math.max(0, round3(lot.stockCount - li.quantity))
     lot.updatedAt = liveNow().toISOString()
     persistLot(lot)
   }
+}
+
+/** A quote can only be accepted while every lot in it still has enough unreserved stock. */
+function assertLotsAvailable(deal: Deal) {
+  for (const li of deal.lineItems) {
+    if (!li.lot) continue
+    const lot = db.products.find((p) => p.id === li.productId)?.lots.find((l) => l.id === li.lot?.lotId)
+    if (!lot || !isSellable(lot) || availableLots(lot) < li.quantity) throw new ApiError(`Lot ${li.lot.lotNumber} is no longer available in this quantity`, 409)
+  }
+}
+
+/** The status a deal had before its dispute was opened; resolving the dispute returns it there. */
+function statusBeforeDispute(deal: Deal): DealStatus {
+  const disputedAt = deal.events.findLastIndex((e) => e.status === 'disputed')
+  const previous = deal.events.slice(0, disputedAt < 0 ? undefined : disputedAt).findLast((e) => e.status !== 'disputed')
+  return previous?.status ?? (deal.deliveredAt ? 'completed' : 'order_confirmed')
 }
 
 function applyTransition(deal: Deal, to: DealStatus, actor: PartyRole, noteKey?: string) {
@@ -114,12 +132,12 @@ function applyTransition(deal: Deal, to: DealStatus, actor: PartyRole, noteKey?:
   emitDealChanged(deal)
 }
 
-const L10N_LOCALE: Record<LanguageCode, string> = { en: 'en-GB', de: 'de-DE', ro: 'ro-RO' }
-const money = (amount: number, currency: string, lang: LanguageCode) => new Intl.NumberFormat(L10N_LOCALE[lang], { style: 'currency', currency, maximumFractionDigits: 2 }).format(amount)
+const intlLocale = (lang: LanguageCode) => LANGUAGES[lang].intlLocale
+const money = (amount: number, currency: string, lang: LanguageCode) => new Intl.NumberFormat(intlLocale(lang), { style: 'currency', currency, maximumFractionDigits: 2 }).format(amount)
 
 function rfqMessage(deal: Deal): Record<LanguageCode, string> {
   const lines = (l: LanguageCode) => deal.lineItems.map((li) => `• ${li.productName}: ${li.lot ? `${li.quantity} × ${l === 'de' ? 'Los' : 'lot'} ${li.lot.lotNumber}` : `${li.quantity} ${li.unit}`}`).join('\n')
-  const date = (l: LanguageCode) => new Intl.DateTimeFormat(L10N_LOCALE[l], { dateStyle: 'medium' }).format(new Date(deal.requestedDeliveryDate))
+  const date = (l: LanguageCode) => new Intl.DateTimeFormat(intlLocale(l), { dateStyle: 'medium' }).format(new Date(deal.requestedDeliveryDate))
   return {
     en: `Quote request ${deal.id}:\n${lines('en')}\nDelivery ${deal.incoterm} ${deal.deliveryAddress.city} by ${date('en')}.${deal.notes ? `\nNote: ${deal.notes}` : ''}`,
     de: `Angebotsanfrage ${deal.id}:\n${lines('de')}\nLieferung ${deal.incoterm} ${deal.deliveryAddress.city} bis ${date('de')}.${deal.notes ? `\nHinweis: ${deal.notes}` : ''}`,
@@ -153,6 +171,16 @@ function scheduleAutoQuote(dealId: string, threadId: string) {
   )
 }
 
+/**
+ * Quote requests created in this browser are saved, but the reply timer is not. After a reload, any request
+ * created during a demo session (so after the fixed demo date) that is still waiting gets its auto-quote again.
+ */
+function resumePendingQuotes() {
+  for (const deal of db.deals) {
+    if (deal.status === 'quote_request' && deal.threadId && new Date(deal.createdAt) >= DEMO_NOW) scheduleAutoQuote(deal.id, deal.threadId)
+  }
+}
+
 function buildLineItem(input: QuoteRequestItem, producerId: string, currency: Deal['currency']): DealLineItem {
   const product = db.products.find((p) => p.id === input.productId && p.producerId === producerId)
   if (!product) throw new ApiError(`Product ${input.productId} is not sold by this producer`, 422)
@@ -166,7 +194,7 @@ function buildLineItem(input: QuoteRequestItem, producerId: string, currency: De
   }
   if (!product.saleModes.includes('measure')) throw new ApiError('This product is sold by lot only', 422)
   if (input.quantity < product.moq) throw new ApiError('Quantity below MOQ', 422)
-  const tier = [...product.pricing.tiers].reverse().find((t) => input.quantity >= t.minQty) ?? product.pricing.tiers[0]
+  const tier = tierFor(product.pricing.tiers, input.quantity)
   const unitPrice = tier ? roundPrice(convert(tier.unitPrice, product.pricing.currency, currency)) : 0
   return { productId: product.id, productName: product.name, categorySlug: product.categorySlug, quantity: input.quantity, unit: product.unit, unitPrice, subtotal: round2(unitPrice * input.quantity) }
 }
@@ -220,7 +248,7 @@ function partnershipsFor(role: PartyRole, partyId: string): Partnership[] {
       completedCount: sorted.filter((d) => d.status === 'completed').length,
       totalVolumeEUR: Math.round(valid.reduce((s, d) => s + toEUR(d.total, d.currency), 0)),
       onTimeRate: delivered.length ? delivered.filter((d) => d.onTime).length / delivered.length : null,
-      avgRatingGiven: ratings.length ? round1(ratings.reduce((s, r) => s + r.overall, 0) / ratings.length) : null,
+      avgRatingGiven: ratings.length ? round1(avg(ratings.map((r) => r.overall))) : null,
       disputeCount: sorted.filter((d) => d.dispute).length,
       activeCount,
       status: activeCount > 0 || recent ? 'active' : 'dormant',
@@ -234,13 +262,13 @@ function refreshRatings(producerId: string) {
   if (!producer) return
   const rs = db.reviews.filter((r) => r.producerId === producerId)
   producer.reviewCount = rs.length
-  producer.rating = rs.length ? round1(rs.reduce((s, r) => s + r.overall, 0) / rs.length) : producer.rating
+  producer.rating = rs.length ? round1(avg(rs.map((r) => r.overall))) : producer.rating
   producer.trustInputs = { ...producer.trustInputs, avgRating: producer.rating }
   producer.trust = computeTrustScore(producer.trustInputs, liveNow().toISOString())
   for (const product of db.products.filter((p) => p.producerId === producerId)) {
     const pr = rs.filter((r) => r.productIds.includes(product.id))
     product.reviewCount = pr.length
-    product.rating = pr.length ? round1(pr.reduce((s, r) => s + r.overall, 0) / pr.length) : 0
+    product.rating = round1(avg(pr.map((r) => r.overall)))
   }
 }
 
@@ -281,6 +309,7 @@ export const dealService: DealService = {
       const deal = findDeal(role, partyId, dealId)
       const t = TRANSITIONS[deal.status].find((x) => x.action === action && x.actor === role)
       if (!t) throw new ApiError(`Action ${action} is not allowed in status ${deal.status}`, 409)
+      if (t.to === 'order_confirmed') assertLotsAvailable(deal)
       if (action === 'sendQuote') {
         const timer = autoQuotes.get(dealId)
         if (timer) clearTimeout(timer)
@@ -292,6 +321,7 @@ export const dealService: DealService = {
     mockRequest(() => {
       const buyer = db.buyers.find((b) => b.id === buyerId)
       if (!buyer) throw new NotFoundError('Buyer')
+      if (isSameCompany(buyerId, input.producerId)) throw new ApiError('A company cannot request a quote from itself', 422)
       if (!input.items.length) throw new ApiError('A quote request needs at least one item', 422)
       const first = db.products.find((p) => p.id === input.items[0]?.productId)
       if (!first) throw new NotFoundError('Product')
@@ -347,9 +377,10 @@ export const dealService: DealService = {
   resolveDispute: (role, partyId, dealId, note) =>
     mockRequest(() => {
       const deal = findDeal(role, partyId, dealId)
+      if (role !== 'buyer') throw new ApiError('Only the buyer can mark a dispute as resolved', 403)
       if (deal.status !== 'disputed' || !deal.dispute) throw new ApiError('No open dispute', 409)
       deal.dispute = { ...deal.dispute, status: 'resolved', resolvedAt: liveNow().toISOString(), resolutionNote: note }
-      applyTransition(deal, 'completed', role, 'dispute_resolved')
+      applyTransition(deal, statusBeforeDispute(deal), role, 'dispute_resolved')
       return deal
     }),
   addReview: (buyerId, dealId, input) =>
@@ -368,7 +399,7 @@ export const dealService: DealService = {
         verifiedDeal: true,
         createdAt: liveNow().toISOString(),
         ratings: input.ratings,
-        overall: round1(values.reduce((a, b) => a + b, 0) / values.length),
+        overall: round1(avg(values)),
         text: input.text.trim(),
         contentLang: input.lang,
         photoCount: input.photoCount,
@@ -396,3 +427,5 @@ export const dealService: DealService = {
       { latencyFactor: 0.4 },
     ),
 }
+
+resumePendingQuotes()

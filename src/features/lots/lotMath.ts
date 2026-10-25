@@ -1,6 +1,7 @@
 import type { Lot, LotStatus, Product, UnitCode } from '@/types/models'
 import { convertQuantity } from '@/config/units'
 import { now } from '@/shared/lib/dates'
+import { round3 } from '@/shared/lib/math'
 
 export interface Measure {
   quantity: number
@@ -34,7 +35,7 @@ export function normalizedLotPrice(lot: Lot, unit: UnitCode): { amount: number; 
 }
 
 export function pricePerLotFor(lot: Pick<Lot, 'pricePerLot' | 'tiers'>, lots: number): number {
-  const tier = [...lot.tiers].reverse().find((t) => lots >= t.minLots)
+  const tier = lot.tiers.findLast((t) => lots >= t.minLots)
   return tier ? tier.pricePerLot : lot.pricePerLot
 }
 
@@ -69,7 +70,7 @@ export function clampLotQuantity(lot: Lot, qty: number): number {
   const { min, step } = lotQuantityRule(lot)
   const max = availableLots(lot)
   const snapped = Math.round(qty / step) * step
-  return Math.round(Math.min(max, Math.max(min, snapped)) * 1000) / 1000
+  return round3(Math.min(max, Math.max(min, snapped)))
 }
 
 /** The cheapest sellable lot by normalized price (falls back to lot price). */

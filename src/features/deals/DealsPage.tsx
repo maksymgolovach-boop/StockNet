@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Download, FilePlus2, SearchX } from 'lucide-react'
@@ -7,6 +7,7 @@ import { useFormat } from '@/features/i18n/useFormat'
 import { Button, ButtonLink } from '@/shared/ui/Button'
 import { EmptyState, ErrorState, LoadingRegion, Skeleton } from '@/shared/ui/states'
 import { liveNow } from '@/shared/lib/dates'
+import { usePageTitle } from '@/shared/hooks/usePageTitle'
 import { downloadText, toCsv } from './csv'
 import { parseDealFilters, serializeDealFilters, type DealFilters } from './dealFilters'
 import { DealsFilterBar } from './DealsFilterBar'
@@ -22,9 +23,7 @@ export function DealsPage() {
   const filters = useMemo(() => parseDealFilters(params), [params])
   const { all, rows, isPending, error, refetch } = useDealRows(filters)
 
-  useEffect(() => {
-    document.title = `${t('pages.deals')} · Stocknet`
-  }, [t])
+  usePageTitle(t('pages.deals'))
 
   const update = (patch: Partial<DealFilters>) => setParams(serializeDealFilters({ ...filters, ...patch }), { replace: true })
 

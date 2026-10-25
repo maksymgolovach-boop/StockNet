@@ -2,6 +2,7 @@ import type { CurrencyCode, Deal, DealDocument, DealEvent, DealLineItem, DealSta
 import { CURRENCIES } from '@/config/currencies'
 import { addDays, now } from '@/shared/lib/dates'
 import { createRng, type Rng } from '@/shared/lib/random'
+import { tierFor } from '@/features/product/pricing'
 import { BUYER_SEEDS } from './buyers'
 import { cityById } from './cities'
 import { PRODUCER_SEEDS } from './producers'
@@ -114,7 +115,7 @@ function lineItems(products: Product[], currency: CurrencyCode, maxEUR: number, 
     const moqEUR = convert(baseTier.unitPrice * product.moq, product.pricing.currency, 'EUR')
     const maxMultiple = Math.max(1, Math.min(9, Math.floor(maxEUR / n / moqEUR)))
     const quantity = product.moq * rng.int(1, maxMultiple)
-    const tier = [...product.pricing.tiers].reverse().find((t) => quantity >= t.minQty) ?? baseTier
+    const tier = tierFor(product.pricing.tiers, quantity) ?? baseTier
     const unitPrice = roundPrice(convert(tier.unitPrice, product.pricing.currency, currency))
     items.push({
       productId: product.id,

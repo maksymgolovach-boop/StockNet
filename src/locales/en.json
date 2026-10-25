@@ -782,7 +782,8 @@
     "showImage": "Show image {{index}}",
     "placeholderImages": "Placeholder images in this demo.",
     "stockPhotos": "Illustrative stock photos from Pexels and Unsplash. Actual goods may differ.",
-    "similar": "Similar products"
+    "similar": "Similar products",
+    "ownListing": "This is your listing. Buyers see the quote and contact buttons here."
   },
   "map": {
     "showMap": "Map",
@@ -1543,7 +1544,8 @@
       "lotMin": "Minimum {{min}}",
       "lotMax": "Only {{max}} available",
       "lotStep": "Use steps of {{step}} lot",
-      "lotWhole": "This lot is indivisible: whole lots only"
+      "lotWhole": "This lot is indivisible: whole lots only",
+      "ownProducer": "You can't request a quote from your own company."
     },
     "itemCount_one": "{{count}} item",
     "itemCount_other": "{{count}} items"

@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { CalendarClock, FilePlus2, PackageX, PauseCircle } from 'lucide-react'
@@ -16,6 +15,7 @@ import { useMyDeals } from '@/services/queries'
 import { daysFromNow } from '@/shared/lib/dates'
 import { ButtonLink } from '@/shared/ui/Button'
 import { ErrorState, LoadingRegion, Skeleton } from '@/shared/ui/states'
+import { usePageTitle } from '@/shared/hooks/usePageTitle'
 import { ConversationsWidget, DealRows, Empty, RecentSearchesWidget, SavedWidget, StatTiles, Widget } from './widgets'
 
 function RecoWidget() {
@@ -89,9 +89,7 @@ export function DashboardPage() {
   const saved = useSaved()
   const name = company.name
 
-  useEffect(() => {
-    document.title = `${t('pages.dashboard')} · Stocknet`
-  }, [t])
+  usePageTitle(t('pages.dashboard'))
 
   const list = [...(deals.data ?? [])].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
   const buyQuotes = list.filter((d) => d.buyerId === buyerId && OPEN_QUOTE_STATUSES.has(d.status))

@@ -1,7 +1,8 @@
 import { useParams, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Heart, MapPin, MessageSquare, Star } from 'lucide-react'
+import { Boxes, Heart, MapPin, MessageSquare, Star } from 'lucide-react'
 import { NotFoundPage } from '@/app/NotFoundPage'
+import { useIsOwnProducer } from '@/features/dev/devStore'
 import { useFormat } from '@/features/i18n/useFormat'
 import { ProductCard } from '@/features/product/ProductCard'
 import { useSaved } from '@/features/saved/savedStore'
@@ -62,6 +63,7 @@ export function ProducerPage() {
   const history = usePartnerHistory(id, 'buyer')
   const saved = useSaved((s) => s.producerIds.includes(id))
   const toggleSaved = useSaved((s) => s.toggleProducer)
+  const isOwn = useIsOwnProducer(id)
 
   if (producer.error instanceof NotFoundError) return <NotFoundPage />
   if (producer.isPending)
@@ -123,9 +125,15 @@ export function ProducerPage() {
         </div>
         <div className="flex flex-wrap items-center gap-2 md:flex-col md:items-end">
           <div className="flex gap-2">
-            <ButtonLink to={`/messages?producer=${p.id}`} icon={<MessageSquare className="size-4" aria-hidden />}>
-              {t('product.contactProducer')}
-            </ButtonLink>
+            {isOwn ? (
+              <ButtonLink to="/stock" variant="secondary" icon={<Boxes className="size-4" aria-hidden />}>
+                {t('nav.stock')}
+              </ButtonLink>
+            ) : (
+              <ButtonLink to={`/messages?producer=${p.id}`} icon={<MessageSquare className="size-4" aria-hidden />}>
+                {t('product.contactProducer')}
+              </ButtonLink>
+            )}
             <Button variant="secondary" onClick={() => toggleSaved(p.id)} aria-pressed={saved} aria-label={t(saved ? 'map.unsave' : 'map.save', { name: p.name })}>
               <Heart className={cn('size-4', saved && 'fill-primary text-primary')} aria-hidden />
             </Button>
