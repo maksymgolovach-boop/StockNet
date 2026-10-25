@@ -7,7 +7,13 @@ import { LOT_CONDITIONS, SALE_MODE_FILTERS } from '../filtersCodec'
 import type { SearchResponse } from '../types'
 import type { FiltersApi } from '../useFilters'
 
-export function LotFilters({ api, counts }: { api: FiltersApi; counts: SearchResponse['facets']['saleModes'] | undefined }) {
+export function LotFilters({
+  api,
+  counts,
+}: {
+  api: FiltersApi
+  counts: SearchResponse['facets']['saleModes'] | undefined
+}) {
   const { t } = useTranslation()
   const currency = useDisplayCurrency()
   const id = useId()
@@ -25,7 +31,10 @@ export function LotFilters({ api, counts }: { api: FiltersApi; counts: SearchRes
           onChange={(saleMode) => api.setFilters({ saleMode })}
           options={[
             { value: '', label: t('filters.any') },
-            ...SALE_MODE_FILTERS.map((m) => ({ value: m, label: counts ? `${t(`lots.saleModes.${m}`)} (${counts[m]})` : t(`lots.saleModes.${m}`) })),
+            ...SALE_MODE_FILTERS.map((m) => ({
+              value: m,
+              label: counts ? `${t(`lots.saleModes.${m}`)} (${counts[m]})` : t(`lots.saleModes.${m}`),
+            })),
           ]}
         />
       </div>
@@ -47,15 +56,27 @@ export function LotFilters({ api, counts }: { api: FiltersApi; counts: SearchRes
           onCommit={(lotSizeMin, lotSizeMax) => api.setFilters({ lotSizeMin, lotSizeMax })}
         />
       )}
-      <NumberField value={f.lotsAvailableMin} label={t('lots.filters.lotsAvailable')} suffix={t('lots.unit')} onCommit={(lotsAvailableMin) => api.setFilters({ lotsAvailableMin })} />
-      <Switch checked={f.indivisibleOnly} onChange={(indivisibleOnly) => api.setFilters({ indivisibleOnly })} label={t('lots.filters.indivisibleOnly')} hint={t('lots.filters.indivisibleHint')} />
+      <NumberField
+        value={f.lotsAvailableMin}
+        label={t('lots.filters.lotsAvailable')}
+        suffix={t('lots.unit')}
+        onCommit={(lotsAvailableMin) => api.setFilters({ lotsAvailableMin })}
+      />
+      <Switch
+        checked={f.indivisibleOnly}
+        onChange={(indivisibleOnly) => api.setFilters({ indivisibleOnly })}
+        label={t('lots.filters.indivisibleOnly')}
+        hint={t('lots.filters.indivisibleHint')}
+      />
       <fieldset className="flex flex-col gap-0.5">
         <legend className="mb-1 text-xs text-ink-muted">{t('lots.filters.condition')}</legend>
         {LOT_CONDITIONS.map((c) => (
           <Checkbox
             key={c}
             checked={f.lotConditions.includes(c)}
-            onChange={(on) => api.setFilters({ lotConditions: on ? [...f.lotConditions, c] : f.lotConditions.filter((x) => x !== c) })}
+            onChange={(on) =>
+              api.setFilters({ lotConditions: on ? [...f.lotConditions, c] : f.lotConditions.filter((x) => x !== c) })
+            }
             label={t(`lots.conditions.${c}`)}
           />
         ))}
@@ -65,11 +86,25 @@ export function LotFilters({ api, counts }: { api: FiltersApi; counts: SearchRes
         <div className="flex gap-2">
           <label htmlFor={`${id}-from`} className="flex min-w-0 flex-1 flex-col gap-1 text-xs text-ink-muted">
             {t('lots.filters.from')}
-            <input id={`${id}-from`} type="date" value={f.producedFrom ?? ''} max={f.producedTo} onChange={(e) => api.setFilters({ producedFrom: e.target.value || undefined })} className={dateInput} />
+            <input
+              id={`${id}-from`}
+              type="date"
+              value={f.producedFrom ?? ''}
+              max={f.producedTo}
+              onChange={(e) => api.setFilters({ producedFrom: e.target.value || undefined })}
+              className={dateInput}
+            />
           </label>
           <label htmlFor={`${id}-to`} className="flex min-w-0 flex-1 flex-col gap-1 text-xs text-ink-muted">
             {t('lots.filters.to')}
-            <input id={`${id}-to`} type="date" value={f.producedTo ?? ''} min={f.producedFrom} onChange={(e) => api.setFilters({ producedTo: e.target.value || undefined })} className={dateInput} />
+            <input
+              id={`${id}-to`}
+              type="date"
+              value={f.producedTo ?? ''}
+              min={f.producedFrom}
+              onChange={(e) => api.setFilters({ producedTo: e.target.value || undefined })}
+              className={dateInput}
+            />
           </label>
         </div>
       </fieldset>

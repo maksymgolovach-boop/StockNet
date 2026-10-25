@@ -40,7 +40,8 @@ function reportMissingTranslations() {
     if (code === DEFAULT_LANGUAGE) continue
     const keys = new Set(flatten(LANGUAGES[code].resources).map(strip))
     const missing = [...base].filter((k) => !keys.has(k))
-    if (missing.length) console.warn(`[i18n] ${code} is missing ${missing.length} keys (English fallback used):`, missing)
+    if (missing.length)
+      console.warn(`[i18n] ${code} is missing ${missing.length} keys (English fallback used):`, missing)
   }
 }
 

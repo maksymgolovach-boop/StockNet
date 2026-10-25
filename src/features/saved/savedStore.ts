@@ -20,6 +20,11 @@ export const useSaved = create<SavedState>()(
       toggleProduct: (id) => set((s) => ({ productIds: toggle(s.productIds, id) })),
       toggleProducer: (id) => set((s) => ({ producerIds: toggle(s.producerIds, id) })),
     }),
-    { name: 'sy-saved', version: 2, storage: createJSONStorage(() => safeStorage), migrate: () => ({ productIds: ['pr-139', 'pr-157'], producerIds: ['p28', 'p27'] }) as SavedState },
+    {
+      name: 'sy-saved',
+      version: 2,
+      storage: createJSONStorage(() => safeStorage),
+      migrate: () => ({ productIds: ['pr-139', 'pr-157'], producerIds: ['p28', 'p27'] }) as SavedState,
+    },
   ),
 )

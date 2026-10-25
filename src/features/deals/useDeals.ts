@@ -8,8 +8,16 @@ export function useDeal(dealId: string) {
   const { buyerId, producerId } = useCompanyIds()
   const results = useQueries({
     queries: [
-      { queryKey: ['deal', 'buyer', buyerId, dealId], queryFn: () => dealService.deal('buyer', buyerId, dealId), enabled: !!dealId },
-      { queryKey: ['deal', 'producer', producerId, dealId], queryFn: () => dealService.deal('producer', producerId, dealId), enabled: !!dealId },
+      {
+        queryKey: ['deal', 'buyer', buyerId, dealId],
+        queryFn: () => dealService.deal('buyer', buyerId, dealId),
+        enabled: !!dealId,
+      },
+      {
+        queryKey: ['deal', 'producer', producerId, dealId],
+        queryFn: () => dealService.deal('producer', producerId, dealId),
+        enabled: !!dealId,
+      },
     ],
   })
   const index = results.findIndex((r) => r.data)
@@ -26,7 +34,10 @@ export function usePartnerships() {
   const results = useQueries({
     queries: [
       { queryKey: ['partnerships', 'buyer', buyerId], queryFn: () => dealService.partnerships('buyer', buyerId) },
-      { queryKey: ['partnerships', 'producer', producerId], queryFn: () => dealService.partnerships('producer', producerId) },
+      {
+        queryKey: ['partnerships', 'producer', producerId],
+        queryFn: () => dealService.partnerships('producer', producerId),
+      },
     ],
   })
   const merged = new Map<string, Partnership>()
@@ -47,26 +58,55 @@ export function useDealMutations() {
   const qc = useQueryClient()
   const actorFor = (side: PartyRole) => (side === 'buyer' ? buyerId : producerId)
   const onSuccess = () => {
-    for (const key of ['deal', 'deals', 'partnerships', 'threads', 'messages', 'producerLots', 'products', 'search', 'reviews', 'producers']) void qc.invalidateQueries({ queryKey: [key] })
+    for (const key of [
+      'deal',
+      'deals',
+      'partnerships',
+      'threads',
+      'messages',
+      'producerLots',
+      'products',
+      'search',
+      'reviews',
+      'producers',
+    ])
+      void qc.invalidateQueries({ queryKey: [key] })
   }
   return {
     transition: useMutation({
-      mutationFn: ({ dealId, action, side }: { dealId: string; action: DealActionId; side: PartyRole }) => dealService.transition(side, actorFor(side), dealId, action),
+      mutationFn: ({ dealId, action, side }: { dealId: string; action: DealActionId; side: PartyRole }) =>
+        dealService.transition(side, actorFor(side), dealId, action),
       onSuccess,
     }),
-    createQuote: useMutation({ mutationFn: (input: QuoteRequestInput) => dealService.createQuoteRequest(buyerId, input), onSuccess }),
+    createQuote: useMutation({
+      mutationFn: (input: QuoteRequestInput) => dealService.createQuoteRequest(buyerId, input),
+      onSuccess,
+    }),
     openDispute: useMutation({
-      mutationFn: ({ dealId, input, side }: { dealId: string; input: DisputeInput; side: PartyRole }) => dealService.openDispute(side, actorFor(side), dealId, input),
+      mutationFn: ({ dealId, input, side }: { dealId: string; input: DisputeInput; side: PartyRole }) =>
+        dealService.openDispute(side, actorFor(side), dealId, input),
       onSuccess,
     }),
     resolveDispute: useMutation({
-      mutationFn: ({ dealId, note, side }: { dealId: string; note: string; side: PartyRole }) => dealService.resolveDispute(side, actorFor(side), dealId, note),
+      mutationFn: ({ dealId, note, side }: { dealId: string; note: string; side: PartyRole }) =>
+        dealService.resolveDispute(side, actorFor(side), dealId, note),
       onSuccess,
     }),
-    addReview: useMutation({ mutationFn: ({ dealId, input }: { dealId: string; input: ReviewInput }) => dealService.addReview(buyerId, dealId, input), onSuccess }),
+    addReview: useMutation({
+      mutationFn: ({ dealId, input }: { dealId: string; input: ReviewInput }) =>
+        dealService.addReview(buyerId, dealId, input),
+      onSuccess,
+    }),
     setMeta: useMutation({
-      mutationFn: ({ counterpartyId, patch, side }: { counterpartyId: string; patch: Partial<Pick<PartnershipMeta, 'favorite' | 'tag' | 'privateNotes'>>; side: PartyRole }) =>
-        dealService.setPartnerMeta(actorFor(side), counterpartyId, patch),
+      mutationFn: ({
+        counterpartyId,
+        patch,
+        side,
+      }: {
+        counterpartyId: string
+        patch: Partial<Pick<PartnershipMeta, 'favorite' | 'tag' | 'privateNotes'>>
+        side: PartyRole
+      }) => dealService.setPartnerMeta(actorFor(side), counterpartyId, patch),
       onSuccess: () => void qc.invalidateQueries({ queryKey: ['partnerships'] }),
     }),
   }

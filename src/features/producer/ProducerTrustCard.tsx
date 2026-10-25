@@ -15,7 +15,10 @@ export function ProducerTrustCard({ producer }: { producer: Producer }) {
   const me = usePreferences((s) => s.location.point)
   const distance = Math.round(distanceKm(me, producer.location))
   return (
-    <section aria-label={t('product.soldBy')} className="flex flex-col gap-3 rounded-[var(--radius-card)] border border-line bg-surface p-4">
+    <section
+      aria-label={t('product.soldBy')}
+      className="flex flex-col gap-3 rounded-[var(--radius-card)] border border-line bg-surface p-4"
+    >
       <p className="text-xs font-semibold tracking-wide text-ink-subtle uppercase">{t('product.soldBy')}</p>
       <div className="flex items-start gap-3">
         <ProducerAvatar producer={producer} />
@@ -38,7 +41,11 @@ export function ProducerTrustCard({ producer }: { producer: Producer }) {
         {producer.reviewCount > 0 && (
           <li className="flex items-center gap-2">
             <Star className="size-4 shrink-0 fill-accent text-accent" aria-hidden />
-            {t('product.rating', { rating: fmt.number(producer.rating, { minimumFractionDigits: 1, maximumFractionDigits: 1 }), count: producer.reviewCount })} · {t('common.reviews', { count: producer.reviewCount })}
+            {t('product.rating', {
+              rating: fmt.number(producer.rating, { minimumFractionDigits: 1, maximumFractionDigits: 1 }),
+              count: producer.reviewCount,
+            })}{' '}
+            · {t('common.reviews', { count: producer.reviewCount })}
           </li>
         )}
         <li className="flex items-center gap-2">
@@ -46,7 +53,10 @@ export function ProducerTrustCard({ producer }: { producer: Producer }) {
           {t('producer.responds', { hours: Math.round(producer.trustInputs.avgResponseHours) })}
         </li>
       </ul>
-      <Link to={`/producer/${producer.id}`} className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline">
+      <Link
+        to={`/producer/${producer.id}`}
+        className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+      >
         {t('producer.viewProfile')}
         <ArrowRight className="size-3.5 rtl:rotate-180" aria-hidden />
       </Link>

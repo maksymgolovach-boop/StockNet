@@ -62,44 +62,57 @@ export function lotFormSchema(policy: LotPolicy | undefined, opts: { reserved: n
       status: z.enum(['active', 'paused', 'archived']),
     })
     .superRefine((v, ctx) => {
-      const issue = (path: string, message: string) => ctx.addIssue({ code: 'custom', path: path.split('.'), message: `${E}${message}` })
+      const issue = (path: string, message: string) =>
+        ctx.addIssue({ code: 'custom', path: path.split('.'), message: `${E}${message}` })
       if (!policy?.allowedSaleModes.includes('lot')) issue('productId', 'lotsNotAllowed')
       else if (!policy.lotTypes.includes(v.type as LotType)) issue('type', 'required')
       if (policy?.requiresBatch && v.lotNumber.trim().length < 3) issue('lotNumber', 'batchRequired')
-      if (v.lotNumber && !/^[\p{L}\p{N}][\p{L}\p{N}\-/._]*$/u.test(v.lotNumber.trim())) issue('lotNumber', 'lotNumberFormat')
+      if (v.lotNumber && !/^[\p{L}\p{N}][\p{L}\p{N}\-/._]*$/u.test(v.lotNumber.trim()))
+        issue('lotNumber', 'lotNumberFormat')
       if (!isNum(v.contentQty) || num(v.contentQty) <= 0) issue('contentQty', 'positive')
       if (v.itemQty.trim() !== '' && (!isNum(v.itemQty) || num(v.itemQty) <= 0)) issue('itemQty', 'positive')
       if (v.itemQty.trim() !== '' && !v.itemUnit) issue('itemUnit', 'required')
-      for (const k of ['weightKg', 'volumeM3'] as const) if (v[k].trim() !== '' && (!isNum(v[k]) || num(v[k]) <= 0)) issue(k, 'positive')
+      for (const k of ['weightKg', 'volumeM3'] as const)
+        if (v[k].trim() !== '' && (!isNum(v[k]) || num(v[k]) <= 0)) issue(k, 'positive')
       if (!isNum(v.pricePerLot) || num(v.pricePerLot) <= 0) issue('pricePerLot', 'positive')
       let prevMin = 1
       let prevPrice = isNum(v.pricePerLot) ? num(v.pricePerLot) : Infinity
       v.tiers.forEach((tier, i) => {
-        if (!isNum(tier.minLots) || !Number.isInteger(num(tier.minLots)) || num(tier.minLots) <= prevMin) issue(`tiers.${i}.minLots`, 'tierOrder')
+        if (!isNum(tier.minLots) || !Number.isInteger(num(tier.minLots)) || num(tier.minLots) <= prevMin)
+          issue(`tiers.${i}.minLots`, 'tierOrder')
         else prevMin = num(tier.minLots)
         if (!isNum(tier.price) || num(tier.price) <= 0) issue(`tiers.${i}.price`, 'positive')
         else if (num(tier.price) > prevPrice) issue(`tiers.${i}.price`, 'tierPrice')
         else prevPrice = num(tier.price)
       })
-      if (!isNum(v.stockCount) || !Number.isInteger(num(v.stockCount)) || num(v.stockCount) < 0) issue('stockCount', 'wholeNumber')
+      if (!isNum(v.stockCount) || !Number.isInteger(num(v.stockCount)) || num(v.stockCount) < 0)
+        issue('stockCount', 'wholeNumber')
       else if (num(v.stockCount) < opts.reserved) issue('stockCount', 'belowReserved')
       if (v.divisible) {
         const step = num(v.step)
         const min = num(v.minSplit)
         if (!isNum(v.step) || step <= 0 || step > 1) issue('step', 'step')
-        if (!isNum(v.minSplit) || min < step || Math.abs(min / step - Math.round(min / step)) > 1e-9) issue('minSplit', 'minSplit')
-      } else if (!isNum(v.moqLots) || !Number.isInteger(num(v.moqLots)) || num(v.moqLots) < 1) issue('moqLots', 'wholeNumber')
+        if (!isNum(v.minSplit) || min < step || Math.abs(min / step - Math.round(min / step)) > 1e-9)
+          issue('minSplit', 'minSplit')
+      } else if (!isNum(v.moqLots) || !Number.isInteger(num(v.moqLots)) || num(v.moqLots) < 1)
+        issue('moqLots', 'wholeNumber')
       if (v.productionDate && Number.isNaN(Date.parse(v.productionDate))) issue('productionDate', 'date')
       if (policy?.requiresExpiry && !v.expiryDate) issue('expiryDate', 'expiryRequired')
-      if (v.expiryDate && v.productionDate && v.expiryDate <= v.productionDate) issue('expiryDate', 'expiryAfterProduction')
-      if (policy?.requiresCertificate && !v.certificateFile && !opts.hasCertificate) issue('certificateFile', 'certificateRequired')
+      if (v.expiryDate && v.productionDate && v.expiryDate <= v.productionDate)
+        issue('expiryDate', 'expiryAfterProduction')
+      if (policy?.requiresCertificate && !v.certificateFile && !opts.hasCertificate)
+        issue('certificateFile', 'certificateRequired')
     })
 }
 
 const day = (iso?: string) => (iso ? iso.slice(0, 10) : '')
 const opt = (s: string) => (s.trim() === '' ? undefined : num(s))
 
-export function toFormValues(lot: Lot | undefined, product: Product | undefined, defaults: { cityId: string; warehouseLabel: string; lotNumber: string; type: string; unit: UnitCode }): LotFormValues {
+export function toFormValues(
+  lot: Lot | undefined,
+  product: Product | undefined,
+  defaults: { cityId: string; warehouseLabel: string; lotNumber: string; type: string; unit: UnitCode },
+): LotFormValues {
   if (!lot)
     return {
       productId: product?.id ?? '',
@@ -159,16 +172,25 @@ export function toLotInput(v: LotFormValues): LotInput {
   const price = num(v.pricePerLot)
   const tiers = v.tiers.map((t) => ({ minLots: num(t.minLots), pricePerLot: num(t.price) }))
   const allTiers = tiers.length ? [{ minLots: 1, pricePerLot: price }, ...tiers] : []
-  const divisibility = v.divisible ? { kind: 'divisible' as const, step: num(v.step), minSplit: num(v.minSplit) } : { kind: 'indivisible' as const }
+  const divisibility = v.divisible
+    ? { kind: 'divisible' as const, step: num(v.step), minSplit: num(v.minSplit) }
+    : { kind: 'indivisible' as const }
   return {
     productId: v.productId,
     lotNumber: v.lotNumber.trim(),
     type: v.type as LotType,
-    content: { quantity: num(v.contentQty), unit: v.contentUnit as UnitCode, itemSize: v.itemQty.trim() ? { quantity: num(v.itemQty), unit: v.itemUnit as UnitCode } : undefined },
+    content: {
+      quantity: num(v.contentQty),
+      unit: v.contentUnit as UnitCode,
+      itemSize: v.itemQty.trim() ? { quantity: num(v.itemQty), unit: v.itemUnit as UnitCode } : undefined,
+    },
     totalWeightKg: opt(v.weightKg),
     totalVolumeM3: opt(v.volumeM3),
     pricePerLot: price,
-    tiers: allTiers.map((t, i) => ({ ...t, maxLots: allTiers[i + 1] ? (allTiers[i + 1] as { minLots: number }).minLots - 1 : undefined })),
+    tiers: allTiers.map((t, i) => ({
+      ...t,
+      maxLots: allTiers[i + 1] ? (allTiers[i + 1] as { minLots: number }).minLots - 1 : undefined,
+    })),
     stockCount: num(v.stockCount),
     moqLots: divisibility.kind === 'divisible' ? divisibility.minSplit : num(v.moqLots),
     divisibility,

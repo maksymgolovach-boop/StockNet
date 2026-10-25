@@ -72,15 +72,22 @@ export function ProductPage() {
   const lots = p.saleModes.includes('lot') ? sellableLots(p) : []
   const selectedLot = lots.find((l) => l.id === params.get('lot')) ?? bestLot(p)
   const hasMeasure = p.saleModes.includes('measure')
-  const mode: 'measure' | 'lot' = !hasMeasure ? 'lot' : !lots.length ? 'measure' : (modeChoice ?? (params.get('lot') ? 'lot' : 'measure'))
+  const mode: 'measure' | 'lot' = !hasMeasure
+    ? 'lot'
+    : !lots.length
+      ? 'measure'
+      : (modeChoice ?? (params.get('lot') ? 'lot' : 'measure'))
   const shownExpiry = mode === 'lot' && selectedLot?.expiryDate ? selectedLot.expiryDate : p.expiryDate
   const selectLot = (id: string) => {
     setModeChoice('lot')
-    setParams((prev) => {
-      const next = new URLSearchParams(prev)
-      next.set('lot', id)
-      return next
-    }, { replace: true, preventScrollReset: true })
+    setParams(
+      (prev) => {
+        const next = new URLSearchParams(prev)
+        next.set('lot', id)
+        return next
+      },
+      { replace: true, preventScrollReset: true },
+    )
   }
   const productReviews = (reviews.data ?? []).filter((r) => r.productIds.includes(p.id))
   const translations = Object.fromEntries(Object.entries(p.mockTranslations).map(([k, v]) => [k, v?.description ?? '']))
@@ -92,9 +99,19 @@ export function ProductPage() {
   return (
     <div className="mx-auto flex max-w-[90rem] flex-col gap-8 px-4 py-6 lg:px-6">
       <div className="flex flex-col gap-3">
-        <Breadcrumbs items={[{ label: t('nav.home'), to: '/' }, ...cat.path.map((c) => ({ label: c.name, to: `/category/${c.slug}` })), { label: p.name }]} />
+        <Breadcrumbs
+          items={[
+            { label: t('nav.home'), to: '/' },
+            ...cat.path.map((c) => ({ label: c.name, to: `/category/${c.slug}` })),
+            { label: p.name },
+          ]}
+        />
         <div className="flex flex-wrap items-center gap-2">
-          {p.clearance && <Badge tone="accent">{t(`product.clearance.${p.clearance.reason}`, { pct: p.clearance.discountPct })}</Badge>}
+          {p.clearance && (
+            <Badge tone="accent">
+              {t(`product.clearance.${p.clearance.reason}`, { pct: p.clearance.discountPct })}
+            </Badge>
+          )}
           {p.expiryDate ? <ExpiryBadge expiryDate={p.expiryDate} /> : <AvailabilityBadge product={p} />}
           {lots.length > 0 && <LotBadge />}
         </div>
@@ -116,18 +133,32 @@ export function ProductPage() {
                   <span className="text-base font-normal text-ink-muted">({lots.length})</span>
                 </h2>
                 {isOwner && (
-                  <ButtonLink to={`/stock?new=${p.id}`} variant="secondary" size="sm" icon={<Plus className="size-4" aria-hidden />}>
+                  <ButtonLink
+                    to={`/stock?new=${p.id}`}
+                    variant="secondary"
+                    size="sm"
+                    icon={<Plus className="size-4" aria-hidden />}
+                  >
                     {t('lots.addLot')}
                   </ButtonLink>
                 )}
               </div>
               {lots.length > 0 ? (
                 <>
-                  <p className="text-sm text-ink-muted">{t(hasMeasure ? 'lots.sectionBodyBoth' : 'lots.sectionBodyLotOnly')}</p>
-                  <LotTable product={p} lots={lots} selectedId={mode === 'lot' ? selectedLot?.id : undefined} onSelect={selectLot} />
+                  <p className="text-sm text-ink-muted">
+                    {t(hasMeasure ? 'lots.sectionBodyBoth' : 'lots.sectionBodyLotOnly')}
+                  </p>
+                  <LotTable
+                    product={p}
+                    lots={lots}
+                    selectedId={mode === 'lot' ? selectedLot?.id : undefined}
+                    onSelect={selectLot}
+                  />
                 </>
               ) : (
-                <p className="rounded-[var(--radius-card)] border border-dashed border-line-strong p-4 text-sm text-ink-muted">{t(p.saleModes.includes('lot') ? 'lots.noneAvailableBody' : 'lots.noLotsYet')}</p>
+                <p className="rounded-[var(--radius-card)] border border-dashed border-line-strong p-4 text-sm text-ink-muted">
+                  {t(p.saleModes.includes('lot') ? 'lots.noneAvailableBody' : 'lots.noLotsYet')}
+                </p>
               )}
             </section>
           )}
@@ -135,7 +166,12 @@ export function ProductPage() {
             <h2 id="desc-title" className="text-xl font-semibold">
               {t('product.description')}
             </h2>
-            <TranslatableText text={p.description} lang={p.contentLang} translations={translations} className="leading-relaxed" />
+            <TranslatableText
+              text={p.description}
+              lang={p.contentLang}
+              translations={translations}
+              className="leading-relaxed"
+            />
           </section>
           <SpecTable product={p} />
           {p.certifications.length > 0 && (
@@ -158,9 +194,16 @@ export function ProductPage() {
         </div>
 
         <aside className="flex flex-col gap-4 lg:sticky lg:top-[calc(var(--header-h,8rem)+1rem)] lg:self-start">
-          <section aria-label={t('product.purchase')} className="flex flex-col gap-4 rounded-[var(--radius-card)] border-2 border-ink bg-surface p-5">
+          <section
+            aria-label={t('product.purchase')}
+            className="flex flex-col gap-4 rounded-[var(--radius-card)] border-2 border-ink bg-surface p-5"
+          >
             {hasMeasure && lots.length > 0 && (
-              <div role="radiogroup" aria-label={t('lots.filters.saleMode')} className="grid grid-cols-2 gap-1 rounded-[var(--radius-control)] bg-surface-2 p-1 text-sm">
+              <div
+                role="radiogroup"
+                aria-label={t('lots.filters.saleMode')}
+                className="grid grid-cols-2 gap-1 rounded-[var(--radius-control)] bg-surface-2 p-1 text-sm"
+              >
                 {(['measure', 'lot'] as const).map((m) => (
                   <button
                     key={m}
@@ -168,7 +211,10 @@ export function ProductPage() {
                     role="radio"
                     aria-checked={mode === m}
                     onClick={() => setModeChoice(m)}
-                    className={cn('h-9 rounded-[calc(var(--radius-control)-2px)] font-medium', mode === m ? 'bg-ink text-bg' : 'text-ink-muted hover:text-ink')}
+                    className={cn(
+                      'h-9 rounded-[calc(var(--radius-control)-2px)] font-medium',
+                      mode === m ? 'bg-ink text-bg' : 'text-ink-muted hover:text-ink',
+                    )}
                   >
                     {t(`lots.buyBy.${m}`)}
                   </button>
@@ -193,7 +239,9 @@ export function ProductPage() {
                   {p.availability.availableFrom && (
                     <p className="flex items-center gap-2">
                       <CalendarClock className="size-4 shrink-0 text-ink-muted" aria-hidden />
-                      {t('availability.availableFrom', { date: fmt.date(p.availability.availableFrom, { dateStyle: 'long' }) })}
+                      {t('availability.availableFrom', {
+                        date: fmt.date(p.availability.availableFrom, { dateStyle: 'long' }),
+                      })}
                     </p>
                   )}
                 </>
@@ -207,7 +255,11 @@ export function ProductPage() {
             </div>
             <ProductActions product={p} showQuote={mode === 'measure'} />
           </section>
-          {producer.data ? <ProducerTrustCard producer={producer.data} /> : producer.isPending ? <Skeleton className="h-64" /> : null}
+          {producer.data ? (
+            <ProducerTrustCard producer={producer.data} />
+          ) : producer.isPending ? (
+            <Skeleton className="h-64" />
+          ) : null}
         </aside>
       </div>
 
@@ -218,7 +270,11 @@ export function ProductPage() {
         {reviews.isPending ? (
           <Skeleton className="h-40" />
         ) : (
-          <ReviewsSection reviews={productReviews} producerName={producer.data?.name ?? ''} emptyBody={t('reviews.noneForProduct')} />
+          <ReviewsSection
+            reviews={productReviews}
+            producerName={producer.data?.name ?? ''}
+            emptyBody={t('reviews.noneForProduct')}
+          />
         )}
       </section>
       <SimilarProducts product={p} />

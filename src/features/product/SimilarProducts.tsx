@@ -9,7 +9,12 @@ import { ProductCard } from './ProductCard'
 export function SimilarProducts({ product }: { product: Product }) {
   const { t } = useTranslation()
   const parent = getCategory(product.categorySlug)?.parentSlug ?? product.categorySlug
-  const { data, isPending, error, refetch } = useSearchResults({ filters: { ...emptyFilters(), category: parent }, sort: 'relevance', limit: 4, excludeProductId: product.id })
+  const { data, isPending, error, refetch } = useSearchResults({
+    filters: { ...emptyFilters(), category: parent },
+    sort: 'relevance',
+    limit: 4,
+    excludeProductId: product.id,
+  })
   if (!isPending && !error && !data?.items.length) return null
   return (
     <section aria-labelledby="similar-title" className="flex flex-col gap-3">

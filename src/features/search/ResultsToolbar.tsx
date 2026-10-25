@@ -17,15 +17,28 @@ interface ResultsToolbarProps {
   compact?: boolean
 }
 
-export function ResultsToolbar({ api, total, fetching, onOpenFilters, filtersButton = 'mobile', compact = false }: ResultsToolbarProps) {
+export function ResultsToolbar({
+  api,
+  total,
+  fetching,
+  onOpenFilters,
+  filtersButton = 'mobile',
+  compact = false,
+}: ResultsToolbarProps) {
   const { t } = useTranslation()
   const perishableOrAny = !api.filters.category || getCategoryConfig(api.filters.category)?.perishable
   const sorts = SORT_OPTIONS.filter((s) => s !== 'expiry' || perishableOrAny)
   const count = activeFilterCount(api.filters)
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <p className={cn('me-auto text-sm text-ink-muted transition-opacity', fetching && 'opacity-60')} role="status" aria-live="polite">
-        {total === undefined ? t('common.loading') : t(api.map.bounds ? 'map.inArea' : 'search.resultCount', { count: total })}
+      <p
+        className={cn('me-auto text-sm text-ink-muted transition-opacity', fetching && 'opacity-60')}
+        role="status"
+        aria-live="polite"
+      >
+        {total === undefined
+          ? t('common.loading')
+          : t(api.map.bounds ? 'map.inArea' : 'search.resultCount', { count: total })}
       </p>
       <button
         type="button"
@@ -38,7 +51,9 @@ export function ResultsToolbar({ api, total, fetching, onOpenFilters, filtersBut
       >
         <SlidersHorizontal className="size-4" aria-hidden />
         {t('filters.title')}
-        {count > 0 && <span className="rounded-full bg-primary px-1.5 text-[0.6875rem] text-on-primary tabular">{count}</span>}
+        {count > 0 && (
+          <span className="tabular rounded-full bg-primary px-1.5 text-[0.6875rem] text-on-primary">{count}</span>
+        )}
       </button>
       <Select
         label={t('search.sortBy')}
@@ -46,9 +61,16 @@ export function ResultsToolbar({ api, total, fetching, onOpenFilters, filtersBut
         compact
         value={api.sort}
         onChange={(e) => api.setSort(e.target.value as SortOption)}
-        options={sorts.map((s) => ({ value: s, label: compact ? t(`search.sort.${s}`) : `${t('search.sortBy')}: ${t(`search.sort.${s}`)}` }))}
+        options={sorts.map((s) => ({
+          value: s,
+          label: compact ? t(`search.sort.${s}`) : `${t('search.sortBy')}: ${t(`search.sort.${s}`)}`,
+        }))}
       />
-      <div role="radiogroup" aria-label={t('search.view')} className="flex rounded-[var(--radius-control)] border border-line-strong bg-surface p-0.5">
+      <div
+        role="radiogroup"
+        aria-label={t('search.view')}
+        className="flex rounded-[var(--radius-control)] border border-line-strong bg-surface p-0.5"
+      >
         {(['list', 'grid', 'map'] as const).map((v) => {
           const Icon = v === 'list' ? List : v === 'grid' ? LayoutGrid : MapIcon
           return (
@@ -60,7 +82,10 @@ export function ResultsToolbar({ api, total, fetching, onOpenFilters, filtersBut
               aria-label={t(`search.views.${v}`)}
               title={t(`search.views.${v}`)}
               onClick={() => api.setView(v)}
-              className={cn('grid size-7 place-items-center rounded', api.view === v ? 'bg-ink text-bg' : 'text-ink-muted hover:bg-surface-2')}
+              className={cn(
+                'grid size-7 place-items-center rounded',
+                api.view === v ? 'bg-ink text-bg' : 'text-ink-muted hover:bg-surface-2',
+              )}
             >
               <Icon className="size-4" aria-hidden />
             </button>

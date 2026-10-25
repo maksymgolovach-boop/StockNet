@@ -6,7 +6,17 @@ import { useMapUi } from './mapUiStore'
  * Wraps a result so hovering/focusing it highlights its map pin, and a pin selected on the
  * map scrolls the first matching result into view.
  */
-export function MapSyncItem({ producerId, first, children, className }: { producerId: string; first: boolean; children: ReactNode; className?: string }) {
+export function MapSyncItem({
+  producerId,
+  first,
+  children,
+  className,
+}: {
+  producerId: string
+  first: boolean
+  children: ReactNode
+  className?: string
+}) {
   const ref = useRef<HTMLDivElement>(null)
   const selectedFromMap = useMapUi((s) => s.selectedProducerId === producerId && s.selectionSource === 'map')
   const setHovered = useMapUi((s) => s.setHovered)

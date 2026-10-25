@@ -7,19 +7,39 @@ import { cn } from '@/shared/lib/cn'
 const ICON = { image: FileImage, pdf: FileText, drawing: PencilRuler, spreadsheet: FileSpreadsheet }
 
 function formatSize(kb: number, fmt: ReturnType<typeof useFormat>) {
-  return kb >= 1024 ? `${fmt.number(kb / 1024, { maximumFractionDigits: 1 })} MB` : `${fmt.number(Math.max(1, Math.round(kb)))} KB`
+  return kb >= 1024
+    ? `${fmt.number(kb / 1024, { maximumFractionDigits: 1 })} MB`
+    : `${fmt.number(Math.max(1, Math.round(kb)))} KB`
 }
 
-export function AttachmentChip({ attachment, onRemove, tone = 'light' }: { attachment: Omit<Attachment, 'id'>; onRemove?: () => void; tone?: 'light' | 'dark' }) {
+export function AttachmentChip({
+  attachment,
+  onRemove,
+  tone = 'light',
+}: {
+  attachment: Omit<Attachment, 'id'>
+  onRemove?: () => void
+  tone?: 'light' | 'dark'
+}) {
   const { t } = useTranslation()
   const fmt = useFormat()
   const Icon = ICON[attachment.kind]
   return (
-    <div className={cn('flex max-w-full min-w-0 items-center gap-2 rounded-lg border p-1.5 pe-2 text-start', tone === 'dark' ? 'border-white/25 bg-white/10' : 'border-line bg-surface')}>
+    <div
+      className={cn(
+        'flex max-w-full min-w-0 items-center gap-2 rounded-lg border p-1.5 pe-2 text-start',
+        tone === 'dark' ? 'border-white/25 bg-white/10' : 'border-line bg-surface',
+      )}
+    >
       {attachment.kind === 'image' && attachment.previewUrl ? (
         <img src={attachment.previewUrl} alt="" className="size-10 shrink-0 rounded object-cover" />
       ) : (
-        <span className={cn('grid size-10 shrink-0 place-items-center rounded', tone === 'dark' ? 'bg-white/15' : 'bg-surface-2 text-ink-muted')}>
+        <span
+          className={cn(
+            'grid size-10 shrink-0 place-items-center rounded',
+            tone === 'dark' ? 'bg-white/15' : 'bg-surface-2 text-ink-muted',
+          )}
+        >
           <Icon className="size-5" aria-hidden />
         </span>
       )}
@@ -30,7 +50,12 @@ export function AttachmentChip({ attachment, onRemove, tone = 'light' }: { attac
         </span>
       </span>
       {onRemove ? (
-        <button type="button" onClick={onRemove} aria-label={t('chat.removeAttachment', { name: attachment.fileName })} className="grid size-7 shrink-0 place-items-center rounded hover:bg-surface-2">
+        <button
+          type="button"
+          onClick={onRemove}
+          aria-label={t('chat.removeAttachment', { name: attachment.fileName })}
+          className="grid size-7 shrink-0 place-items-center rounded hover:bg-surface-2"
+        >
           <X className="size-4" aria-hidden />
         </button>
       ) : (

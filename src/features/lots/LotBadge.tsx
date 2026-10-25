@@ -3,7 +3,13 @@ import { Boxes } from 'lucide-react'
 import type { LotCondition } from '@/types/models'
 import { Badge, type BadgeTone } from '@/shared/ui/Badge'
 
-const CONDITION_TONE: Record<LotCondition, BadgeTone> = { new: 'neutral', surplus: 'accent', clearance: 'accent', b_grade: 'expiring', returned: 'expiring' }
+const CONDITION_TONE: Record<LotCondition, BadgeTone> = {
+  new: 'neutral',
+  surplus: 'accent',
+  clearance: 'accent',
+  b_grade: 'expiring',
+  returned: 'expiring',
+}
 
 export function LotBadge() {
   const { t } = useTranslation()

@@ -14,16 +14,32 @@ import { useSearchHistory } from '@/features/search/searchHistoryStore'
 import { useMyThreads, useProducers, useProducts } from '@/services/queries'
 import { Skeleton } from '@/shared/ui/states'
 
-export function Widget({ title, action, children, className = '' }: { title: string; action?: { to: string; label: string }; children: ReactNode; className?: string }) {
+export function Widget({
+  title,
+  action,
+  children,
+  className = '',
+}: {
+  title: string
+  action?: { to: string; label: string }
+  children: ReactNode
+  className?: string
+}) {
   const id = `w-${title.replace(/\W+/g, '-').toLowerCase()}`
   return (
-    <section aria-labelledby={id} className={`flex min-w-0 flex-col gap-3 rounded-[var(--radius-card)] border border-line bg-surface p-4 ${className}`}>
+    <section
+      aria-labelledby={id}
+      className={`flex min-w-0 flex-col gap-3 rounded-[var(--radius-card)] border border-line bg-surface p-4 ${className}`}
+    >
       <div className="flex items-center justify-between gap-2">
         <h2 id={id} className="text-base font-semibold">
           {title}
         </h2>
         {action && (
-          <Link to={action.to} className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline">
+          <Link
+            to={action.to}
+            className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+          >
             {action.label}
             <ArrowRight className="size-3.5 rtl:rotate-180" aria-hidden />
           </Link>
@@ -35,7 +51,11 @@ export function Widget({ title, action, children, className = '' }: { title: str
 }
 
 export function Empty({ children }: { children: ReactNode }) {
-  return <p className="rounded-md border border-dashed border-line-strong px-3 py-4 text-center text-sm text-ink-muted">{children}</p>
+  return (
+    <p className="rounded-md border border-dashed border-line-strong px-3 py-4 text-center text-sm text-ink-muted">
+      {children}
+    </p>
+  )
 }
 
 export function StatTiles({ stats }: { stats: { label: string; value: string; to: string }[] }) {
@@ -43,9 +63,12 @@ export function StatTiles({ stats }: { stats: { label: string; value: string; to
     <ul className="grid grid-cols-2 gap-3 md:grid-cols-4">
       {stats.map((s) => (
         <li key={s.label}>
-          <Link to={s.to} className="flex flex-col rounded-[var(--radius-card)] border border-line bg-surface p-4 transition hover:border-ink">
+          <Link
+            to={s.to}
+            className="flex flex-col rounded-[var(--radius-card)] border border-line bg-surface p-4 transition hover:border-ink"
+          >
             <span className="text-xs text-ink-muted">{s.label}</span>
-            <span className="text-3xl font-semibold tabular">{s.value}</span>
+            <span className="tabular text-3xl font-semibold">{s.value}</span>
           </Link>
         </li>
       ))}
@@ -66,7 +89,10 @@ export function DealRows({ deals, empty }: { deals: Deal[]; empty: string }) {
           <li key={d.id} className="relative flex items-center gap-3 py-2.5">
             {partner && <ProducerAvatar producer={partner} size="sm" />}
             <div className="flex min-w-0 flex-1 flex-col">
-              <Link to={`/deals/${d.id}`} className="truncate text-sm font-medium after:absolute after:inset-0 hover:text-primary">
+              <Link
+                to={`/deals/${d.id}`}
+                className="truncate text-sm font-medium after:absolute after:inset-0 hover:text-primary"
+              >
                 {partner?.name ?? d.id}
               </Link>
               <span className="truncate text-xs text-ink-muted">
@@ -76,7 +102,7 @@ export function DealRows({ deals, empty }: { deals: Deal[]; empty: string }) {
             </div>
             <div className="flex shrink-0 flex-col items-end gap-1">
               <DealStatusBadge status={d.status} />
-              <span className="text-xs text-ink-muted tabular">
+              <span className="tabular text-xs text-ink-muted">
                 {format(d.total, d.currency, { compact: true })} · {fmt.relative(d.updatedAt)}
               </span>
             </div>
@@ -92,8 +118,11 @@ export function ConversationsWidget() {
   const fmt = useFormat()
   const threads = useMyThreads()
   const partners = usePartners()
-  const unreadOf = (x: { mySide: 'buyer' | 'producer'; unreadForBuyer: number; unreadForProducer: number }) => (x.mySide === 'buyer' ? x.unreadForBuyer : x.unreadForProducer)
-  const list = [...(threads.data ?? [])].sort((a, b) => unreadOf(b) - unreadOf(a) || b.lastMessageAt.localeCompare(a.lastMessageAt)).slice(0, 5)
+  const unreadOf = (x: { mySide: 'buyer' | 'producer'; unreadForBuyer: number; unreadForProducer: number }) =>
+    x.mySide === 'buyer' ? x.unreadForBuyer : x.unreadForProducer
+  const list = [...(threads.data ?? [])]
+    .sort((a, b) => unreadOf(b) - unreadOf(a) || b.lastMessageAt.localeCompare(a.lastMessageAt))
+    .slice(0, 5)
   return (
     <Widget title={t('dashboard.conversations')} action={{ to: '/messages', label: t('common.viewAll') }}>
       {threads.isPending ? (
@@ -109,15 +138,20 @@ export function ConversationsWidget() {
               <li key={x.id} className="relative flex items-center gap-3 py-2.5">
                 {partner && <ProducerAvatar producer={partner} size="sm" />}
                 <div className="flex min-w-0 flex-1 flex-col">
-                  <Link to={`/messages/${x.id}`} className={`truncate text-sm after:absolute after:inset-0 hover:text-primary ${unread ? 'font-semibold' : 'font-medium'}`}>
+                  <Link
+                    to={`/messages/${x.id}`}
+                    className={`truncate text-sm after:absolute after:inset-0 hover:text-primary ${unread ? 'font-semibold' : 'font-medium'}`}
+                  >
                     {partner?.name ?? x.id}
                   </Link>
-                  <span className="truncate text-xs text-ink-muted">{x.lastMessage?.text ?? t('chat.newConversation')}</span>
+                  <span className="truncate text-xs text-ink-muted">
+                    {x.lastMessage?.text ?? t('chat.newConversation')}
+                  </span>
                 </div>
                 <div className="flex shrink-0 flex-col items-end gap-1">
                   <span className="text-xs text-ink-subtle">{fmt.relative(x.lastMessageAt)}</span>
                   {unread > 0 && (
-                    <span className="grid h-5 min-w-5 place-items-center rounded-full bg-primary px-1.5 text-xs font-semibold text-on-primary tabular">
+                    <span className="tabular grid h-5 min-w-5 place-items-center rounded-full bg-primary px-1.5 text-xs font-semibold text-on-primary">
                       {unread}
                       <span className="sr-only">{t('chat.unreadCount', { count: unread })}</span>
                     </span>
@@ -152,7 +186,11 @@ export function SavedWidget() {
               {items.map((p) => (
                 <li key={p.id} className="flex items-center gap-3 py-2">
                   <div className="min-w-0 flex-1">
-                    <Link to={`/product/${p.id}`} className="block truncate text-sm font-medium hover:text-primary" lang={p.contentLang}>
+                    <Link
+                      to={`/product/${p.id}`}
+                      className="block truncate text-sm font-medium hover:text-primary"
+                      lang={p.contentLang}
+                    >
                       {p.name}
                     </Link>
                     <span className="text-xs text-ink-muted">{p.city}</span>
@@ -160,7 +198,13 @@ export function SavedWidget() {
                   <div className="shrink-0 text-end text-sm">
                     <ProductPrice product={p} />
                   </div>
-                  <button type="button" onClick={() => saved.toggleProduct(p.id)} aria-label={t('product.unsave')} title={t('product.unsave')} className="grid size-8 shrink-0 place-items-center rounded hover:bg-surface-2">
+                  <button
+                    type="button"
+                    onClick={() => saved.toggleProduct(p.id)}
+                    aria-label={t('product.unsave')}
+                    title={t('product.unsave')}
+                    className="grid size-8 shrink-0 place-items-center rounded hover:bg-surface-2"
+                  >
                     <Heart className="size-4 fill-primary text-primary" aria-hidden />
                   </button>
                 </li>
@@ -170,12 +214,20 @@ export function SavedWidget() {
           {firms.length > 0 && (
             <ul className="flex flex-wrap gap-2" aria-label={t('dashboard.savedProducers')}>
               {firms.map((p) => (
-                <li key={p.id} className="flex items-center gap-1 rounded-full border border-line-strong py-1 ps-1 pe-1">
+                <li
+                  key={p.id}
+                  className="flex items-center gap-1 rounded-full border border-line-strong py-1 ps-1 pe-1"
+                >
                   <ProducerAvatar producer={p} size="sm" />
                   <Link to={`/producer/${p.id}`} className="px-1 text-sm font-medium hover:text-primary">
                     {p.name}
                   </Link>
-                  <button type="button" onClick={() => saved.toggleProducer(p.id)} aria-label={t('map.unsave', { name: p.name })} className="grid size-7 place-items-center rounded-full hover:bg-surface-2">
+                  <button
+                    type="button"
+                    onClick={() => saved.toggleProducer(p.id)}
+                    aria-label={t('map.unsave', { name: p.name })}
+                    className="grid size-7 place-items-center rounded-full hover:bg-surface-2"
+                  >
                     <X className="size-3.5" aria-hidden />
                   </button>
                 </li>
@@ -200,17 +252,29 @@ export function RecentSearchesWidget() {
           <ul className="flex flex-wrap gap-2">
             {recent.map((q) => (
               <li key={q} className="flex items-center rounded-full border border-line-strong">
-                <Link to={`/search?q=${encodeURIComponent(q)}`} className="flex items-center gap-1.5 py-1 ps-3 pe-1 text-sm hover:text-primary">
+                <Link
+                  to={`/search?q=${encodeURIComponent(q)}`}
+                  className="flex items-center gap-1.5 py-1 ps-3 pe-1 text-sm hover:text-primary"
+                >
                   <History className="size-3.5 text-ink-subtle" aria-hidden />
                   {q}
                 </Link>
-                <button type="button" onClick={() => remove(q)} aria-label={t('search.removeRecent', { query: q })} className="grid size-7 place-items-center rounded-full hover:bg-surface-2">
+                <button
+                  type="button"
+                  onClick={() => remove(q)}
+                  aria-label={t('search.removeRecent', { query: q })}
+                  className="grid size-7 place-items-center rounded-full hover:bg-surface-2"
+                >
                   <X className="size-3.5" aria-hidden />
                 </button>
               </li>
             ))}
           </ul>
-          <button type="button" onClick={clear} className="self-start text-xs font-medium text-ink-muted hover:text-primary">
+          <button
+            type="button"
+            onClick={clear}
+            className="self-start text-xs font-medium text-ink-muted hover:text-primary"
+          >
             {t('dashboard.clearSearches')}
           </button>
         </>

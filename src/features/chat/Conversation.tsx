@@ -34,14 +34,25 @@ export function Conversation({ thread, partner }: { thread: CompanyThread; partn
     <div className="flex min-h-0 min-w-0 flex-1">
       <section aria-label={t('chat.conversationWith', { name })} className="flex min-h-0 min-w-0 flex-1 flex-col bg-bg">
         <header className="flex items-center gap-2 border-b border-line bg-surface px-2 py-2 md:px-4">
-          <Link to="/messages" className="grid size-10 shrink-0 place-items-center rounded-[var(--radius-control)] text-ink-muted hover:bg-surface-2 lg:hidden" aria-label={t('chat.back')}>
+          <Link
+            to="/messages"
+            className="grid size-10 shrink-0 place-items-center rounded-[var(--radius-control)] text-ink-muted hover:bg-surface-2 lg:hidden"
+            aria-label={t('chat.back')}
+          >
             <ArrowLeft className="size-5 rtl:rotate-180" aria-hidden />
           </Link>
           {partner && <ProducerAvatar producer={partner} size="sm" />}
           <div className="flex min-w-0 flex-1 flex-col">
             <h2 className="truncate font-semibold">{name}</h2>
             <div className="flex min-w-0 items-center gap-1.5">
-              {partner && <VerificationBadge level={partner.kind === 'producer' ? partner.producer.verification.level : partner.buyer.verification.level} compact />}
+              {partner && (
+                <VerificationBadge
+                  level={
+                    partner.kind === 'producer' ? partner.producer.verification.level : partner.buyer.verification.level
+                  }
+                  compact
+                />
+              )}
               {partner?.kind === 'producer' && <TrustScoreButton trust={partner.producer.trust} size="sm" />}
               {chat.typing && <span className="truncate text-xs text-primary">{t('chat.typingShort')}</span>}
             </div>
@@ -53,7 +64,11 @@ export function Conversation({ thread, partner }: { thread: CompanyThread; partn
               aria-controls="partner-panel"
               onClick={() => (wide ? togglePanel() : setDrawer(true))}
             >
-              {wide && panelOpen ? <PanelRightClose className="size-5" aria-hidden /> : <PanelRightOpen className="size-5" aria-hidden />}
+              {wide && panelOpen ? (
+                <PanelRightClose className="size-5" aria-hidden />
+              ) : (
+                <PanelRightOpen className="size-5" aria-hidden />
+              )}
             </IconButton>
           )}
         </header>
@@ -89,16 +104,31 @@ export function Conversation({ thread, partner }: { thread: CompanyThread; partn
             }
           />
         )}
-        <Composer role={chat.role} productName={product.data?.name ?? ''} onSend={chat.send} disabled={!chat.messages.data} />
+        <Composer
+          role={chat.role}
+          productName={product.data?.name ?? ''}
+          onSend={chat.send}
+          disabled={!chat.messages.data}
+        />
       </section>
       {showPanel && (
-        <aside id="partner-panel" aria-label={t('chat.aboutPartner')} className="w-80 shrink-0 overflow-y-auto border-s border-line bg-surface">
+        <aside
+          id="partner-panel"
+          aria-label={t('chat.aboutPartner')}
+          className="w-80 shrink-0 overflow-y-auto border-s border-line bg-surface"
+        >
           <h2 className="border-b border-line px-4 py-3 text-sm font-semibold">{t('chat.aboutPartner')}</h2>
           <PartnerPanel partner={partner} thread={thread} />
         </aside>
       )}
       {partner && !wide && (
-        <Drawer open={drawer} onClose={() => setDrawer(false)} title={t('chat.aboutPartner')} closeLabel={t('common.close')} side="end">
+        <Drawer
+          open={drawer}
+          onClose={() => setDrawer(false)}
+          title={t('chat.aboutPartner')}
+          closeLabel={t('common.close')}
+          side="end"
+        >
           <div id="partner-panel">
             <PartnerPanel partner={partner} thread={thread} />
           </div>

@@ -33,7 +33,9 @@ export function useDealRows(filters: DealFilters) {
           partner: resolve(deal),
           counterpartyId: side === 'buyer' ? deal.producerId : deal.buyerId,
           displayTotal: convert(deal.total, deal.currency),
-          rootCategories: [...new Set(deal.lineItems.map((li) => getCategory(li.categorySlug)?.rootSlug ?? li.categorySlug))],
+          rootCategories: [
+            ...new Set(deal.lineItems.map((li) => getCategory(li.categorySlug)?.rootSlug ?? li.categorySlug)),
+          ],
         }
       }),
     [deals.data, resolve, buyerId, producerId, convert],
@@ -52,7 +54,13 @@ export function useDealRows(filters: DealFilters) {
       if (filters.max !== undefined && (displayTotal ?? 0) > filters.max) return false
       if (filters.currencies.length && !filters.currencies.includes(deal.currency)) return false
       if (q) {
-        const hay = normalize([deal.id, partner?.name ?? '', ...deal.lineItems.map((li) => `${li.productName} ${li.lot?.lotNumber ?? ''}`)].join(' '))
+        const hay = normalize(
+          [
+            deal.id,
+            partner?.name ?? '',
+            ...deal.lineItems.map((li) => `${li.productName} ${li.lot?.lotNumber ?? ''}`),
+          ].join(' '),
+        )
         if (!hay.includes(q)) return false
       }
       return true

@@ -31,7 +31,11 @@ function RecoWidget() {
         <ul className="flex flex-col divide-y divide-line">
           {data.items.map((i) => (
             <li key={i.product.id} className="flex flex-col gap-0.5 py-2">
-              <Link to={`/product/${i.product.id}`} className="truncate text-sm font-medium hover:text-primary" lang={i.product.contentLang}>
+              <Link
+                to={`/product/${i.product.id}`}
+                className="truncate text-sm font-medium hover:text-primary"
+                lang={i.product.contentLang}
+              >
                 {i.product.name}
               </Link>
               <span className="truncate text-xs text-ink-muted">{i.producer.name}</span>
@@ -51,11 +55,34 @@ function StockAlerts() {
   const alerts = (lots.data ?? []).flatMap(({ product, lot }) => {
     const status = lotStatus(lot)
     const out: { key: string; icon: typeof PackageX; text: string; to: string }[] = []
-    if (status === 'available' && availableLots(lot) <= 2) out.push({ key: `${lot.id}-low`, icon: PackageX, text: t('dashboard.alerts.low', { number: lot.lotNumber, count: availableLots(lot) }), to: '/stock' })
+    if (status === 'available' && availableLots(lot) <= 2)
+      out.push({
+        key: `${lot.id}-low`,
+        icon: PackageX,
+        text: t('dashboard.alerts.low', { number: lot.lotNumber, count: availableLots(lot) }),
+        to: '/stock',
+      })
     if (lot.expiryDate && status !== 'archived' && daysFromNow(lot.expiryDate) <= 7)
-      out.push({ key: `${lot.id}-exp`, icon: CalendarClock, text: t('dashboard.alerts.expiry', { number: lot.lotNumber, date: fmt.date(lot.expiryDate) }), to: `/product/${product.id}?lot=${lot.id}` })
-    if (status === 'paused') out.push({ key: `${lot.id}-paused`, icon: PauseCircle, text: t('dashboard.alerts.paused', { number: lot.lotNumber }), to: '/stock' })
-    if (status === 'sold') out.push({ key: `${lot.id}-sold`, icon: PackageX, text: t('dashboard.alerts.sold', { number: lot.lotNumber }), to: '/stock' })
+      out.push({
+        key: `${lot.id}-exp`,
+        icon: CalendarClock,
+        text: t('dashboard.alerts.expiry', { number: lot.lotNumber, date: fmt.date(lot.expiryDate) }),
+        to: `/product/${product.id}?lot=${lot.id}`,
+      })
+    if (status === 'paused')
+      out.push({
+        key: `${lot.id}-paused`,
+        icon: PauseCircle,
+        text: t('dashboard.alerts.paused', { number: lot.lotNumber }),
+        to: '/stock',
+      })
+    if (status === 'sold')
+      out.push({
+        key: `${lot.id}-sold`,
+        icon: PackageX,
+        text: t('dashboard.alerts.sold', { number: lot.lotNumber }),
+        to: '/stock',
+      })
     return out
   })
   return (
@@ -101,12 +128,32 @@ export function DashboardPage() {
   })
 
   const stats = [
-    { label: t('dashboard.stats.quotes'), value: String(buyQuotes.length), to: '/deals?status=quote_request,quote_received,negotiation' },
-    { label: t('dashboard.stats.requests'), value: String(sellQuotes.length), to: '/deals?status=quote_request,quote_received,negotiation' },
-    { label: t('dashboard.stats.active'), value: String(active.length), to: '/deals?status=order_confirmed,in_delivery,delivered,disputed' },
-    { label: t('dashboard.stats.toShip'), value: String(list.filter((d) => d.producerId === producerId && d.status === 'order_confirmed').length), to: '/deals?status=order_confirmed' },
+    {
+      label: t('dashboard.stats.quotes'),
+      value: String(buyQuotes.length),
+      to: '/deals?status=quote_request,quote_received,negotiation',
+    },
+    {
+      label: t('dashboard.stats.requests'),
+      value: String(sellQuotes.length),
+      to: '/deals?status=quote_request,quote_received,negotiation',
+    },
+    {
+      label: t('dashboard.stats.active'),
+      value: String(active.length),
+      to: '/deals?status=order_confirmed,in_delivery,delivered,disputed',
+    },
+    {
+      label: t('dashboard.stats.toShip'),
+      value: String(list.filter((d) => d.producerId === producerId && d.status === 'order_confirmed').length),
+      to: '/deals?status=order_confirmed',
+    },
     { label: t('dashboard.stats.unread'), value: String(unread), to: '/messages' },
-    { label: t('dashboard.stats.saved'), value: String(saved.productIds.length + saved.producerIds.length), to: '#saved' },
+    {
+      label: t('dashboard.stats.saved'),
+      value: String(saved.productIds.length + saved.producerIds.length),
+      to: '#saved',
+    },
   ]
 
   return (
@@ -145,14 +192,35 @@ export function DashboardPage() {
               <DealRows deals={needsMe.slice(0, 5)} empty="" />
             </Widget>
           )}
-          <Widget title={t('dashboard.openQuotes')} action={{ to: '/deals?status=quote_request,quote_received,negotiation', label: t('common.viewAll') }}>
-            {deals.isPending ? <Skeleton className="h-32" /> : <DealRows deals={buyQuotes.slice(0, 5)} empty={t('dashboard.noQuotes')} />}
+          <Widget
+            title={t('dashboard.openQuotes')}
+            action={{ to: '/deals?status=quote_request,quote_received,negotiation', label: t('common.viewAll') }}
+          >
+            {deals.isPending ? (
+              <Skeleton className="h-32" />
+            ) : (
+              <DealRows deals={buyQuotes.slice(0, 5)} empty={t('dashboard.noQuotes')} />
+            )}
           </Widget>
-          <Widget title={t('dashboard.incomingRequests')} action={{ to: '/deals?status=quote_request,quote_received,negotiation', label: t('common.viewAll') }}>
-            {deals.isPending ? <Skeleton className="h-32" /> : <DealRows deals={sellQuotes.slice(0, 5)} empty={t('dashboard.noQuotes')} />}
+          <Widget
+            title={t('dashboard.incomingRequests')}
+            action={{ to: '/deals?status=quote_request,quote_received,negotiation', label: t('common.viewAll') }}
+          >
+            {deals.isPending ? (
+              <Skeleton className="h-32" />
+            ) : (
+              <DealRows deals={sellQuotes.slice(0, 5)} empty={t('dashboard.noQuotes')} />
+            )}
           </Widget>
-          <Widget title={t('dashboard.activeDeals')} action={{ to: '/deals?status=order_confirmed,in_delivery,delivered,disputed', label: t('common.viewAll') }}>
-            {deals.isPending ? <Skeleton className="h-32" /> : <DealRows deals={active.slice(0, 5)} empty={t('dashboard.noActive')} />}
+          <Widget
+            title={t('dashboard.activeDeals')}
+            action={{ to: '/deals?status=order_confirmed,in_delivery,delivered,disputed', label: t('common.viewAll') }}
+          >
+            {deals.isPending ? (
+              <Skeleton className="h-32" />
+            ) : (
+              <DealRows deals={active.slice(0, 5)} empty={t('dashboard.noActive')} />
+            )}
           </Widget>
           <div id="saved" className="scroll-mt-[calc(var(--chrome-h,8rem)+1rem)]">
             <SavedWidget />

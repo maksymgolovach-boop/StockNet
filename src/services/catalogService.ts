@@ -35,14 +35,22 @@ export const catalogService: CatalogService = {
       getAllCategories().map((c) => {
         const slugs = new Set(getDescendantSlugs(c.slug))
         const products = db.products.filter((p) => slugs.has(p.categorySlug))
-        return { slug: c.slug, productCount: products.length, producerCount: new Set(products.map((p) => p.producerId)).size }
+        return {
+          slug: c.slug,
+          productCount: products.length,
+          producerCount: new Set(products.map((p) => p.producerId)).size,
+        }
       }),
     ),
   platformStats: () =>
     mockRequest(() => ({
       producers: db.producers.length,
-      verifiedOrAudited: db.producers.filter((p) => p.verification.level === 'verified' || p.verification.level === 'audited').length,
-      documents: db.producers.reduce((n, p) => n + p.documents.length, 0) + db.products.reduce((n, p) => n + p.documents.length, 0),
+      verifiedOrAudited: db.producers.filter(
+        (p) => p.verification.level === 'verified' || p.verification.level === 'audited',
+      ).length,
+      documents:
+        db.producers.reduce((n, p) => n + p.documents.length, 0) +
+        db.products.reduce((n, p) => n + p.documents.length, 0),
       reviews: db.reviews.length,
       countries: new Set(db.producers.map((p) => p.address.country)).size,
     })),

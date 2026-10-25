@@ -25,7 +25,8 @@ export function DealsPage() {
 
   usePageTitle(t('pages.deals'))
 
-  const update = (patch: Partial<DealFilters>) => setParams(serializeDealFilters({ ...filters, ...patch }), { replace: true })
+  const update = (patch: Partial<DealFilters>) =>
+    setParams(serializeDealFilters({ ...filters, ...patch }), { replace: true })
 
   const exportCsv = (list: DealRow[]) => {
     const separator = fmt.lang === 'en' ? ',' : ';'
@@ -49,7 +50,9 @@ export function DealsPage() {
       deal.id,
       t(`deals.status.${deal.status}`),
       partner?.name ?? '',
-      deal.lineItems.map((li) => `${li.productName} (${n(li.quantity)} ${li.lot ? t('lots.unit') : li.unit})`).join(' | '),
+      deal.lineItems
+        .map((li) => `${li.productName} (${n(li.quantity)} ${li.lot ? t('lots.unit') : li.unit})`)
+        .join(' | '),
       deal.lineItems.flatMap((li) => (li.lot ? [li.lot.lotNumber] : [])).join(' | '),
       deal.currency,
       n(deal.total),
@@ -71,7 +74,12 @@ export function DealsPage() {
           <p className="text-sm text-ink-muted">{t('dealsPage.subtitleCompany')}</p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button variant="secondary" icon={<Download className="size-4" aria-hidden />} onClick={() => exportCsv(rows)} disabled={!rows.length}>
+          <Button
+            variant="secondary"
+            icon={<Download className="size-4" aria-hidden />}
+            onClick={() => exportCsv(rows)}
+            disabled={!rows.length}
+          >
             {t('dealsPage.export', { count: rows.length })}
           </Button>
           <ButtonLink to="/deals/new" icon={<FilePlus2 className="size-4" aria-hidden />}>
@@ -93,7 +101,12 @@ export function DealsPage() {
       ) : (
         <>
           <DealsSummary rows={rows} />
-          <DealsFilterBar filters={filters} onChange={update} onReset={() => setParams(new URLSearchParams(), { replace: true })} all={all} />
+          <DealsFilterBar
+            filters={filters}
+            onChange={update}
+            onReset={() => setParams(new URLSearchParams(), { replace: true })}
+            all={all}
+          />
           <p className="text-sm text-ink-muted" aria-live="polite">
             {t('dealsPage.showing', { count: rows.length, total: all.length })}
           </p>

@@ -23,13 +23,20 @@ export const ALL_CATEGORY_CONFIGS: readonly CategoryConfig[] = [
   plastics,
 ]
 
-export const CATEGORY_CONFIGS: readonly CategoryConfig[] = ALL_CATEGORY_CONFIGS.filter((c) => ACTIVE_ROOT_CATEGORIES.includes(c.slug))
+export const CATEGORY_CONFIGS: readonly CategoryConfig[] = ALL_CATEGORY_CONFIGS.filter((c) =>
+  ACTIVE_ROOT_CATEGORIES.includes(c.slug),
+)
 
 const configBySlug = new Map<string, CategoryConfig>(ALL_CATEGORY_CONFIGS.map((c) => [c.slug, c]))
 const nodes = new Map<string, Category>()
 const nodeOverrides = new Map<string, Partial<LogisticsProfile>>()
 
-function register(node: CategoryNodeConfig, root: CategoryConfig, parent: Category | null, inherited: Partial<LogisticsProfile>) {
+function register(
+  node: CategoryNodeConfig,
+  root: CategoryConfig,
+  parent: Category | null,
+  inherited: Partial<LogisticsProfile>,
+) {
   const level = (parent ? parent.level + 1 : 1) as Category['level']
   const path = parent ? [...parent.path, node.slug] : [node.slug]
   const merged = { ...inherited, ...(node.logistics ?? {}) }
@@ -52,7 +59,8 @@ for (const root of ALL_CATEGORY_CONFIGS) register(root, root, null, {})
 
 export const ROOT_CATEGORY_SLUGS = CATEGORY_CONFIGS.map((c) => c.slug)
 
-const isActive = (node: Category | undefined): node is Category => !!node && ACTIVE_ROOT_CATEGORIES.includes(node.rootSlug)
+const isActive = (node: Category | undefined): node is Category =>
+  !!node && ACTIVE_ROOT_CATEGORIES.includes(node.rootSlug)
 
 export function isActiveRoot(slug: string): boolean {
   return ACTIVE_ROOT_CATEGORIES.includes(slug)

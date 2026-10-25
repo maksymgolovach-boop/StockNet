@@ -11,7 +11,10 @@ export function HomePage() {
   return (
     <div className="flex flex-col gap-14">
       <section className="relative border-b border-line bg-surface">
-        <div aria-hidden className="grid-paper absolute inset-0 opacity-50 [mask-image:linear-gradient(to_bottom,black,transparent)]" />
+        <div
+          aria-hidden
+          className="grid-paper absolute inset-0 [mask-image:linear-gradient(to_bottom,black,transparent)] opacity-50"
+        />
         <div className="relative mx-auto flex max-w-[90rem] flex-col gap-6 px-4 py-12 md:py-16 lg:px-6">
           <h1 className="max-w-3xl text-4xl font-semibold md:text-5xl">{t('home.heroTitle')}</h1>
           <p className="max-w-2xl text-base text-ink-muted md:text-lg">{t('home.heroBody')}</p>

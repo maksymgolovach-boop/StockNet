@@ -46,7 +46,11 @@ export function StockPage() {
   const [editing, setEditing] = useState<ProducerLotRow | null>(null)
   const [creatingFor, setCreatingFor] = useState<string | null>(() => params.get('new'))
   const [notice, setNotice] = useState('')
-  const busyId = (m.setStock.isPending && m.setStock.variables?.lotId) || (m.setStatus.isPending && m.setStatus.variables?.lotId) || (m.duplicate.isPending && m.duplicate.variables) || undefined
+  const busyId =
+    (m.setStock.isPending && m.setStock.variables?.lotId) ||
+    (m.setStatus.isPending && m.setStatus.variables?.lotId) ||
+    (m.duplicate.isPending && m.duplicate.variables) ||
+    undefined
 
   usePageTitle(t('lots.stock.title'))
 
@@ -54,11 +58,14 @@ export function StockPage() {
   useValueChange(requestedNew, (id) => id !== null && setCreatingFor(id))
   useEffect(() => {
     if (requestedNew === null) return
-    setParams((prev) => {
-      const next = new URLSearchParams(prev)
-      next.delete('new')
-      return next
-    }, { replace: true })
+    setParams(
+      (prev) => {
+        const next = new URLSearchParams(prev)
+        next.delete('new')
+        return next
+      },
+      { replace: true },
+    )
   }, [requestedNew, setParams])
 
   const rows = useMemo(() => lots.data ?? [], [lots.data])
@@ -69,11 +76,17 @@ export function StockPage() {
   }, [rows])
   const q = normalize(query)
   const visible = rows.filter(
-    (r) => (status === 'all' || lotStatus(r.lot) === status) && (!productFilter || r.product.id === productFilter) && (!q || normalize(`${r.lot.lotNumber} ${r.product.name}`).includes(q)),
+    (r) =>
+      (status === 'all' || lotStatus(r.lot) === status) &&
+      (!productFilter || r.product.id === productFilter) &&
+      (!q || normalize(`${r.lot.lotNumber} ${r.product.name}`).includes(q)),
   )
   const stats = useMemo(() => {
     const live = rows.filter((r) => lotStatus(r.lot) === 'available' || lotStatus(r.lot) === 'reserved')
-    const value = live.reduce((sum, r) => sum + (convert(r.lot.pricePerLot * availableLots(r.lot), r.product.pricing.currency) ?? 0), 0)
+    const value = live.reduce(
+      (sum, r) => sum + (convert(r.lot.pricePerLot * availableLots(r.lot), r.product.pricing.currency) ?? 0),
+      0,
+    )
     return {
       listings: new Set(live.map((r) => r.product.id)).size,
       available: live.reduce((n, r) => n + availableLots(r.lot), 0),
@@ -89,10 +102,18 @@ export function StockPage() {
     setEditing(null)
     setCreatingFor(null)
   }
-  const defaultCity = producer.data ? cityIdFor(producer.data.address.city, producer.data.address.country, CITIES[0]?.id ?? '') : (CITIES[0]?.id ?? '')
+  const defaultCity = producer.data
+    ? cityIdFor(producer.data.address.city, producer.data.address.country, CITIES[0]?.id ?? '')
+    : (CITIES[0]?.id ?? '')
   const yymm = now().toISOString().slice(2, 7).replace('-', '')
   const initial = editing
-    ? toFormValues(editing.lot, undefined, { cityId: cityIdFor(editing.lot.location.city, editing.lot.location.country, defaultCity), warehouseLabel: '', lotNumber: '', type: '', unit: 'piece' })
+    ? toFormValues(editing.lot, undefined, {
+        cityId: cityIdFor(editing.lot.location.city, editing.lot.location.country, defaultCity),
+        warehouseLabel: '',
+        lotNumber: '',
+        type: '',
+        unit: 'piece',
+      })
     : toFormValues(undefined, createProduct, {
         cityId: defaultCity,
         warehouseLabel: producer.data?.name ?? '',
@@ -117,7 +138,11 @@ export function StockPage() {
           {t('lots.stock.newLot')}
         </Button>
       </div>
-      <p role="status" aria-live="polite" className={cn('rounded-md bg-verified-soft px-3 py-2 text-sm text-verified', !notice && 'sr-only')}>
+      <p
+        role="status"
+        aria-live="polite"
+        className={cn('rounded-md bg-verified-soft px-3 py-2 text-sm text-verified', !notice && 'sr-only')}
+      >
         {notice}
       </p>
       <dl className="grid grid-cols-2 gap-3 md:grid-cols-4">
@@ -129,35 +154,55 @@ export function StockPage() {
         ].map(([k, v]) => (
           <div key={k} className="rounded-[var(--radius-card)] border border-line bg-surface p-3">
             <dt className="text-xs text-ink-muted">{k}</dt>
-            <dd className="text-2xl font-semibold tabular">{v}</dd>
+            <dd className="tabular text-2xl font-semibold">{v}</dd>
           </div>
         ))}
       </dl>
       <div className="flex flex-col gap-3 rounded-[var(--radius-card)] border border-line bg-surface p-3 lg:flex-row lg:items-end">
         <label className="relative block min-w-0 flex-1">
           <span className="sr-only">{t('lots.stock.search')}</span>
-          <Search className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-ink-subtle" aria-hidden />
-          <input type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t('lots.stock.search')} className="h-10 w-full rounded-[var(--radius-control)] border border-line-strong bg-surface ps-9 pe-3 text-sm" />
+          <Search
+            className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-ink-subtle"
+            aria-hidden
+          />
+          <input
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder={t('lots.stock.search')}
+            className="h-10 w-full rounded-[var(--radius-control)] border border-line-strong bg-surface ps-9 pe-3 text-sm"
+          />
         </label>
         <Select
           label={t('lots.form.product')}
           hideLabel
           value={productFilter}
           onChange={(e) => setProductFilter(e.target.value)}
-          options={[{ value: '', label: t('lots.stock.allProducts') }, ...productList.filter((p) => p.lots.length).map((p) => ({ value: p.id, label: p.name }))]}
+          options={[
+            { value: '', label: t('lots.stock.allProducts') },
+            ...productList.filter((p) => p.lots.length).map((p) => ({ value: p.id, label: p.name })),
+          ]}
           className="lg:w-80"
         />
       </div>
-      <div role="group" aria-label={t('lots.stock.statusFilter')} className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1">
+      <div
+        role="group"
+        aria-label={t('lots.stock.statusFilter')}
+        className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1"
+      >
         {(['all', ...STATUSES] as const).map((s) => (
           <button
             key={s}
             type="button"
             aria-pressed={status === s}
             onClick={() => setStatus(s)}
-            className={cn('h-8 shrink-0 rounded-full border px-3 text-[0.8125rem] font-medium', status === s ? 'border-ink bg-ink text-bg' : 'border-line-strong hover:bg-surface-2')}
+            className={cn(
+              'h-8 shrink-0 rounded-full border px-3 text-[0.8125rem] font-medium',
+              status === s ? 'border-ink bg-ink text-bg' : 'border-line-strong hover:bg-surface-2',
+            )}
           >
-            {s === 'all' ? t('chat.all') : t(`lots.status.${s}`)} <span className="tabular opacity-70">{counts[s] ?? 0}</span>
+            {s === 'all' ? t('chat.all') : t(`lots.status.${s}`)}{' '}
+            <span className="tabular opacity-70">{counts[s] ?? 0}</span>
           </button>
         ))}
       </div>
@@ -168,15 +213,27 @@ export function StockPage() {
       ) : lots.error ? (
         <ErrorState error={lots.error} onRetry={() => void lots.refetch()} />
       ) : visible.length === 0 ? (
-        <EmptyState title={t('lots.stock.empty')} body={rows.length ? t('lots.stock.emptyFiltered') : t('lots.stock.emptyBody')} />
+        <EmptyState
+          title={t('lots.stock.empty')}
+          body={rows.length ? t('lots.stock.emptyFiltered') : t('lots.stock.emptyBody')}
+        />
       ) : (
         <StockTable
           rows={visible}
           busyId={busyId || undefined}
           onEdit={(row) => setEditing(row)}
-          onDuplicate={(lotId) => m.duplicate.mutate(lotId, { onSuccess: (lot) => setNotice(t('lots.stock.duplicated', { number: lot.lotNumber })) })}
+          onDuplicate={(lotId) =>
+            m.duplicate.mutate(lotId, {
+              onSuccess: (lot) => setNotice(t('lots.stock.duplicated', { number: lot.lotNumber })),
+            })
+          }
           onStock={(lotId, stock) => m.setStock.mutate({ lotId, stock })}
-          onStatus={(lotId, s) => m.setStatus.mutate({ lotId, status: s }, { onSuccess: (lot) => setNotice(t(`lots.stock.statusChanged.${s}`, { number: lot.lotNumber })) })}
+          onStatus={(lotId, s) =>
+            m.setStatus.mutate(
+              { lotId, status: s },
+              { onSuccess: (lot) => setNotice(t(`lots.stock.statusChanged.${s}`, { number: lot.lotNumber })) },
+            )
+          }
         />
       )}
       <p className="text-xs text-ink-subtle">{t('lots.stock.persistNote')}</p>
@@ -217,7 +274,8 @@ export function StockPage() {
                 setNotice(t(editing ? 'lots.stock.saved' : 'lots.stock.created', { number }))
                 close()
               }
-              if (editing) m.update.mutate({ lotId: editing.lot.id, input }, { onSuccess: (lot) => done(lot.lotNumber) })
+              if (editing)
+                m.update.mutate({ lotId: editing.lot.id, input }, { onSuccess: (lot) => done(lot.lotNumber) })
               else m.create.mutate(input, { onSuccess: (lot) => done(lot.lotNumber) })
             }}
           />

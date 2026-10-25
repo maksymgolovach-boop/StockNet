@@ -11,7 +11,12 @@ export function DealDetails({ deal }: { deal: Deal }) {
   const fmt = useFormat()
   const a = deal.deliveryAddress
   const rows: [string, React.ReactNode][] = [
-    [t('dealDetail.incoterm'), <span key="incoterm" className="font-mono">{deal.incoterm}</span>],
+    [
+      t('dealDetail.incoterm'),
+      <span key="incoterm" className="font-mono">
+        {deal.incoterm}
+      </span>,
+    ],
     [t('dealDetail.currency'), deal.currency],
     [t('dealDetail.address'), `${a.street}, ${a.postcode} ${a.city}, ${fmt.region(a.country)}`],
     [t('dealDetail.requested'), fmt.date(deal.requestedDeliveryDate, { dateStyle: 'long' })],
@@ -21,7 +26,11 @@ export function DealDetails({ deal }: { deal: Deal }) {
       t('dealDetail.delivered'),
       <span key="delivered" className="flex flex-wrap items-center gap-2">
         {fmt.date(deal.deliveredAt, { dateStyle: 'long' })}
-        {deal.onTime !== undefined && <Badge tone={deal.onTime ? 'verified' : 'expiring'}>{t(deal.onTime ? 'dealDetail.onTime' : 'dealDetail.late')}</Badge>}
+        {deal.onTime !== undefined && (
+          <Badge tone={deal.onTime ? 'verified' : 'expiring'}>
+            {t(deal.onTime ? 'dealDetail.onTime' : 'dealDetail.late')}
+          </Badge>
+        )}
       </span>,
     ])
   if (deal.reorderOf)
@@ -32,7 +41,10 @@ export function DealDetails({ deal }: { deal: Deal }) {
       </Link>,
     ])
   return (
-    <section aria-labelledby="deal-details" className="flex flex-col gap-3 rounded-[var(--radius-card)] border border-line bg-surface p-4">
+    <section
+      aria-labelledby="deal-details"
+      className="flex flex-col gap-3 rounded-[var(--radius-card)] border border-line bg-surface p-4"
+    >
       <h2 id="deal-details" className="text-lg font-semibold">
         {t('dealDetail.details')}
       </h2>
@@ -53,7 +65,11 @@ export function DealDetails({ deal }: { deal: Deal }) {
       {deal.attachments && deal.attachments.length > 0 && (
         <ul className="flex flex-wrap gap-2 border-t border-line pt-3" aria-label={t('dealDetail.attachments')}>
           {deal.attachments.map((f) => (
-            <li key={f} className="inline-flex items-center gap-1 rounded bg-surface-2 px-2 py-0.5 text-xs" title={t('docs.demoOnly')}>
+            <li
+              key={f}
+              className="inline-flex items-center gap-1 rounded bg-surface-2 px-2 py-0.5 text-xs"
+              title={t('docs.demoOnly')}
+            >
               <Paperclip className="size-3" aria-hidden />
               {f}
             </li>
@@ -68,7 +84,10 @@ export function DealDocuments({ deal }: { deal: Deal }) {
   const { t } = useTranslation()
   const fmt = useFormat()
   return (
-    <section aria-labelledby="deal-docs" className="flex flex-col gap-3 rounded-[var(--radius-card)] border border-line bg-surface p-4">
+    <section
+      aria-labelledby="deal-docs"
+      className="flex flex-col gap-3 rounded-[var(--radius-card)] border border-line bg-surface p-4"
+    >
       <h2 id="deal-docs" className="text-lg font-semibold">
         {t('dealDetail.documents')}
       </h2>
@@ -87,7 +106,12 @@ export function DealDocuments({ deal }: { deal: Deal }) {
                     {d.fileName} · {fmt.date(d.issuedAt)} · {d.sizeKb} KB
                   </span>
                 </span>
-                <button type="button" disabled title={t('docs.demoOnly')} className={buttonClass('secondary', 'sm', 'opacity-60')}>
+                <button
+                  type="button"
+                  disabled
+                  title={t('docs.demoOnly')}
+                  className={buttonClass('secondary', 'sm', 'opacity-60')}
+                >
                   PDF
                 </button>
               </li>
@@ -98,14 +122,29 @@ export function DealDocuments({ deal }: { deal: Deal }) {
   )
 }
 
-export function DealThreadCard({ deal, partnerName, messageLink }: { deal: Deal; partnerName: string; messageLink: string }) {
+export function DealThreadCard({
+  deal,
+  partnerName,
+  messageLink,
+}: {
+  deal: Deal
+  partnerName: string
+  messageLink: string
+}) {
   const { t } = useTranslation()
   return (
-    <section aria-labelledby="deal-thread" className="flex flex-col gap-2 rounded-[var(--radius-card)] border border-line bg-surface p-4">
+    <section
+      aria-labelledby="deal-thread"
+      className="flex flex-col gap-2 rounded-[var(--radius-card)] border border-line bg-surface p-4"
+    >
       <h2 id="deal-thread" className="text-lg font-semibold">
         {t('dealDetail.conversation')}
       </h2>
-      <p className="text-sm text-ink-muted">{deal.threadId ? t('dealDetail.threadLinked', { name: partnerName }) : t('dealDetail.threadNone', { name: partnerName })}</p>
+      <p className="text-sm text-ink-muted">
+        {deal.threadId
+          ? t('dealDetail.threadLinked', { name: partnerName })
+          : t('dealDetail.threadNone', { name: partnerName })}
+      </p>
       <Link to={messageLink} className={buttonClass('secondary', 'md', 'self-start')}>
         <MessageSquare className="size-4" aria-hidden />
         {deal.threadId ? t('dealDetail.openThread') : t('dealDetail.messagePartner')}

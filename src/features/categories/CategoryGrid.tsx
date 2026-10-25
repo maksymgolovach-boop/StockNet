@@ -51,8 +51,9 @@ export function CategoryGrid() {
                   )}
                 </span>
                 <span className="text-[0.8125rem] leading-snug text-ink-muted">{t(`categoryBlurb.${c.slug}`)}</span>
-                <span className="mt-auto pt-1 text-xs text-ink-subtle tabular">
-                  {t('common.products', { count: s?.productCount ?? 0 })} · {t('common.producers', { count: s?.producerCount ?? 0 })}
+                <span className="tabular mt-auto pt-1 text-xs text-ink-subtle">
+                  {t('common.products', { count: s?.productCount ?? 0 })} ·{' '}
+                  {t('common.producers', { count: s?.producerCount ?? 0 })}
                 </span>
               </span>
             </Link>

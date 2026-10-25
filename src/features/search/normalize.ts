@@ -1,5 +1,19 @@
 const COMBINING = /[̀-ͯ]/g
-const SPECIAL: Record<string, string> = { ß: 'ss', '×': 'x', '·': ' ', '–': '-', '—': '-', '„': '"', '“': '"', '”': '"', 'ı': 'i', 'ł': 'l', 'ø': 'o', 'æ': 'ae', 'œ': 'oe' }
+const SPECIAL: Record<string, string> = {
+  ß: 'ss',
+  '×': 'x',
+  '·': ' ',
+  '–': '-',
+  '—': '-',
+  '„': '"',
+  '“': '"',
+  '”': '"',
+  ı: 'i',
+  ł: 'l',
+  ø: 'o',
+  æ: 'ae',
+  œ: 'oe',
+}
 
 function foldChar(ch: string): string {
   const lower = ch.toLowerCase()
@@ -43,7 +57,13 @@ export function normalize(input: string): string {
 }
 
 export function tokenize(query: string): string[] {
-  return [...new Set(normalize(query).split(' ').filter((t) => t.length >= 2 || /\d/.test(t)))]
+  return [
+    ...new Set(
+      normalize(query)
+        .split(' ')
+        .filter((t) => t.length >= 2 || /\d/.test(t)),
+    ),
+  ]
 }
 
 export const hasDigit = (token: string) => /\d/.test(token)

@@ -5,7 +5,15 @@ import { useFormat } from '@/features/i18n/useFormat'
 import { Popover } from '@/shared/ui/Popover'
 import { cn } from '@/shared/lib/cn'
 
-const ORDER: TrustFactor[] = ['verification', 'onTimeDelivery', 'disputeRate', 'reviewRating', 'responseTime', 'repeatCustomers', 'accountAge']
+const ORDER: TrustFactor[] = [
+  'verification',
+  'onTimeDelivery',
+  'disputeRate',
+  'reviewRating',
+  'responseTime',
+  'repeatCustomers',
+  'accountAge',
+]
 
 const BAND_CLASS: Record<TrustScoreModel['band'], string> = {
   excellent: 'bg-verified text-surface',
@@ -48,9 +56,15 @@ export function TrustBreakdown({ trust }: { trust: TrustScoreModel }) {
         <caption className="sr-only">{t('trust.score')}</caption>
         <thead>
           <tr className="text-start text-xs text-ink-subtle">
-            <th scope="col" className="pb-1 text-start font-medium">{t('trust.factor')}</th>
-            <th scope="col" className="pb-1 text-end font-medium">{t('trust.value')}</th>
-            <th scope="col" className="pb-1 text-end font-medium">{t('trust.contribution')}</th>
+            <th scope="col" className="pb-1 text-start font-medium">
+              {t('trust.factor')}
+            </th>
+            <th scope="col" className="pb-1 text-end font-medium">
+              {t('trust.value')}
+            </th>
+            <th scope="col" className="pb-1 text-end font-medium">
+              {t('trust.contribution')}
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -64,22 +78,32 @@ export function TrustBreakdown({ trust }: { trust: TrustScoreModel }) {
                     {t(`trust.rules.${key}`)} · {t('trust.weight', { weight: Math.round(f.weight * 100) })}
                   </span>
                   <span className="mt-1 block h-1.5 w-full overflow-hidden rounded-full bg-surface-3" aria-hidden>
-                    <span className={cn('block h-full rounded-full', f.score >= 70 ? 'bg-verified' : f.score >= 45 ? 'bg-expiring' : 'bg-expired')} style={{ width: `${f.score}%` }} />
+                    <span
+                      className={cn(
+                        'block h-full rounded-full',
+                        f.score >= 70 ? 'bg-verified' : f.score >= 45 ? 'bg-expiring' : 'bg-expired',
+                      )}
+                      style={{ width: `${f.score}%` }}
+                    />
                   </span>
                 </th>
-                <td className="py-2 text-end whitespace-nowrap tabular">
+                <td className="tabular py-2 text-end whitespace-nowrap">
                   <span className="block">{rawLabel(f)}</span>
                   <span className="block text-xs text-ink-subtle">{t('trust.subScore', { score: f.score })}</span>
                 </td>
-                <td className="py-2 ps-2 text-end font-semibold whitespace-nowrap tabular">{t('trust.points', { points: fmt.number(f.points, { maximumFractionDigits: 1 }) })}</td>
+                <td className="tabular py-2 ps-2 text-end font-semibold whitespace-nowrap">
+                  {t('trust.points', { points: fmt.number(f.points, { maximumFractionDigits: 1 }) })}
+                </td>
               </tr>
             )
           })}
         </tbody>
         <tfoot>
           <tr className="border-t-2 border-ink">
-            <th scope="row" colSpan={2} className="pt-2 text-start">{t('trust.total')}</th>
-            <td className="pt-2 text-end text-base font-bold whitespace-nowrap tabular">{trust.score} / 100</td>
+            <th scope="row" colSpan={2} className="pt-2 text-start">
+              {t('trust.total')}
+            </th>
+            <td className="tabular pt-2 text-end text-base font-bold whitespace-nowrap">{trust.score} / 100</td>
           </tr>
         </tfoot>
       </table>
@@ -104,7 +128,7 @@ export function TrustScoreButton({ trust, size = 'md' }: { trust: TrustScoreMode
           aria-controls={open ? id : undefined}
           aria-label={`${t('trust.score')}: ${trust.score} / 100, ${t(`trust.bands.${trust.band}`)}. ${t('trust.explain')}`}
           className={cn(
-            'relative z-10 inline-flex items-center gap-1.5 rounded-full font-semibold tabular hover:opacity-90',
+            'tabular relative z-10 inline-flex items-center gap-1.5 rounded-full font-semibold hover:opacity-90',
             BAND_CLASS[trust.band],
             size === 'lg' ? 'h-9 px-3.5 text-base' : size === 'md' ? 'h-7 px-2.5 text-sm' : 'h-5 px-2 text-[0.6875rem]',
           )}

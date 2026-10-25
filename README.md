@@ -9,9 +9,12 @@ Requires **Node.js 20.19+ or 22.12+** (Vite 8). `.nvmrc` pins Node 22 for nvm / 
 ```bash
 npm install
 npm run dev        # http://localhost:5173
-npm run check      # type-check + lint + locale coverage + mock-data validation + search and deal tests
+npm run check      # type-check + lint + format check + locale coverage + mock-data validation + search and deal tests
+npm run format     # format all files with Prettier (Tailwind classes are sorted too)
 npm run build      # type-check and production build
 ```
+
+Code style is enforced by Prettier (`.prettierrc.json`) and oxlint. VS Code suggests both extensions (`.vscode/extensions.json`); turn on "Format on Save". Generated mock data in `src/mocks` is not formatted, so each record stays on one line.
 
 GitHub Actions (`.github/workflows/check.yml`) runs `npm run check` and `npm run build` on every push and pull request.
 

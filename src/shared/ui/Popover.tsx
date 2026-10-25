@@ -3,7 +3,12 @@ import { createPortal } from 'react-dom'
 import { cn } from '@/shared/lib/cn'
 
 interface PopoverProps {
-  trigger: (props: { open: boolean; toggle: () => void; id: string; ref: (el: HTMLButtonElement | null) => void }) => ReactNode
+  trigger: (props: {
+    open: boolean
+    toggle: () => void
+    id: string
+    ref: (el: HTMLButtonElement | null) => void
+  }) => ReactNode
   children: ReactNode
   label: string
   width?: number
@@ -69,7 +74,10 @@ export function Popover({ trigger, children, label, width = 360, className }: Po
             aria-label={label}
             tabIndex={-1}
             style={{ left: pos?.left ?? -9999, top: pos?.top ?? -9999, width: Math.min(width, innerWidth - 16) }}
-            className={cn('fixed z-[2500] max-h-[80vh] overflow-y-auto rounded-[var(--radius-card)] border border-line bg-surface p-4 text-ink shadow-overlay outline-none', className)}
+            className={cn(
+              'fixed z-[2500] max-h-[80vh] overflow-y-auto rounded-[var(--radius-card)] border border-line bg-surface p-4 text-ink shadow-overlay outline-none',
+              className,
+            )}
           >
             {children}
           </div>,

@@ -7,9 +7,22 @@ import { cn } from '@/shared/lib/cn'
 import { CategoryIcon } from './CategoryIcon'
 
 const linkClass = ({ isActive }: { isActive: boolean }) =>
-  cn('flex min-h-10 flex-1 items-center gap-3 rounded-[var(--radius-control)] px-3 text-sm', isActive ? 'bg-primary-soft font-medium text-primary' : 'hover:bg-surface-2')
+  cn(
+    'flex min-h-10 flex-1 items-center gap-3 rounded-[var(--radius-control)] px-3 text-sm',
+    isActive ? 'bg-primary-soft font-medium text-primary' : 'hover:bg-surface-2',
+  )
 
-function Branch({ slug, depth, activePath, onNavigate }: { slug: string; depth: number; activePath: string[]; onNavigate?: () => void }) {
+function Branch({
+  slug,
+  depth,
+  activePath,
+  onNavigate,
+}: {
+  slug: string
+  depth: number
+  activePath: string[]
+  onNavigate?: () => void
+}) {
   const { t } = useTranslation()
   const [open, setOpen] = useState(activePath.includes(slug))
   const listId = useId()

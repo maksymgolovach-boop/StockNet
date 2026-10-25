@@ -6,7 +6,13 @@ import { runSearch } from '@/features/search/engine'
 import { emptyFilters } from '@/features/search/filtersCodec'
 import { meetsVerification } from '@/features/trust/trustScore'
 import { ProductSearchIndex, searchCategories, searchProducers } from '@/features/search/searchIndex'
-import type { SearchContext, SearchParams, SearchResponse, SearchResultItem, Suggestions } from '@/features/search/types'
+import type {
+  SearchContext,
+  SearchParams,
+  SearchResponse,
+  SearchResultItem,
+  Suggestions,
+} from '@/features/search/types'
 import { mockRequest } from './client'
 
 let index: ProductSearchIndex | null = null
@@ -22,7 +28,8 @@ export interface SearchRequestContext {
 function partnerDeals(role: PartyRole, partyId: string): Record<string, number> {
   if (role !== 'buyer') return {}
   const out: Record<string, number> = {}
-  for (const d of db.deals) if (d.buyerId === partyId && d.status !== 'cancelled') out[d.producerId] = (out[d.producerId] ?? 0) + 1
+  for (const d of db.deals)
+    if (d.buyerId === partyId && d.status !== 'cancelled') out[d.producerId] = (out[d.producerId] ?? 0) + 1
   return out
 }
 
@@ -38,7 +45,14 @@ export interface RecommendationResponse {
   items: (SearchResultItem & { recommendation: Recommendation })[]
 }
 
-const REASON_PRIORITY: RecommendationReason['code'][] = ['searched', 'past_partner', 'saved_similar', 'popular_with_type', 'preferred_category', 'nearby']
+const REASON_PRIORITY: RecommendationReason['code'][] = [
+  'searched',
+  'past_partner',
+  'saved_similar',
+  'popular_with_type',
+  'preferred_category',
+  'nearby',
+]
 
 function contextFor(req: SearchRequestContext): SearchContext {
   return {
@@ -52,7 +66,13 @@ function contextFor(req: SearchRequestContext): SearchContext {
 /** Scores every listing against the buyer profile, tuning, searches, saved items and deal history. */
 function recommend(req: SearchRequestContext, r: RecommendationRequest): RecommendationResponse {
   const ctx = contextFor(req)
-  const all = runSearch(db.products, db.producers, null, { filters: emptyFilters(), sort: 'relevance', limit: Infinity }, ctx).items
+  const all = runSearch(
+    db.products,
+    db.producers,
+    null,
+    { filters: emptyFilters(), sort: 'relevance', limit: Infinity },
+    ctx,
+  ).items
   const buyer = db.buyers.find((b) => b.id === req.partyId)
   const byId = new Map(db.products.map((p) => [p.id, p]))
   const savedCategories = new Set(r.savedProductIds.map((id) => byId.get(id)?.categorySlug).filter(Boolean))
@@ -67,7 +87,10 @@ function recommend(req: SearchRequestContext, r: RecommendationRequest): Recomme
         if (root) popularRoots.set(root, (popularRoots.get(root) ?? 0) + 1)
       }
     }
-  const topPopular = [...popularRoots.entries()].sort((a, b) => b[1] - a[1]).slice(0, 3).map(([root]) => root)
+  const topPopular = [...popularRoots.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3)
+    .map(([root]) => root)
   const scored = all.map((item) => {
     const p = item.product
     const producer = db.producers.find((x) => x.id === p.producerId)
@@ -107,8 +130,10 @@ function recommend(req: SearchRequestContext, r: RecommendationRequest): Recomme
       if (moqEUR > r.tuning.volumeEUR.max) score -= 2
       else if (moqEUR >= r.tuning.volumeEUR.min * 0.1) score += 0.5
     }
-    if (r.tuning.certifications.length) score += r.tuning.certifications.every((c) => p.certifications.includes(c)) ? 1.5 : -1
-    if (r.tuning.preferVerified && producer) score += meetsVerification(producer.verification.level, 'verified') ? 1 : -2
+    if (r.tuning.certifications.length)
+      score += r.tuning.certifications.every((c) => p.certifications.includes(c)) ? 1.5 : -1
+    if (r.tuning.preferVerified && producer)
+      score += meetsVerification(producer.verification.level, 'verified') ? 1 : -2
     reasons.sort((a, b) => REASON_PRIORITY.indexOf(a.code) - REASON_PRIORITY.indexOf(b.code))
     return { ...item, recommendation: { productId: p.id, score: Math.round(score * 100) / 100, reasons } }
   })
@@ -152,7 +177,11 @@ export const searchService: SearchService = {
       () => {
         const scores = getIndex().search(query)
         const products = scores
-          ? [...scores].sort((a, b) => a[1] - b[1]).slice(0, 5).map(([id]) => db.products.find((p) => p.id === id)).filter((p) => p !== undefined)
+          ? [...scores]
+              .sort((a, b) => a[1] - b[1])
+              .slice(0, 5)
+              .map(([id]) => db.products.find((p) => p.id === id))
+              .filter((p) => p !== undefined)
           : []
         const counts = (slug: string) => {
           const slugs = new Set(getDescendantSlugs(slug))

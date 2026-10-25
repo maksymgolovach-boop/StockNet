@@ -16,11 +16,19 @@ export function FilterPanel({ api, facets }: { api: FiltersApi; facets: SearchRe
   const { t } = useTranslation()
   const f = api.filters
   const lotCount =
-    [f.saleMode, f.lotSizeMin ?? f.lotSizeMax, f.lotPriceMin ?? f.lotPriceMax, f.lotsAvailableMin, f.producedFrom ?? f.producedTo].filter((v) => v !== undefined).length +
+    [
+      f.saleMode,
+      f.lotSizeMin ?? f.lotSizeMax,
+      f.lotPriceMin ?? f.lotPriceMax,
+      f.lotsAvailableMin,
+      f.producedFrom ?? f.producedTo,
+    ].filter((v) => v !== undefined).length +
     (f.indivisibleOnly ? 1 : 0) +
     f.lotConditions.length
   const showLots = (facets?.saleModes.lot ?? 0) > 0 || hasLotFilters(f) || f.saleMode !== undefined
-  const trustCount = [f.verificationMin, f.minTrust].filter((v) => v !== undefined).length + [f.pastPartnersOnly, f.validCertsOnly].filter(Boolean).length
+  const trustCount =
+    [f.verificationMin, f.minTrust].filter((v) => v !== undefined).length +
+    [f.pastPartnersOnly, f.validCertsOnly].filter(Boolean).length
   return (
     <div className="flex flex-col">
       <FilterSection title={t('nav.categories')}>
@@ -33,7 +41,10 @@ export function FilterPanel({ api, facets }: { api: FiltersApi; facets: SearchRe
         <TrustFilters api={api} />
       </FilterSection>
       <AttributeFilters api={api} />
-      <FilterSection title={t('filters.price')} count={f.priceMin !== undefined || f.priceMax !== undefined ? 1 : undefined}>
+      <FilterSection
+        title={t('filters.price')}
+        count={f.priceMin !== undefined || f.priceMax !== undefined ? 1 : undefined}
+      >
         <PriceFilter api={api} />
       </FilterSection>
       {showLots && (
@@ -50,7 +61,11 @@ export function FilterPanel({ api, facets }: { api: FiltersApi; facets: SearchRe
       <FilterSection title={t('filters.country')} count={f.countries.length || undefined}>
         <CountryFilter api={api} facets={facets?.countries ?? []} />
       </FilterSection>
-      <FilterSection title={t('filters.certifications')} defaultOpen={!!f.category} count={f.certifications.length || undefined}>
+      <FilterSection
+        title={t('filters.certifications')}
+        defaultOpen={!!f.category}
+        count={f.certifications.length || undefined}
+      >
         <CertificationFilter api={api} facets={facets?.certifications ?? []} />
       </FilterSection>
     </div>

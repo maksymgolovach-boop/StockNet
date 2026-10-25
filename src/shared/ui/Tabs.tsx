@@ -21,7 +21,20 @@ export function Tabs<T extends string>({ tabs, active, onChange, label, children
   const refs = useRef(new Map<T, HTMLButtonElement>())
   const onKey = (e: KeyboardEvent, index: number) => {
     const last = tabs.length - 1
-    const next = e.key === 'ArrowRight' ? (index === last ? 0 : index + 1) : e.key === 'ArrowLeft' ? (index === 0 ? last : index - 1) : e.key === 'Home' ? 0 : e.key === 'End' ? last : null
+    const next =
+      e.key === 'ArrowRight'
+        ? index === last
+          ? 0
+          : index + 1
+        : e.key === 'ArrowLeft'
+          ? index === 0
+            ? last
+            : index - 1
+          : e.key === 'Home'
+            ? 0
+            : e.key === 'End'
+              ? last
+              : null
     if (next === null) return
     e.preventDefault()
     const tab = tabs[next]
@@ -59,7 +72,13 @@ export function Tabs<T extends string>({ tabs, active, onChange, label, children
           )
         })}
       </div>
-      <div id={`${base}-panel`} role="tabpanel" aria-labelledby={`${base}-tab-${active}`} tabIndex={0} className="pt-5 outline-none">
+      <div
+        id={`${base}-panel`}
+        role="tabpanel"
+        aria-labelledby={`${base}-tab-${active}`}
+        tabIndex={0}
+        className="pt-5 outline-none"
+      >
         {children}
       </div>
     </div>

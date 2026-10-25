@@ -12,7 +12,11 @@ export function CategoryFilter({ api, facets }: { api: FiltersApi; facets: Facet
     <div className="flex flex-col gap-0.5 text-sm">
       {current && (
         <>
-          <button type="button" onClick={() => api.setFilters({ category: up })} className="flex min-h-8 items-center gap-1 rounded px-1 text-ink-muted hover:bg-surface-2 hover:text-ink">
+          <button
+            type="button"
+            onClick={() => api.setFilters({ category: up })}
+            className="flex min-h-8 items-center gap-1 rounded px-1 text-ink-muted hover:bg-surface-2 hover:text-ink"
+          >
             <ChevronLeft className="size-4 rtl:rotate-180" aria-hidden />
             {up ? t(`categories.${up}`) : t('nav.allCategories')}
           </button>
@@ -31,7 +35,7 @@ export function CategoryFilter({ api, facets }: { api: FiltersApi; facets: Facet
               className="flex min-h-8 w-full items-center justify-between gap-2 rounded px-1 text-start hover:bg-surface-2 hover:text-primary disabled:pointer-events-none disabled:opacity-45"
             >
               <span>{t(`categories.${f.value}`)}</span>
-              <span className="text-xs text-ink-subtle tabular">{f.count}</span>
+              <span className="tabular text-xs text-ink-subtle">{f.count}</span>
             </button>
           </li>
         ))}

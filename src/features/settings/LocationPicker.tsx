@@ -63,7 +63,9 @@ export function LocationPicker() {
       >
         {status === 'locating' ? t('common.loading') : t('filters.useMyLocation')}
       </Button>
-      {(status === 'denied' || status === 'unavailable') && <p className="text-xs text-accent">{t(`filters.geo.${status}`)}</p>}
+      {(status === 'denied' || status === 'unavailable') && (
+        <p className="text-xs text-accent">{t(`filters.geo.${status}`)}</p>
+      )}
     </div>
   )
 }

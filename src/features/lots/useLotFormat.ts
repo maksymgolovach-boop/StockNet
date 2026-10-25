@@ -9,9 +9,16 @@ export function useLotFormat() {
   const fmt = useFormat()
   return useMemo(() => {
     const amount = (qty: number, unit: UnitCode) =>
-      UNITS[unit].dimension === 'count' ? t(`lots.items.${unit}`, { count: qty, value: fmt.number(qty) }) : fmt.quantity(qty, unit, { withImperial: false })
+      UNITS[unit].dimension === 'count'
+        ? t(`lots.items.${unit}`, { count: qty, value: fmt.number(qty) })
+        : fmt.quantity(qty, unit, { withImperial: false })
     const content = (c: Lot['content']) =>
-      c.itemSize ? t('lots.contentOf', { items: amount(c.quantity, c.unit), size: fmt.quantity(c.itemSize.quantity, c.itemSize.unit, { withImperial: false }) }) : amount(c.quantity, c.unit)
+      c.itemSize
+        ? t('lots.contentOf', {
+            items: amount(c.quantity, c.unit),
+            size: fmt.quantity(c.itemSize.quantity, c.itemSize.unit, { withImperial: false }),
+          })
+        : amount(c.quantity, c.unit)
     return {
       amount,
       content,

@@ -29,7 +29,10 @@ export function Price({ amount, currency, unit, unitLabel: customUnit, className
     <Tooltip content={t('common.listedAt', { price: listed })}>
       <span
         tabIndex={0}
-        className={cn('tabular cursor-help underline decoration-line-strong decoration-dotted underline-offset-4', className)}
+        className={cn(
+          'tabular cursor-help underline decoration-line-strong decoration-dotted underline-offset-4',
+          className,
+        )}
       >
         {label}
       </span>

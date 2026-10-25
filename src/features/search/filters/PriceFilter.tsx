@@ -29,9 +29,14 @@ export function PriceFilter({ api }: { api: FiltersApi }) {
         compact
         value={priceUnit ?? ''}
         onChange={(e) => api.setFilters({ priceUnit: (e.target.value || undefined) as UnitCode | undefined })}
-        options={[{ value: '', label: t('filters.perListedUnit') }, ...units.map((u) => ({ value: u, label: t('filters.perUnit', { unit: t(`units.${u}`) }) }))]}
+        options={[
+          { value: '', label: t('filters.perListedUnit') },
+          ...units.map((u) => ({ value: u, label: t('filters.perUnit', { unit: t(`units.${u}`) }) })),
+        ]}
       />
-      <p className="text-xs text-ink-subtle">{t(priceUnit ? 'filters.priceUnitHint' : 'filters.priceCurrencyHint', { currency })}</p>
+      <p className="text-xs text-ink-subtle">
+        {t(priceUnit ? 'filters.priceUnitHint' : 'filters.priceCurrencyHint', { currency })}
+      </p>
     </div>
   )
 }

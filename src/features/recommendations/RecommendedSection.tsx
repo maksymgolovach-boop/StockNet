@@ -30,7 +30,12 @@ export function RecommendedSection() {
           <p className="text-sm text-ink-muted">{t('reco.body')}</p>
         </div>
         <div className="flex items-center gap-1">
-          <Button variant="secondary" size="sm" icon={<SlidersHorizontal className="size-4" aria-hidden />} onClick={() => setTuneOpen(true)}>
+          <Button
+            variant="secondary"
+            size="sm"
+            icon={<SlidersHorizontal className="size-4" aria-hidden />}
+            onClick={() => setTuneOpen(true)}
+          >
             {t('reco.tune.open')}
           </Button>
           <IconButton label={t('reco.prev')} onClick={() => scroll(-1)} className="hidden sm:inline-flex">
@@ -50,7 +55,11 @@ export function RecommendedSection() {
           </div>
         </LoadingRegion>
       ) : data?.items.length ? (
-        <ul ref={track} aria-label={t('reco.title')} className="-mx-1 flex snap-x snap-mandatory gap-3 overflow-x-auto px-1 pb-2 [scrollbar-width:thin]">
+        <ul
+          ref={track}
+          aria-label={t('reco.title')}
+          className="-mx-1 flex snap-x snap-mandatory [scrollbar-width:thin] gap-3 overflow-x-auto px-1 pb-2"
+        >
           {data.items.map((item) => (
             <li key={item.product.id} className="flex w-[17.5rem] shrink-0 snap-start flex-col gap-1.5 sm:w-72">
               {item.recommendation.reasons[0] && <ReasonChip reason={item.recommendation.reasons[0]} />}
@@ -61,9 +70,17 @@ export function RecommendedSection() {
           ))}
         </ul>
       ) : (
-        <p className="rounded-[var(--radius-card)] border border-dashed border-line-strong p-6 text-sm text-ink-muted">{t('reco.empty')}</p>
+        <p className="rounded-[var(--radius-card)] border border-dashed border-line-strong p-6 text-sm text-ink-muted">
+          {t('reco.empty')}
+        </p>
       )}
-      <Drawer open={tuneOpen} onClose={() => setTuneOpen(false)} title={t('reco.tune.title')} closeLabel={t('common.close')} side="end">
+      <Drawer
+        open={tuneOpen}
+        onClose={() => setTuneOpen(false)}
+        title={t('reco.tune.title')}
+        closeLabel={t('common.close')}
+        side="end"
+      >
         <div className="flex flex-col gap-4 p-4">
           <p className="text-sm text-ink-muted">{t('reco.tune.intro')}</p>
           <TuningPanel />

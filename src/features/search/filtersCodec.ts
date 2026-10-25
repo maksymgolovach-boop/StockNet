@@ -1,10 +1,33 @@
-import type { AttributeFilterValue, ExpiryPreset, Filters, GeoBounds, GeoPoint, LeadTimePreset, LotCondition, SaleModeFilter, SortOption, VerificationLevel } from '@/types/models'
+import type {
+  AttributeFilterValue,
+  ExpiryPreset,
+  Filters,
+  GeoBounds,
+  GeoPoint,
+  LeadTimePreset,
+  LotCondition,
+  SaleModeFilter,
+  SortOption,
+  VerificationLevel,
+} from '@/types/models'
 import { getCategory, getCategoryConfig } from '@/config/categories'
 import { isCertificationCode, type CertificationCode } from '@/config/certifications'
 import { UNIT_CODES, type UnitCode } from '@/config/units'
 import type { ResultsView } from './types'
 
-export const SORT_OPTIONS: SortOption[] = ['relevance', 'price_asc', 'price_desc', 'normalized_asc', 'lot_price_asc', 'distance', 'expiry', 'availability', 'newest', 'rating', 'trust']
+export const SORT_OPTIONS: SortOption[] = [
+  'relevance',
+  'price_asc',
+  'price_desc',
+  'normalized_asc',
+  'lot_price_asc',
+  'distance',
+  'expiry',
+  'availability',
+  'newest',
+  'rating',
+  'trust',
+]
 export const SALE_MODE_FILTERS: SaleModeFilter[] = ['measure', 'lot', 'both']
 export const LOT_CONDITIONS: LotCondition[] = ['new', 'surplus', 'clearance', 'b_grade', 'returned']
 export const EXPIRY_PRESETS: ExpiryPreset[] = ['lt7', 'lt30', 'gt30']
@@ -51,8 +74,16 @@ function parseMap(params: URLSearchParams): MapUrlState {
   const b = (params.get('b') ?? '').split(',').map(Number)
   const zoom = num(params.get('z'))
   const center = c.length === 2 && c.every(Number.isFinite) ? { lat: c[0] as number, lng: c[1] as number } : undefined
-  const bounds = b.length === 4 && b.every(Number.isFinite) ? { south: b[0] as number, west: b[1] as number, north: b[2] as number, east: b[3] as number } : undefined
-  return { center, zoom: zoom !== undefined && zoom >= 2 && zoom <= 18 ? zoom : undefined, bounds, searchAsMove: params.get('move') === '1' }
+  const bounds =
+    b.length === 4 && b.every(Number.isFinite)
+      ? { south: b[0] as number, west: b[1] as number, north: b[2] as number, east: b[3] as number }
+      : undefined
+  return {
+    center,
+    zoom: zoom !== undefined && zoom >= 2 && zoom <= 18 ? zoom : undefined,
+    bounds,
+    searchAsMove: params.get('move') === '1',
+  }
 }
 
 const num = (v: string | null) => {
@@ -66,7 +97,8 @@ const range = (v: string | null) => {
   return [num(lo ?? null), num(hi ?? null)] as const
 }
 const isoDay = (v: string | undefined) => (v && /^\d{4}-\d{2}-\d{2}$/.test(v) ? v : undefined)
-const oneOf = <T extends string>(v: string | null, options: readonly T[]) => (options as readonly string[]).includes(v ?? '') ? (v as T) : undefined
+const oneOf = <T extends string>(v: string | null, options: readonly T[]) =>
+  (options as readonly string[]).includes(v ?? '') ? (v as T) : undefined
 
 /** Attribute filters are only kept when the active category defines that attribute as filterable. */
 function parseAttributes(params: URLSearchParams, category: string | undefined): Record<string, AttributeFilterValue> {
@@ -164,8 +196,10 @@ export function serializeSearchState(state: SearchState, categoryInPath: boolean
   set('exp', f.expiry)
   set('lead', f.leadTime)
   set('mode', f.saleMode)
-  if (f.lotSizeMin !== undefined || f.lotSizeMax !== undefined) set('lsize', `${f.lotSizeMin ?? ''}..${f.lotSizeMax ?? ''}`)
-  if (f.lotPriceMin !== undefined || f.lotPriceMax !== undefined) set('lprice', `${f.lotPriceMin ?? ''}..${f.lotPriceMax ?? ''}`)
+  if (f.lotSizeMin !== undefined || f.lotSizeMax !== undefined)
+    set('lsize', `${f.lotSizeMin ?? ''}..${f.lotSizeMax ?? ''}`)
+  if (f.lotPriceMin !== undefined || f.lotPriceMax !== undefined)
+    set('lprice', `${f.lotPriceMin ?? ''}..${f.lotPriceMax ?? ''}`)
   set('lots', f.lotsAvailableMin)
   set('indiv', f.indivisibleOnly && '1')
   set('lcond', f.lotConditions.join(','))
@@ -191,7 +225,9 @@ export function serializeSearchState(state: SearchState, categoryInPath: boolean
 
 /** Number of user-set constraints (for the mobile "Filters (n)" button). */
 export function activeFilterCount(f: Filters): number {
-  const flags = [f.inStock, f.deliveryAvailable, f.pastPartnersOnly, f.validCertsOnly, f.indivisibleOnly].filter(Boolean).length
+  const flags = [f.inStock, f.deliveryAvailable, f.pastPartnersOnly, f.validCertsOnly, f.indivisibleOnly].filter(
+    Boolean,
+  ).length
   const scalars = [
     f.radiusKm,
     f.priceMin ?? f.priceMax,
@@ -207,5 +243,12 @@ export function activeFilterCount(f: Filters): number {
     f.lotsAvailableMin,
     f.producedFrom ?? f.producedTo,
   ].filter((v) => v !== undefined).length
-  return flags + scalars + f.countries.length + f.certifications.length + f.lotConditions.length + Object.keys(f.attributes).length
+  return (
+    flags +
+    scalars +
+    f.countries.length +
+    f.certifications.length +
+    f.lotConditions.length +
+    Object.keys(f.attributes).length
+  )
 }

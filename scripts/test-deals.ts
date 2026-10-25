@@ -36,20 +36,48 @@ const request = (producerId: string, items: QuoteRequestInput['items']): QuoteRe
   lang: 'en',
 })
 
-const tiers = [{ minQty: 1, unitPrice: 10 }, { minQty: 10, unitPrice: 9 }, { minQty: 50, unitPrice: 8 }]
-check('tierFor picks the highest tier reached', tierFor(tiers, 12)?.unitPrice === 9 && tierFor(tiers, 50)?.unitPrice === 8)
+const tiers = [
+  { minQty: 1, unitPrice: 10 },
+  { minQty: 10, unitPrice: 9 },
+  { minQty: 50, unitPrice: 8 },
+]
+check(
+  'tierFor picks the highest tier reached',
+  tierFor(tiers, 12)?.unitPrice === 9 && tierFor(tiers, 50)?.unitPrice === 8,
+)
 check('tierFor falls back to the first tier', tierFor(tiers, 0)?.unitPrice === 10)
 
-check('no seeded quote request is auto-answered on start-up', !db.deals.some((d) => d.status === 'quote_request' && new Date(d.createdAt) >= DEMO_NOW))
+check(
+  'no seeded quote request is auto-answered on start-up',
+  !db.deals.some((d) => d.status === 'quote_request' && new Date(d.createdAt) >= DEMO_NOW),
+)
 
 const ownProduct = db.products.find((p) => p.producerId === ownProducerId && p.saleModes.includes('measure'))
-if (ownProduct) await rejects('quote request to your own company is rejected', () => dealService.createQuoteRequest(buyerId, request(ownProducerId, [{ productId: ownProduct.id, mode: 'measure', quantity: ownProduct.moq }])), 422)
-await rejects('chat with your own company is rejected', () => chatTransport.openThread({ buyerId, producerId: ownProducerId }), 422)
+if (ownProduct)
+  await rejects(
+    'quote request to your own company is rejected',
+    () =>
+      dealService.createQuoteRequest(
+        buyerId,
+        request(ownProducerId, [{ productId: ownProduct.id, mode: 'measure', quantity: ownProduct.moq }]),
+      ),
+    422,
+  )
+await rejects(
+  'chat with your own company is rejected',
+  () => chatTransport.openThread({ buyerId, producerId: ownProducerId }),
+  422,
+)
 
 const candidate = db.products
   .filter((p) => p.producerId !== ownProducerId && p.saleModes.includes('lot'))
   .flatMap((p) => p.lots.map((lot) => ({ product: p, lot })))
-  .find(({ lot }) => isSellable(lot) && availableLots(lot) >= lotQuantityRule(lot).min && clampLotQuantity(lot, availableLots(lot)) === availableLots(lot))
+  .find(
+    ({ lot }) =>
+      isSellable(lot) &&
+      availableLots(lot) >= lotQuantityRule(lot).min &&
+      clampLotQuantity(lot, availableLots(lot)) === availableLots(lot),
+  )
 
 if (!candidate) check('found a lot to test with', false)
 else {
@@ -61,20 +89,46 @@ else {
   for (const d of [a, b]) await dealService.transition('producer', product.producerId, d.id, 'sendQuote')
   const reservedAtStart = lot.reservedCount
   await dealService.transition('buyer', buyerId, a.id, 'acceptQuote')
-  check('accepting the first quote reserves the lot', lot.reservedCount === reservedAtStart + qty && availableLots(lot) === 0, `(${lot.lotNumber}: ${lot.reservedCount}/${lot.stockCount})`)
-  await rejects('accepting a second quote for the same stock is rejected', () => dealService.transition('buyer', buyerId, b.id, 'acceptQuote'), 409)
+  check(
+    'accepting the first quote reserves the lot',
+    lot.reservedCount === reservedAtStart + qty && availableLots(lot) === 0,
+    `(${lot.lotNumber}: ${lot.reservedCount}/${lot.stockCount})`,
+  )
+  await rejects(
+    'accepting a second quote for the same stock is rejected',
+    () => dealService.transition('buyer', buyerId, b.id, 'acceptQuote'),
+    409,
+  )
 
   const stockBefore = lot.stockCount
   const reservedBefore = lot.reservedCount
-  await dealService.openDispute('buyer', buyerId, a.id, { reason: 'quality', resolution: 'discount', description: 'Goods do not match the agreed specification.', productIds: [product.id], attachments: [] })
+  await dealService.openDispute('buyer', buyerId, a.id, {
+    reason: 'quality',
+    resolution: 'discount',
+    description: 'Goods do not match the agreed specification.',
+    productIds: [product.id],
+    attachments: [],
+  })
   check('lots stay reserved while an undelivered deal is disputed', lot.reservedCount === reservedBefore)
-  await rejects('the producer cannot resolve the buyer’s dispute', () => dealService.resolveDispute('producer', product.producerId, a.id, 'ok'), 403)
+  await rejects(
+    'the producer cannot resolve the buyer’s dispute',
+    () => dealService.resolveDispute('producer', product.producerId, a.id, 'ok'),
+    403,
+  )
   const resolved = await dealService.resolveDispute('buyer', buyerId, a.id, 'Agreed a discount')
-  check('resolving returns the deal to its previous status', resolved.status === 'order_confirmed', `(${resolved.status})`)
+  check(
+    'resolving returns the deal to its previous status',
+    resolved.status === 'order_confirmed',
+    `(${resolved.status})`,
+  )
   await dealService.transition('producer', product.producerId, a.id, 'dispatch')
   const delivered = await dealService.transition('producer', product.producerId, a.id, 'markDelivered')
   check('the resolved deal can still be delivered', delivered.status === 'delivered' && !!delivered.deliveredAt)
-  check('delivery takes the lots out of stock', Math.abs(lot.stockCount - (stockBefore - qty)) < 1e-9, `(${stockBefore} → ${lot.stockCount})`)
+  check(
+    'delivery takes the lots out of stock',
+    Math.abs(lot.stockCount - (stockBefore - qty)) < 1e-9,
+    `(${stockBefore} → ${lot.stockCount})`,
+  )
 }
 
 console.log(fail ? `${fail} failed` : 'all deal tests passed')

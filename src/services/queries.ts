@@ -30,17 +30,25 @@ export const queryKeys = {
   messages: (role: string, id: string, threadId: string) => ['messages', role, id, threadId] as const,
 }
 
-export const useFxRates = () => useQuery({ queryKey: queryKeys.fx, queryFn: () => mockFxProvider.getRates(), staleTime: 15 * 60_000 })
-export const useCategoryStats = () => useQuery({ queryKey: queryKeys.categoryStats, queryFn: () => catalogService.categoryStats() })
-export const usePlatformStats = () => useQuery({ queryKey: queryKeys.platformStats, queryFn: () => catalogService.platformStats() })
+export const useFxRates = () =>
+  useQuery({ queryKey: queryKeys.fx, queryFn: () => mockFxProvider.getRates(), staleTime: 15 * 60_000 })
+export const useCategoryStats = () =>
+  useQuery({ queryKey: queryKeys.categoryStats, queryFn: () => catalogService.categoryStats() })
+export const usePlatformStats = () =>
+  useQuery({ queryKey: queryKeys.platformStats, queryFn: () => catalogService.platformStats() })
 export const useProducts = () => useQuery({ queryKey: queryKeys.products, queryFn: () => catalogService.products() })
 export const useProducers = () => useQuery({ queryKey: queryKeys.producers, queryFn: () => catalogService.producers() })
 
-export const useProduct = (id: string) => useQuery({ queryKey: queryKeys.product(id), queryFn: () => catalogService.product(id) })
+export const useProduct = (id: string) =>
+  useQuery({ queryKey: queryKeys.product(id), queryFn: () => catalogService.product(id) })
 export const useProducer = (id: string | undefined) =>
   useQuery({ queryKey: queryKeys.producer(id ?? ''), queryFn: () => catalogService.producer(id ?? ''), enabled: !!id })
 export const useProducerReviews = (producerId: string | undefined) =>
-  useQuery({ queryKey: ['reviews', producerId], queryFn: () => dealService.reviewsForProducer(producerId ?? ''), enabled: !!producerId })
+  useQuery({
+    queryKey: ['reviews', producerId],
+    queryFn: () => dealService.reviewsForProducer(producerId ?? ''),
+    enabled: !!producerId,
+  })
 export const useBuyers = () => useQuery({ queryKey: ['buyers'], queryFn: () => catalogService.buyers() })
 
 export function useMyDeals() {
@@ -65,7 +73,10 @@ export function useMyThreads() {
   const results = useQueries({
     queries: [
       { queryKey: queryKeys.threads('buyer', buyerId), queryFn: () => dealService.threads('buyer', buyerId) },
-      { queryKey: queryKeys.threads('producer', producerId), queryFn: () => dealService.threads('producer', producerId) },
+      {
+        queryKey: queryKeys.threads('producer', producerId),
+        queryFn: () => dealService.threads('producer', producerId),
+      },
     ],
   })
   const tag = (list: ThreadSummary[] | undefined, mySide: PartyRole) => list?.map((t) => ({ ...t, mySide }))

@@ -14,8 +14,23 @@ export function useRecommendations(limit = 12) {
   const savedProductIds = useSaved((s) => s.productIds)
   const savedProducerIds = useSaved((s) => s.producerIds)
   return useQuery({
-    queryKey: ['recommendations', location, tuning, displayCurrency, 'buyer', buyerId, recentSearches, savedProductIds, savedProducerIds, limit],
-    queryFn: () => searchService.recommend({ location, displayCurrency, role: 'buyer', partyId: buyerId }, { tuning, recentSearches, savedProductIds, savedProducerIds, limit }),
+    queryKey: [
+      'recommendations',
+      location,
+      tuning,
+      displayCurrency,
+      'buyer',
+      buyerId,
+      recentSearches,
+      savedProductIds,
+      savedProducerIds,
+      limit,
+    ],
+    queryFn: () =>
+      searchService.recommend(
+        { location, displayCurrency, role: 'buyer', partyId: buyerId },
+        { tuning, recentSearches, savedProductIds, savedProducerIds, limit },
+      ),
     placeholderData: keepPreviousData,
   })
 }

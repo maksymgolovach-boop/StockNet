@@ -42,16 +42,25 @@ export function DevMenu() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className={cn('fixed start-4 z-[900] flex h-9 min-w-9 items-center justify-center gap-1.5 rounded-full border border-line-strong bg-surface px-2.5 text-xs font-medium text-ink-muted shadow-pop hover:text-ink', inChat ? 'bottom-44 lg:bottom-4' : 'bottom-4')}
+        className={cn(
+          'fixed start-4 z-[900] flex h-9 min-w-9 items-center justify-center gap-1.5 rounded-full border border-line-strong bg-surface px-2.5 text-xs font-medium text-ink-muted shadow-pop hover:text-ink',
+          inChat ? 'bottom-44 lg:bottom-4' : 'bottom-4',
+        )}
         aria-haspopup="dialog"
         aria-label={t('dev.menu')}
         title={t('dev.menu')}
       >
         <Wrench className="size-3.5" aria-hidden />
-        
+
         {simulateErrors && <span className="size-2 rounded-full bg-accent" aria-hidden />}
       </button>
-      <Drawer open={open} onClose={() => setOpen(false)} title={t('dev.menu')} closeLabel={t('common.close')} side="end">
+      <Drawer
+        open={open}
+        onClose={() => setOpen(false)}
+        title={t('dev.menu')}
+        closeLabel={t('common.close')}
+        side="end"
+      >
         <div className="flex flex-col gap-6 p-4 text-sm">
           <div>
             <p className="mb-1 text-xs font-semibold tracking-wide text-ink-subtle uppercase">{t('dev.company')}</p>
@@ -92,7 +101,7 @@ export function DevMenu() {
           />
           <div>
             <p className="mb-1 text-xs font-semibold tracking-wide text-ink-subtle uppercase">{t('dev.dataset')}</p>
-            <dl className="grid grid-cols-2 gap-x-4 gap-y-1 tabular">
+            <dl className="tabular grid grid-cols-2 gap-x-4 gap-y-1">
               {counts.map(([k, v]) => (
                 <div key={k} className="flex justify-between border-b border-line py-1">
                   <dt className="text-ink-muted">{k}</dt>
@@ -107,10 +116,7 @@ export function DevMenu() {
           <Button variant="secondary" onClick={resetPrefs}>
             {t('dev.resetPrefs')}
           </Button>
-          <Button
-            variant="secondary"
-            onClick={resetDemoData}
-          >
+          <Button variant="secondary" onClick={resetDemoData}>
             {t('dev.resetLots')}
           </Button>
         </div>

@@ -12,7 +12,9 @@ const REASONS: DisputeReason[] = ['quality', 'quantity', 'late', 'damaged', 'wro
 const RESOLUTIONS: DisputeResolution[] = ['refund', 'replacement', 'discount', 'return']
 
 const schema = z.object({
-  reason: z.enum(['quality', 'quantity', 'late', 'damaged', 'wrong_product', 'documents'], { message: 'dispute.errors.reason' }),
+  reason: z.enum(['quality', 'quantity', 'late', 'damaged', 'wrong_product', 'documents'], {
+    message: 'dispute.errors.reason',
+  }),
   resolution: z.enum(['refund', 'replacement', 'discount', 'return'], { message: 'dispute.errors.resolution' }),
   productIds: z.array(z.string()).min(1, 'dispute.errors.items'),
   description: z.string().trim().min(20, 'dispute.errors.description').max(2000, 'dispute.errors.tooLong'),
@@ -21,15 +23,36 @@ const schema = z.object({
 
 type Values = z.infer<typeof schema>
 
-export function DisputeDialog({ deal, open, onClose, onSubmit, submitting, error }: { deal: Deal; open: boolean; onClose: () => void; onSubmit: (input: DisputeInput) => void; submitting: boolean; error?: string }) {
+export function DisputeDialog({
+  deal,
+  open,
+  onClose,
+  onSubmit,
+  submitting,
+  error,
+}: {
+  deal: Deal
+  open: boolean
+  onClose: () => void
+  onSubmit: (input: DisputeInput) => void
+  submitting: boolean
+  error?: string
+}) {
   const { t } = useTranslation()
   const { register, handleSubmit, formState, setValue, control } = useForm<Values>({
     resolver: zodResolver(schema),
-    defaultValues: { reason: undefined, resolution: undefined, productIds: deal.lineItems.map((li) => li.productId), description: '', attachments: [] },
+    defaultValues: {
+      reason: undefined,
+      resolution: undefined,
+      productIds: deal.lineItems.map((li) => li.productId),
+      description: '',
+      attachments: [],
+    },
   })
   const attachments = useWatch({ control, name: 'attachments' })
   const err = (k: keyof Values) => formState.errors[k]?.message
-  const input = 'w-full rounded-[var(--radius-control)] border border-line-strong bg-surface px-3 text-sm aria-[invalid=true]:border-expired'
+  const input =
+    'w-full rounded-[var(--radius-control)] border border-line-strong bg-surface px-3 text-sm aria-[invalid=true]:border-expired'
   return (
     <Modal
       open={open}
@@ -59,7 +82,13 @@ export function DisputeDialog({ deal, open, onClose, onSubmit, submitting, error
           <label htmlFor="dispute-reason" className="text-xs font-medium text-ink-muted">
             {t('dispute.reason')} <span className="text-primary">*</span>
           </label>
-          <select id="dispute-reason" {...register('reason')} aria-invalid={!!err('reason')} className={`${input} h-10`} defaultValue="">
+          <select
+            id="dispute-reason"
+            {...register('reason')}
+            aria-invalid={!!err('reason')}
+            className={`${input} h-10`}
+            defaultValue=""
+          >
             <option value="" disabled>
               {t('lots.form.choose')}
             </option>
@@ -77,7 +106,12 @@ export function DisputeDialog({ deal, open, onClose, onSubmit, submitting, error
           </legend>
           {deal.lineItems.map((li) => (
             <label key={li.productId} className="flex items-start gap-2 text-sm">
-              <input type="checkbox" value={li.productId} {...register('productIds')} className="mt-1 size-4 accent-[var(--primary)]" />
+              <input
+                type="checkbox"
+                value={li.productId}
+                {...register('productIds')}
+                className="mt-1 size-4 accent-[var(--primary)]"
+              />
               <span>
                 {li.productName}
                 <span className="ms-2">
@@ -92,7 +126,14 @@ export function DisputeDialog({ deal, open, onClose, onSubmit, submitting, error
           <label htmlFor="dispute-description" className="text-xs font-medium text-ink-muted">
             {t('dispute.description')} <span className="text-primary">*</span>
           </label>
-          <textarea id="dispute-description" rows={5} {...register('description')} aria-invalid={!!err('description')} className={`${input} py-2`} placeholder={t('dispute.descriptionPlaceholder')} />
+          <textarea
+            id="dispute-description"
+            rows={5}
+            {...register('description')}
+            aria-invalid={!!err('description')}
+            className={`${input} py-2`}
+            placeholder={t('dispute.descriptionPlaceholder')}
+          />
           {err('description') && <p className="text-xs text-expired">{t(err('description') as string)}</p>}
         </div>
         <fieldset className="flex flex-col gap-1">
@@ -118,10 +159,17 @@ export function DisputeDialog({ deal, open, onClose, onSubmit, submitting, error
             type="file"
             multiple
             accept="image/*,.pdf"
-            onChange={(e) => setValue('attachments', Array.from(e.target.files ?? []).map((f) => f.name))}
+            onChange={(e) =>
+              setValue(
+                'attachments',
+                Array.from(e.target.files ?? []).map((f) => f.name),
+              )
+            }
             className="text-sm file:me-3 file:h-9 file:rounded-[var(--radius-control)] file:border file:border-line-strong file:bg-surface file:px-3 file:text-sm"
           />
-          <p className="text-xs text-ink-subtle">{attachments.length ? attachments.join(', ') : t('dispute.evidenceHint')}</p>
+          <p className="text-xs text-ink-subtle">
+            {attachments.length ? attachments.join(', ') : t('dispute.evidenceHint')}
+          </p>
         </div>
       </form>
     </Modal>

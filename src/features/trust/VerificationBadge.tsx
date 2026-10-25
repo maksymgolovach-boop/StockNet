@@ -4,8 +4,18 @@ import type { VerificationLevel } from '@/types/models'
 import { Badge, type BadgeTone } from '@/shared/ui/Badge'
 import { Tooltip } from '@/shared/ui/Tooltip'
 
-const TONE: Record<VerificationLevel, BadgeTone> = { unverified: 'unverified', identity: 'neutral', verified: 'verified', audited: 'verified' }
-const ICON: Record<VerificationLevel, typeof BadgeCheck> = { unverified: ShieldQuestion, identity: ShieldAlert, verified: ShieldCheck, audited: BadgeCheck }
+const TONE: Record<VerificationLevel, BadgeTone> = {
+  unverified: 'unverified',
+  identity: 'neutral',
+  verified: 'verified',
+  audited: 'verified',
+}
+const ICON: Record<VerificationLevel, typeof BadgeCheck> = {
+  unverified: ShieldQuestion,
+  identity: ShieldAlert,
+  verified: ShieldCheck,
+  audited: BadgeCheck,
+}
 
 /** Verification level with a tooltip explaining what was checked. */
 export function VerificationBadge({ level, compact = false }: { level: VerificationLevel; compact?: boolean }) {

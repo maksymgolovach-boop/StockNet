@@ -1,4 +1,13 @@
-import { useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState, type ReactNode, type Ref } from 'react'
+import {
+  useEffect,
+  useImperativeHandle,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+  type Ref,
+} from 'react'
 import { createPortal } from 'react-dom'
 import L from 'leaflet'
 import 'leaflet.markercluster'
@@ -54,10 +63,16 @@ export interface MapViewProps {
 
 const OSM = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
 const markerIds = new WeakMap<L.Marker, string>()
-const toBounds = (b: L.LatLngBounds): GeoBounds => ({ north: b.getNorth(), south: b.getSouth(), east: b.getEast(), west: b.getWest() })
+const toBounds = (b: L.LatLngBounds): GeoBounds => ({
+  north: b.getNorth(),
+  south: b.getSouth(),
+  east: b.getEast(),
+  west: b.getWest(),
+})
 
 export default function MapView(props: MapViewProps) {
-  const { pins, fitKey, dataReady, pinText, labels, popups, renderPopup, initialView, ref, userLocation, radiusKm } = props
+  const { pins, fitKey, dataReady, pinText, labels, popups, renderPopup, initialView, ref, userLocation, radiusKm } =
+    props
   const elRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<L.Map | null>(null)
   const clusterRef = useRef<L.MarkerClusterGroup | null>(null)
@@ -73,7 +88,18 @@ export default function MapView(props: MapViewProps) {
   const popupId = useRef<string | null>(null)
   const [tilesFailed, setTilesFailed] = useState(false)
   const popupEl = useMemo(() => document.createElement('div'), [])
-  const popup = useMemo(() => L.popup({ className: 'sy-popup', offset: [0, -30], minWidth: 248, maxWidth: 248, autoPanPaddingTopLeft: [24, 72], autoPanPaddingBottomRight: [24, 24] }).setContent(popupEl), [popupEl])
+  const popup = useMemo(
+    () =>
+      L.popup({
+        className: 'sy-popup',
+        offset: [0, -30],
+        minWidth: 248,
+        maxWidth: 248,
+        autoPanPaddingTopLeft: [24, 72],
+        autoPanPaddingBottomRight: [24, 24],
+      }).setContent(popupEl),
+    [popupEl],
+  )
   const selectedId = useMapUi((s) => s.selectedProducerId)
 
   useLayoutEffect(() => {
@@ -93,7 +119,11 @@ export default function MapView(props: MapViewProps) {
   }
   const state = (id: string): PinState => {
     const ui = useMapUi.getState()
-    return { hovered: ui.hoveredProducerId === id, selected: ui.selectedProducerId === id, visited: ui.visitedProducerIds.includes(id) }
+    return {
+      hovered: ui.hoveredProducerId === id,
+      selected: ui.selectedProducerId === id,
+      visited: ui.visitedProducerIds.includes(id),
+    }
   }
   const decorate = (id: string, m: L.Marker) => {
     const s = state(id)
@@ -167,11 +197,23 @@ export default function MapView(props: MapViewProps) {
     const el = elRef.current
     if (!el) return
     const init = latest.current.initialView
-    const map = L.map(el, { zoomControl: false, minZoom: 3, maxZoom: 17, worldCopyJump: true }).setView(init ? [init.center.lat, init.center.lng] : [47.2, 16], init?.zoom ?? 5)
-    L.control.zoom({ position: 'topright', zoomInTitle: latest.current.labels.zoomIn, zoomOutTitle: latest.current.labels.zoomOut }).addTo(map)
+    const map = L.map(el, { zoomControl: false, minZoom: 3, maxZoom: 17, worldCopyJump: true }).setView(
+      init ? [init.center.lat, init.center.lng] : [47.2, 16],
+      init?.zoom ?? 5,
+    )
+    L.control
+      .zoom({
+        position: 'topright',
+        zoomInTitle: latest.current.labels.zoomIn,
+        zoomOutTitle: latest.current.labels.zoomOut,
+      })
+      .addTo(map)
     let ok = 0
     let failed = 0
-    L.tileLayer(OSM, { maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' })
+    L.tileLayer(OSM, {
+      maxZoom: 19,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    })
       .on('tileload', () => (ok += 1))
       .on('tileerror', () => {
         failed += 1
@@ -206,8 +248,16 @@ export default function MapView(props: MapViewProps) {
       clearTimeout(timer)
       timer = setTimeout(() => {
         const b = map.getBounds()
-        const visiblePins = [...pinById.current.values()].filter((p) => b.contains([p.location.lat, p.location.lng])).length
-        latest.current.onViewport({ center: { lat: map.getCenter().lat, lng: map.getCenter().lng }, zoom: map.getZoom(), bounds: toBounds(b), visiblePins, userInitiated: userMoved.current })
+        const visiblePins = [...pinById.current.values()].filter((p) =>
+          b.contains([p.location.lat, p.location.lng]),
+        ).length
+        latest.current.onViewport({
+          center: { lat: map.getCenter().lat, lng: map.getCenter().lng },
+          zoom: map.getZoom(),
+          bounds: toBounds(b),
+          visiblePins,
+          userInitiated: userMoved.current,
+        })
         userMoved.current = false
       }, 400)
     })
@@ -222,7 +272,9 @@ export default function MapView(props: MapViewProps) {
     clusterRef.current = cluster
     const unsubUi = useMapUi.subscribe((s, prev) => {
       if (s.visitedProducerIds !== prev.visitedProducerIds) return refreshAll()
-      new Set([s.hoveredProducerId, prev.hoveredProducerId, s.selectedProducerId, prev.selectedProducerId]).forEach(refresh)
+      new Set([s.hoveredProducerId, prev.hoveredProducerId, s.selectedProducerId, prev.selectedProducerId]).forEach(
+        refresh,
+      )
       markClusters()
     })
     map.on('zoomend', markClusters)
@@ -305,12 +357,16 @@ export default function MapView(props: MapViewProps) {
     return () => document.removeEventListener('keydown', onKey)
   }, [selectedId, pins, popup])
 
-
   useEffect(() => {
     const map = mapRef.current
     if (!map) return
     const you = L.marker([userLocation.lat, userLocation.lng], {
-      icon: L.divIcon({ className: '', html: '<div class="sy-user-dot"></div>', iconSize: [16, 16], iconAnchor: [8, 8] }),
+      icon: L.divIcon({
+        className: '',
+        html: '<div class="sy-user-dot"></div>',
+        iconSize: [16, 16],
+        iconAnchor: [8, 8],
+      }),
       interactive: false,
       keyboard: false,
       zIndexOffset: -500,
@@ -330,7 +386,14 @@ export default function MapView(props: MapViewProps) {
     let ring = ringRef.current
     if (!ring) {
       if (!target) return
-      ring = L.circle([userLocation.lat, userLocation.lng], { radius: target * 0.6, className: 'sy-radius-ring', weight: 1.5, fillOpacity: 0.04, opacity: 0, interactive: false }).addTo(map)
+      ring = L.circle([userLocation.lat, userLocation.lng], {
+        radius: target * 0.6,
+        className: 'sy-radius-ring',
+        weight: 1.5,
+        fillOpacity: 0.04,
+        opacity: 0,
+        interactive: false,
+      }).addTo(map)
       ringRef.current = ring
     }
     ring.setLatLng([userLocation.lat, userLocation.lng])
@@ -376,7 +439,10 @@ export default function MapView(props: MapViewProps) {
     <div className={cn('relative h-full w-full', tilesFailed && 'tiles-failed')}>
       <div ref={elRef} className="sy-map h-full w-full" />
       {tilesFailed && (
-        <p role="status" className="absolute bottom-8 start-3 z-[450] max-w-xs rounded-md border border-line bg-surface/95 px-3 py-2 text-xs text-ink-muted shadow-pop">
+        <p
+          role="status"
+          className="absolute start-3 bottom-8 z-[450] max-w-xs rounded-md border border-line bg-surface/95 px-3 py-2 text-xs text-ink-muted shadow-pop"
+        >
           {labels.tilesFailed}
         </p>
       )}
@@ -384,4 +450,3 @@ export default function MapView(props: MapViewProps) {
     </div>
   )
 }
-

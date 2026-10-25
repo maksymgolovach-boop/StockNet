@@ -2,7 +2,8 @@ import { useCallback, useLayoutEffect, useRef, useState, type RefObject } from '
 import type { FiltersApi } from '@/features/search/useFilters'
 import type { MapHandle, ViewportEvent } from './MapView'
 
-const same = (a: number | undefined, b: number, digits = 4) => a !== undefined && a.toFixed(digits) === b.toFixed(digits)
+const same = (a: number | undefined, b: number, digits = 4) =>
+  a !== undefined && a.toFixed(digits) === b.toFixed(digits)
 
 /**
  * Glue between the map and the URL: center/zoom are mirrored to the query string (replace),
@@ -39,7 +40,7 @@ export function useMapViewport(api: FiltersApi, handle: RefObject<MapHandle | nu
 
   const setSearchAsMove = useCallback(
     (on: boolean) => {
-      const bounds = on ? handle.current?.getBounds() ?? undefined : undefined
+      const bounds = on ? (handle.current?.getBounds() ?? undefined) : undefined
       latest.current.setMap({ searchAsMove: on, bounds })
       setMoved(false)
     },

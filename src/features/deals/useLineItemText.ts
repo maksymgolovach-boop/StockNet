@@ -5,5 +5,6 @@ import { useLotFormat } from '@/features/lots/useLotFormat'
 export function useLineItemText() {
   const fmt = useFormat()
   const lf = useLotFormat()
-  return (li: DealLineItem) => (li.lot ? lf.lots(li.quantity) : fmt.quantity(li.quantity, li.unit, { withImperial: false }))
+  return (li: DealLineItem) =>
+    li.lot ? lf.lots(li.quantity) : fmt.quantity(li.quantity, li.unit, { withImperial: false })
 }

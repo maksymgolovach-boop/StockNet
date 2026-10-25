@@ -49,7 +49,12 @@ export function MessagesPage() {
   return (
     <div className="mx-auto flex h-[calc(100dvh-var(--chrome-h,8rem))] min-h-[30rem] max-w-[100rem] border-line 2xl:border-x">
       <h1 className="sr-only">{t('pages.messages')}</h1>
-      <aside className={cn('min-h-0 w-full shrink-0 border-e border-line bg-surface lg:block lg:w-[22rem]', threadId ? 'hidden' : 'block')}>
+      <aside
+        className={cn(
+          'min-h-0 w-full shrink-0 border-e border-line bg-surface lg:block lg:w-[22rem]',
+          threadId ? 'hidden' : 'block',
+        )}
+      >
         {loading ? (
           <LoadingRegion>
             <div className="flex flex-col gap-3 p-3">
@@ -75,7 +80,11 @@ export function MessagesPage() {
           </div>
         ) : (
           <div className="m-auto p-6">
-            <EmptyState icon={<MessagesSquare className="size-5" aria-hidden />} title={t('chat.selectTitle')} body={t('chat.selectBody')} />
+            <EmptyState
+              icon={<MessagesSquare className="size-5" aria-hidden />}
+              title={t('chat.selectTitle')}
+              body={t('chat.selectBody')}
+            />
           </div>
         )}
       </div>

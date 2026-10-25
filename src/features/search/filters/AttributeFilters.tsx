@@ -19,7 +19,9 @@ function AttributeControl({ def, api }: { def: AttributeDefinition; api: Filters
           maxLabel={t('filters.max')}
           suffix={def.unit}
           step={def.step}
-          onCommit={(min, max) => api.setAttribute(def.key, min === undefined && max === undefined ? undefined : { kind: 'range', min, max })}
+          onCommit={(min, max) =>
+            api.setAttribute(def.key, min === undefined && max === undefined ? undefined : { kind: 'range', min, max })
+          }
         />
       )
     }
@@ -31,7 +33,11 @@ function AttributeControl({ def, api }: { def: AttributeDefinition; api: Filters
             <Checkbox
               key={o}
               checked={values.includes(o)}
-              label={<span className={def.display === 'verbatim' ? 'font-mono text-[0.8125rem]' : undefined}>{cat.optionLabel(def, o)}</span>}
+              label={
+                <span className={def.display === 'verbatim' ? 'font-mono text-[0.8125rem]' : undefined}>
+                  {cat.optionLabel(def, o)}
+                </span>
+              }
               onChange={(on) => {
                 const next = on ? [...values, o] : values.filter((v) => v !== o)
                 api.setAttribute(def.key, next.length ? { kind: 'enum', values: next } : undefined)
@@ -62,7 +68,12 @@ export function AttributeFilters({ api }: { api: FiltersApi }) {
       {cat.filterableAttributes
         .filter((d) => d.type !== 'text')
         .map((def) => (
-          <FilterSection key={def.key} title={cat.attributeLabel(def)} defaultOpen={def.type !== 'number' || !!api.filters.attributes[def.key]} count={api.filters.attributes[def.key] ? 1 : undefined}>
+          <FilterSection
+            key={def.key}
+            title={cat.attributeLabel(def)}
+            defaultOpen={def.type !== 'number' || !!api.filters.attributes[def.key]}
+            count={api.filters.attributes[def.key] ? 1 : undefined}
+          >
             <AttributeControl def={def} api={api} />
           </FilterSection>
         ))}

@@ -30,15 +30,26 @@ export function useCurrency() {
         maximumFractionDigits: amount < 10 && opts.compact ? 2 : decimals,
       }).format(amount)
     }
-    const convert = (amount: number, from: CurrencyCode, to: CurrencyCode = display, r: ExchangeRates | undefined = rates) =>
-      from === to ? amount : r ? convertAmount(amount, from, to, r) : null
+    const convert = (
+      amount: number,
+      from: CurrencyCode,
+      to: CurrencyCode = display,
+      r: ExchangeRates | undefined = rates,
+    ) => (from === to ? amount : r ? convertAmount(amount, from, to, r) : null)
 
     /** Compact label for map pins: "€790", "3.900 lei", "$1,250". */
     const short = (amount: number, currency: CurrencyCode = display) => {
       const digits = amount < 10 ? 2 : amount < 100 ? 1 : 0
       const local = (CURRENCIES[currency] as CurrencyConfig).localSymbol
-      if (local) return `${new Intl.NumberFormat(locale, { maximumFractionDigits: digits, minimumFractionDigits: amount < 10 ? 2 : 0 }).format(amount)} ${local}`
-      return new Intl.NumberFormat(locale, { style: 'currency', currency, currencyDisplay: 'narrowSymbol', maximumFractionDigits: digits, minimumFractionDigits: amount < 10 ? 2 : 0 }).format(amount)
+      if (local)
+        return `${new Intl.NumberFormat(locale, { maximumFractionDigits: digits, minimumFractionDigits: amount < 10 ? 2 : 0 }).format(amount)} ${local}`
+      return new Intl.NumberFormat(locale, {
+        style: 'currency',
+        currency,
+        currencyDisplay: 'narrowSymbol',
+        maximumFractionDigits: digits,
+        minimumFractionDigits: amount < 10 ? 2 : 0,
+      }).format(amount)
     }
 
     return {

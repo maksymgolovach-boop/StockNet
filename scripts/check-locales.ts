@@ -7,7 +7,8 @@ import { CURRENCY_CODES } from '../src/config/currencies'
 import { CERTIFICATIONS } from '../src/config/certifications'
 
 type Tree = { [k: string]: string | Tree }
-const flatten = (t: Tree, p = ''): string[] => Object.entries(t).flatMap(([k, v]) => (typeof v === 'string' ? [p + k] : flatten(v, `${p}${k}.`)))
+const flatten = (t: Tree, p = ''): string[] =>
+  Object.entries(t).flatMap(([k, v]) => (typeof v === 'string' ? [p + k] : flatten(v, `${p}${k}.`)))
 const PLURAL = /_(zero|one|two|few|many|other)$/
 const locales: Record<string, Tree> = { en, de, ro }
 const required: Record<string, string[]> = { en: ['one', 'other'], de: ['one', 'other'], ro: ['one', 'few', 'other'] }
@@ -20,11 +21,13 @@ for (const [lang, keys] of Object.entries(sets)) {
   for (const k of baseKeys) if (!stripped.has(k)) issues.push(`${lang}: missing ${k}`)
   for (const k of stripped) if (!baseKeys.has(k)) issues.push(`${lang}: extra key ${k}`)
   const plurals = new Set([...keys].filter((k) => PLURAL.test(k)).map((k) => k.replace(PLURAL, '')))
-  for (const base of plurals) for (const form of required[lang]!) if (!keys.has(`${base}_${form}`)) issues.push(`${lang}: ${base} lacks _${form}`)
+  for (const base of plurals)
+    for (const form of required[lang]!) if (!keys.has(`${base}_${form}`)) issues.push(`${lang}: ${base} lacks _${form}`)
 }
 
 const need = (key: string) => {
-  for (const [lang, keys] of Object.entries(sets)) if (!keys.has(key)) issues.push(`${lang}: config-driven key missing ${key}`)
+  for (const [lang, keys] of Object.entries(sets))
+    if (!keys.has(key)) issues.push(`${lang}: config-driven key missing ${key}`)
 }
 const walk = (slug: string): string[] => [slug, ...(getAnyCategory(slug)?.childSlugs ?? []).flatMap(walk)]
 for (const c of ALL_CATEGORY_CONFIGS) for (const slug of walk(c.slug)) need(`categories.${slug}`)
@@ -37,8 +40,12 @@ for (const c of ALL_CATEGORY_CONFIGS) {
 }
 for (const u of UNIT_CODES) need(`units.${u}`)
 for (const c of CURRENCY_CODES) need(`currency.${c}`)
-for (const [code, cfg] of Object.entries(CERTIFICATIONS)) if ('translatable' in cfg && cfg.translatable) need(`certs.${code}`)
+for (const [code, cfg] of Object.entries(CERTIFICATIONS))
+  if ('translatable' in cfg && cfg.translatable) need(`certs.${code}`)
 
 console.log(`locale keys: en ${sets.en!.size}, de ${sets.de!.size}, ro ${sets.ro!.size}`)
-if (issues.length) { console.error(issues.join('\n')); process.exit(1) }
+if (issues.length) {
+  console.error(issues.join('\n'))
+  process.exit(1)
+}
 console.log('OK — all locales complete, plural forms present, every config-driven key translated')

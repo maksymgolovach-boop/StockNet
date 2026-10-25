@@ -9,7 +9,10 @@ import { MessageBubble } from './MessageBubble'
 function SafetyNotice() {
   const { t } = useTranslation()
   return (
-    <div role="note" className="mx-auto flex max-w-xl items-start gap-2 rounded-lg border border-line bg-surface-2 px-3 py-2 text-xs text-ink-muted">
+    <div
+      role="note"
+      className="mx-auto flex max-w-xl items-start gap-2 rounded-lg border border-line bg-surface-2 px-3 py-2 text-xs text-ink-muted"
+    >
       <ShieldCheck className="mt-0.5 size-4 shrink-0 text-verified" aria-hidden />
       <p>{t('chat.safety')}</p>
     </div>
@@ -22,7 +25,11 @@ function TypingIndicator({ name }: { name: string }) {
     <div className="flex items-center gap-2" role="status">
       <span className="flex gap-1 rounded-2xl rounded-es-md border border-line bg-surface px-3.5 py-3" aria-hidden>
         {[0, 1, 2].map((i) => (
-          <span key={i} className="size-1.5 animate-bounce rounded-full bg-ink-subtle" style={{ animationDelay: `${i * 140}ms` }} />
+          <span
+            key={i}
+            className="size-1.5 animate-bounce rounded-full bg-ink-subtle"
+            style={{ animationDelay: `${i * 140}ms` }}
+          />
         ))}
       </span>
       <span className="text-xs text-ink-subtle">{t('chat.typing', { name })}</span>
@@ -30,7 +37,19 @@ function TypingIndicator({ name }: { name: string }) {
   )
 }
 
-export function MessageList({ messages, role, partnerName, typing, empty }: { messages: Message[]; role: PartyRole; partnerName: string; typing: boolean; empty: React.ReactNode }) {
+export function MessageList({
+  messages,
+  role,
+  partnerName,
+  typing,
+  empty,
+}: {
+  messages: Message[]
+  role: PartyRole
+  partnerName: string
+  typing: boolean
+  empty: React.ReactNode
+}) {
   const { t } = useTranslation()
   const fmt = useFormat()
   const scroller = useRef<HTMLDivElement>(null)

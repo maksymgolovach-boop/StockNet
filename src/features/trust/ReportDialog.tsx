@@ -13,7 +13,17 @@ const REASONS: Record<ReportTarget, string[]> = {
 }
 
 /** Report a listing, user or review. UI only: nothing is sent, a confirmation is shown. */
-export function ReportButton({ target, name, compact = false, children }: { target: ReportTarget; name: string; compact?: boolean; children?: ReactNode }) {
+export function ReportButton({
+  target,
+  name,
+  compact = false,
+  children,
+}: {
+  target: ReportTarget
+  name: string
+  compact?: boolean
+  children?: ReactNode
+}) {
   const { t } = useTranslation()
   const id = useId()
   const [open, setOpen] = useState(false)
@@ -71,8 +81,18 @@ export function ReportButton({ target, name, compact = false, children }: { targ
             <fieldset className="flex flex-col gap-1.5">
               <legend className="mb-1 text-sm font-medium">{t('report.reason')}</legend>
               {REASONS[target].map((r) => (
-                <label key={r} className="flex cursor-pointer items-center gap-2 rounded-md border border-line px-3 py-2 text-sm has-[:checked]:border-primary has-[:checked]:bg-primary-soft">
-                  <input type="radio" name={`${id}-reason`} value={r} checked={reason === r} onChange={() => setReason(r)} className="accent-[var(--primary)]" />
+                <label
+                  key={r}
+                  className="flex cursor-pointer items-center gap-2 rounded-md border border-line px-3 py-2 text-sm has-[:checked]:border-primary has-[:checked]:bg-primary-soft"
+                >
+                  <input
+                    type="radio"
+                    name={`${id}-reason`}
+                    value={r}
+                    checked={reason === r}
+                    onChange={() => setReason(r)}
+                    className="accent-[var(--primary)]"
+                  />
                   {t(`report.reasons.${r}`)}
                 </label>
               ))}
@@ -81,7 +101,13 @@ export function ReportButton({ target, name, compact = false, children }: { targ
               <label htmlFor={`${id}-details`} className="text-sm font-medium">
                 {t('report.details')}
               </label>
-              <textarea id={`${id}-details`} value={details} onChange={(e) => setDetails(e.target.value)} rows={3} className="rounded-[var(--radius-control)] border border-line-strong bg-surface p-2 text-sm" />
+              <textarea
+                id={`${id}-details`}
+                value={details}
+                onChange={(e) => setDetails(e.target.value)}
+                rows={3}
+                className="rounded-[var(--radius-control)] border border-line-strong bg-surface p-2 text-sm"
+              />
             </div>
             <p className="text-xs text-ink-subtle">{t('report.demoNote')}</p>
           </form>

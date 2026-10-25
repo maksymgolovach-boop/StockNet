@@ -12,7 +12,13 @@ export function TuningPanel() {
   const tuning = usePreferences((s) => s.recommendations)
   const update = usePreferences((s) => s.update)
   const set = (patch: Partial<RecommendationTuning>) => update({ recommendations: { ...tuning, ...patch } })
-  const certOptions = [...new Set((tuning.categories.length ? tuning.categories : ROOT_CATEGORY_SLUGS).flatMap((slug) => getCategoryConfig(slug)?.certifications ?? []))]
+  const certOptions = [
+    ...new Set(
+      (tuning.categories.length ? tuning.categories : ROOT_CATEGORY_SLUGS).flatMap(
+        (slug) => getCategoryConfig(slug)?.certifications ?? [],
+      ),
+    ),
+  ]
   const certLabel = (c: CertificationCode) => {
     const cfg = CERTIFICATIONS[c] as { label: string; translatable?: boolean }
     return cfg.translatable ? t(`certs.${c}`) : cfg.label
@@ -26,7 +32,12 @@ export function TuningPanel() {
             <Checkbox
               key={slug}
               checked={tuning.categories.includes(slug)}
-              onChange={(on) => set({ categories: on ? [...tuning.categories, slug] : tuning.categories.filter((x) => x !== slug), certifications: tuning.certifications })}
+              onChange={(on) =>
+                set({
+                  categories: on ? [...tuning.categories, slug] : tuning.categories.filter((x) => x !== slug),
+                  certifications: tuning.certifications,
+                })
+              }
               label={t(`categories.${slug}`)}
             />
           ))}
@@ -48,15 +59,39 @@ export function TuningPanel() {
         <legend className="mb-1 text-sm font-semibold">{t('reco.tune.certifications')}</legend>
         <div className="grid max-h-56 gap-x-4 overflow-y-auto sm:grid-cols-2">
           {certOptions.map((c) => (
-            <Checkbox key={c} checked={tuning.certifications.includes(c)} onChange={(on) => set({ certifications: on ? [...tuning.certifications, c] : tuning.certifications.filter((x) => x !== c) })} label={certLabel(c)} />
+            <Checkbox
+              key={c}
+              checked={tuning.certifications.includes(c)}
+              onChange={(on) =>
+                set({
+                  certifications: on ? [...tuning.certifications, c] : tuning.certifications.filter((x) => x !== c),
+                })
+              }
+              label={certLabel(c)}
+            />
           ))}
         </div>
       </fieldset>
       <div className="flex flex-col gap-1">
-        <Switch checked={tuning.preferVerified} onChange={(preferVerified) => set({ preferVerified })} label={t('reco.tune.preferVerified')} hint={t('reco.tune.preferVerifiedHint')} />
-        <Switch checked={tuning.preferPastPartners} onChange={(preferPastPartners) => set({ preferPastPartners })} label={t('reco.tune.preferPartners')} hint={t('reco.tune.preferPartnersHint')} />
+        <Switch
+          checked={tuning.preferVerified}
+          onChange={(preferVerified) => set({ preferVerified })}
+          label={t('reco.tune.preferVerified')}
+          hint={t('reco.tune.preferVerifiedHint')}
+        />
+        <Switch
+          checked={tuning.preferPastPartners}
+          onChange={(preferPastPartners) => set({ preferPastPartners })}
+          label={t('reco.tune.preferPartners')}
+          hint={t('reco.tune.preferPartnersHint')}
+        />
       </div>
-      <Button variant="ghost" size="sm" className="self-start" onClick={() => update({ recommendations: DEFAULT_PREFERENCES.recommendations })}>
+      <Button
+        variant="ghost"
+        size="sm"
+        className="self-start"
+        onClick={() => update({ recommendations: DEFAULT_PREFERENCES.recommendations })}
+      >
         {t('reco.tune.reset')}
       </Button>
     </div>

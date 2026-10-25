@@ -48,10 +48,27 @@ function StatePanel({ title, body, icon, action, className, compact }: StateProp
 
 export function EmptyState(props: Partial<StateProps>) {
   const { t } = useTranslation()
-  return <StatePanel icon={<Inbox className="size-5" aria-hidden />} title={t('empty.title')} body={t('empty.body')} {...props} />
+  return (
+    <StatePanel
+      icon={<Inbox className="size-5" aria-hidden />}
+      title={t('empty.title')}
+      body={t('empty.body')}
+      {...props}
+    />
+  )
 }
 
-export function ErrorState({ error, onRetry, className, compact }: { error?: unknown; onRetry?: () => void; className?: string; compact?: boolean }) {
+export function ErrorState({
+  error,
+  onRetry,
+  className,
+  compact,
+}: {
+  error?: unknown
+  onRetry?: () => void
+  className?: string
+  compact?: boolean
+}) {
   const { t } = useTranslation()
   const simulated = error instanceof ApiError && error.simulated
   return (
@@ -66,7 +83,12 @@ export function ErrorState({ error, onRetry, className, compact }: { error?: unk
           <>
             {simulated && <p className="text-xs text-ink-subtle">{t('errors.simulated')}</p>}
             {onRetry && (
-              <Button variant="secondary" size="sm" onClick={onRetry} icon={<RefreshCw className="size-3.5" aria-hidden />}>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={onRetry}
+                icon={<RefreshCw className="size-3.5" aria-hidden />}
+              >
                 {t('common.retry')}
               </Button>
             )}

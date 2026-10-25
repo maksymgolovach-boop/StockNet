@@ -22,7 +22,17 @@ function kindOf(file: File): Draft['kind'] {
 const MAX_FILES = 5
 const MAX_MB = 25
 
-export function Composer({ role, productName, onSend, disabled }: { role: PartyRole; productName: string; onSend: (text: string, attachments: Draft[]) => Promise<unknown>; disabled?: boolean }) {
+export function Composer({
+  role,
+  productName,
+  onSend,
+  disabled,
+}: {
+  role: PartyRole
+  productName: string
+  onSend: (text: string, attachments: Draft[]) => Promise<unknown>
+  disabled?: boolean
+}) {
   const { t } = useTranslation()
   const [text, setText] = useState('')
   const [files, setFiles] = useState<Draft[]>([])
@@ -64,7 +74,12 @@ export function Composer({ role, productName, onSend, disabled }: { role: PartyR
         setError(t('chat.fileTooLarge', { name: f.name, max: MAX_MB }))
         continue
       }
-      next.push({ fileName: f.name, kind: kindOf(f), sizeKb: f.size / 1024, previewUrl: f.type.startsWith('image/') ? URL.createObjectURL(f) : undefined })
+      next.push({
+        fileName: f.name,
+        kind: kindOf(f),
+        sizeKb: f.size / 1024,
+        previewUrl: f.type.startsWith('image/') ? URL.createObjectURL(f) : undefined,
+      })
     }
     setFiles((prev) => [...prev, ...next].slice(0, MAX_FILES))
   }
@@ -118,7 +133,11 @@ export function Composer({ role, productName, onSend, disabled }: { role: PartyR
             e.target.value = ''
           }}
         />
-        <IconButton label={t('chat.attach')} onClick={() => picker.current?.click()} disabled={files.length >= MAX_FILES}>
+        <IconButton
+          label={t('chat.attach')}
+          onClick={() => picker.current?.click()}
+          disabled={files.length >= MAX_FILES}
+        >
           <Paperclip className="size-5" aria-hidden />
         </IconButton>
         <label className="min-w-0 flex-1">
@@ -138,11 +157,18 @@ export function Composer({ role, productName, onSend, disabled }: { role: PartyR
             className="block max-h-40 min-h-10 w-full resize-none rounded-[var(--radius-control)] border border-line-strong bg-surface px-3 py-2 text-[0.9375rem] leading-6"
           />
         </label>
-        <Button type="submit" disabled={!canSend} aria-label={t('chat.send')} icon={<SendHorizontal className="size-4 rtl:rotate-180" aria-hidden />}>
+        <Button
+          type="submit"
+          disabled={!canSend}
+          aria-label={t('chat.send')}
+          icon={<SendHorizontal className="size-4 rtl:rotate-180" aria-hidden />}
+        >
           <span className="hidden sm:inline">{t('chat.send')}</span>
         </Button>
       </form>
-      <p className="hidden text-[0.6875rem] text-ink-subtle md:block">{t('chat.hint', { max: MAX_FILES, mb: MAX_MB })}</p>
+      <p className="hidden text-[0.6875rem] text-ink-subtle md:block">
+        {t('chat.hint', { max: MAX_FILES, mb: MAX_MB })}
+      </p>
     </div>
   )
 }

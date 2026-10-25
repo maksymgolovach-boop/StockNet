@@ -30,7 +30,12 @@ import { ProducerOverview } from './ProducerOverview'
 type ProducerTab = 'overview' | 'products' | 'trust' | 'reviews' | 'history'
 
 function ProducerProducts({ producerId }: { producerId: string }) {
-  const { data, isPending, error, refetch } = useSearchResults({ filters: emptyFilters(), sort: 'relevance', limit: 200, producerId })
+  const { data, isPending, error, refetch } = useSearchResults({
+    filters: emptyFilters(),
+    sort: 'relevance',
+    limit: 200,
+    producerId,
+  })
   if (isPending)
     return (
       <LoadingRegion>
@@ -89,8 +94,20 @@ export function ProducerPage() {
     { id: 'overview' as const, label: t('producer.tabs.overview') },
     { id: 'products' as const, label: t('producer.tabs.products') },
     { id: 'trust' as const, label: t('producer.tabs.trust') },
-    { id: 'reviews' as const, label: t('producer.tabs.reviews'), badge: <span className="rounded-full bg-surface-2 px-1.5 text-xs tabular">{p.reviewCount}</span> },
-    ...(history ? [{ id: 'history' as const, label: t('producer.tabs.history'), badge: <span className="rounded-full bg-ink px-1.5 text-xs text-bg tabular">{history.deals.length}</span> }] : []),
+    {
+      id: 'reviews' as const,
+      label: t('producer.tabs.reviews'),
+      badge: <span className="tabular rounded-full bg-surface-2 px-1.5 text-xs">{p.reviewCount}</span>,
+    },
+    ...(history
+      ? [
+          {
+            id: 'history' as const,
+            label: t('producer.tabs.history'),
+            badge: <span className="tabular rounded-full bg-ink px-1.5 text-xs text-bg">{history.deals.length}</span>,
+          },
+        ]
+      : []),
   ]
   const active: ProducerTab = requested && tabs.some((x) => x.id === requested) ? requested : 'overview'
   const setTab = (tab: ProducerTab) => setParams(tab === 'overview' ? {} : { tab }, { replace: true })
@@ -113,7 +130,9 @@ export function ProducerPage() {
             {p.reviewCount > 0 && (
               <span className="inline-flex items-center gap-1 text-sm">
                 <Star className="size-4 fill-accent text-accent" aria-hidden />
-                <span className="font-semibold tabular">{fmt.number(p.rating, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
+                <span className="tabular font-semibold">
+                  {fmt.number(p.rating, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
+                </span>
                 <span className="text-ink-muted">({t('common.reviews', { count: p.reviewCount })})</span>
               </span>
             )}
@@ -134,7 +153,12 @@ export function ProducerPage() {
                 {t('product.contactProducer')}
               </ButtonLink>
             )}
-            <Button variant="secondary" onClick={() => toggleSaved(p.id)} aria-pressed={saved} aria-label={t(saved ? 'map.unsave' : 'map.save', { name: p.name })}>
+            <Button
+              variant="secondary"
+              onClick={() => toggleSaved(p.id)}
+              aria-pressed={saved}
+              aria-label={t(saved ? 'map.unsave' : 'map.save', { name: p.name })}
+            >
               <Heart className={cn('size-4', saved && 'fill-primary text-primary')} aria-hidden />
             </Button>
           </div>
@@ -162,7 +186,12 @@ export function ProducerPage() {
             </div>
           </div>
         )}
-        {active === 'reviews' && (reviews.isPending ? <Skeleton className="h-60" /> : <ReviewsSection reviews={reviews.data ?? []} producerName={p.name} />)}
+        {active === 'reviews' &&
+          (reviews.isPending ? (
+            <Skeleton className="h-60" />
+          ) : (
+            <ReviewsSection reviews={reviews.data ?? []} producerName={p.name} />
+          ))}
         {active === 'history' && history && <ProducerHistory history={history} />}
       </Tabs>
     </div>

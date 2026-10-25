@@ -58,7 +58,10 @@ export interface QuoteRequestInput {
   lang: LanguageCode
 }
 
-export interface DisputeInput extends Pick<DealDispute, 'reason' | 'resolution' | 'description' | 'productIds' | 'attachments'> {}
+export interface DisputeInput extends Pick<
+  DealDispute,
+  'reason' | 'resolution' | 'description' | 'productIds' | 'attachments'
+> {}
 
 export interface ReviewInput {
   ratings: Record<ReviewCriterion, number>
@@ -68,7 +71,8 @@ export interface ReviewInput {
 }
 
 const toEUR = (amount: number, currency: Deal['currency']) => amount / CURRENCIES[currency].mockRateFromEUR
-const convert = (amount: number, from: Deal['currency'], to: Deal['currency']) => (amount / CURRENCIES[from].mockRateFromEUR) * CURRENCIES[to].mockRateFromEUR
+const convert = (amount: number, from: Deal['currency'], to: Deal['currency']) =>
+  (amount / CURRENCIES[from].mockRateFromEUR) * CURRENCIES[to].mockRateFromEUR
 
 function findDeal(role: PartyRole, partyId: string, dealId: string): Deal {
   const d = db.deals.find((x) => x.id === dealId && isParty(role, partyId)(x))
@@ -78,14 +82,22 @@ function findDeal(role: PartyRole, partyId: string, dealId: string): Deal {
 
 function nextDealId(at: Date): string {
   const year = at.getUTCFullYear()
-  const max = db.deals.filter((d) => d.id.startsWith(`D-${year}-`)).reduce((m, d) => Math.max(m, Number(d.id.slice(7)) || 0), 0)
+  const max = db.deals
+    .filter((d) => d.id.startsWith(`D-${year}-`))
+    .reduce((m, d) => Math.max(m, Number(d.id.slice(7)) || 0), 0)
   return `D-${year}-${String(max + 1).padStart(4, '0')}`
 }
 
 function addDocument(deal: Deal, status: DealStatus, at: string) {
   const type = DOCUMENT_ON[status]
   if (!type || deal.documents.some((d) => d.type === type)) return
-  deal.documents.push({ id: `${deal.id}-${type}`, type, fileName: `${type.replace(/_/g, '-')}-${deal.id}.pdf`, issuedAt: at, sizeKb: 90 + deal.documents.length * 37 })
+  deal.documents.push({
+    id: `${deal.id}-${type}`,
+    type,
+    fileName: `${type.replace(/_/g, '-')}-${deal.id}.pdf`,
+    issuedAt: at,
+    sizeKb: 90 + deal.documents.length * 37,
+  })
 }
 
 /** Physical stock leaves the warehouse on delivery; reservations follow the deal status. */
@@ -105,20 +117,29 @@ function assertLotsAvailable(deal: Deal) {
   for (const li of deal.lineItems) {
     if (!li.lot) continue
     const lot = db.products.find((p) => p.id === li.productId)?.lots.find((l) => l.id === li.lot?.lotId)
-    if (!lot || !isSellable(lot) || availableLots(lot) < li.quantity) throw new ApiError(`Lot ${li.lot.lotNumber} is no longer available in this quantity`, 409)
+    if (!lot || !isSellable(lot) || availableLots(lot) < li.quantity)
+      throw new ApiError(`Lot ${li.lot.lotNumber} is no longer available in this quantity`, 409)
   }
 }
 
 /** The status a deal had before its dispute was opened; resolving the dispute returns it there. */
 function statusBeforeDispute(deal: Deal): DealStatus {
   const disputedAt = deal.events.findLastIndex((e) => e.status === 'disputed')
-  const previous = deal.events.slice(0, disputedAt < 0 ? undefined : disputedAt).findLast((e) => e.status !== 'disputed')
+  const previous = deal.events
+    .slice(0, disputedAt < 0 ? undefined : disputedAt)
+    .findLast((e) => e.status !== 'disputed')
   return previous?.status ?? (deal.deliveredAt ? 'completed' : 'order_confirmed')
 }
 
 function applyTransition(deal: Deal, to: DealStatus, actor: PartyRole, noteKey?: string) {
   const at = liveNow().toISOString()
-  deal.events.push({ id: `${deal.id}-ev${deal.events.length}-${Date.now().toString(36)}`, status: to, at, actor, noteKey })
+  deal.events.push({
+    id: `${deal.id}-ev${deal.events.length}-${Date.now().toString(36)}`,
+    status: to,
+    at,
+    actor,
+    noteKey,
+  })
   deal.status = to
   deal.updatedAt = at
   addDocument(deal, to, at)
@@ -133,11 +154,19 @@ function applyTransition(deal: Deal, to: DealStatus, actor: PartyRole, noteKey?:
 }
 
 const intlLocale = (lang: LanguageCode) => LANGUAGES[lang].intlLocale
-const money = (amount: number, currency: string, lang: LanguageCode) => new Intl.NumberFormat(intlLocale(lang), { style: 'currency', currency, maximumFractionDigits: 2 }).format(amount)
+const money = (amount: number, currency: string, lang: LanguageCode) =>
+  new Intl.NumberFormat(intlLocale(lang), { style: 'currency', currency, maximumFractionDigits: 2 }).format(amount)
 
 function rfqMessage(deal: Deal): Record<LanguageCode, string> {
-  const lines = (l: LanguageCode) => deal.lineItems.map((li) => `• ${li.productName}: ${li.lot ? `${li.quantity} × ${l === 'de' ? 'Los' : 'lot'} ${li.lot.lotNumber}` : `${li.quantity} ${li.unit}`}`).join('\n')
-  const date = (l: LanguageCode) => new Intl.DateTimeFormat(intlLocale(l), { dateStyle: 'medium' }).format(new Date(deal.requestedDeliveryDate))
+  const lines = (l: LanguageCode) =>
+    deal.lineItems
+      .map(
+        (li) =>
+          `• ${li.productName}: ${li.lot ? `${li.quantity} × ${l === 'de' ? 'Los' : 'lot'} ${li.lot.lotNumber}` : `${li.quantity} ${li.unit}`}`,
+      )
+      .join('\n')
+  const date = (l: LanguageCode) =>
+    new Intl.DateTimeFormat(intlLocale(l), { dateStyle: 'medium' }).format(new Date(deal.requestedDeliveryDate))
   return {
     en: `Quote request ${deal.id}:\n${lines('en')}\nDelivery ${deal.incoterm} ${deal.deliveryAddress.city} by ${date('en')}.${deal.notes ? `\nNote: ${deal.notes}` : ''}`,
     de: `Angebotsanfrage ${deal.id}:\n${lines('de')}\nLieferung ${deal.incoterm} ${deal.deliveryAddress.city} bis ${date('de')}.${deal.notes ? `\nHinweis: ${deal.notes}` : ''}`,
@@ -165,7 +194,9 @@ function scheduleAutoQuote(dealId: string, threadId: string) {
       const thread = db.threads.find((t) => t.id === threadId)
       if (!deal || deal.status !== 'quote_request' || !thread) return
       applyTransition(deal, 'quote_received', 'producer', 'auto_quote')
-      const message = serverPost(thread, 'producer', quoteMessage(deal), threadLanguage(thread, 'producer'), [{ fileName: `quote-${deal.id}.pdf`, kind: 'pdf', sizeKb: 148 }])
+      const message = serverPost(thread, 'producer', quoteMessage(deal), threadLanguage(thread, 'producer'), [
+        { fileName: `quote-${deal.id}.pdf`, kind: 'pdf', sizeKb: 148 },
+      ])
       persistThread(thread, [message])
     }, 6000),
   )
@@ -177,7 +208,8 @@ function scheduleAutoQuote(dealId: string, threadId: string) {
  */
 function resumePendingQuotes() {
   for (const deal of db.deals) {
-    if (deal.status === 'quote_request' && deal.threadId && new Date(deal.createdAt) >= DEMO_NOW) scheduleAutoQuote(deal.id, deal.threadId)
+    if (deal.status === 'quote_request' && deal.threadId && new Date(deal.createdAt) >= DEMO_NOW)
+      scheduleAutoQuote(deal.id, deal.threadId)
   }
 }
 
@@ -190,13 +222,30 @@ function buildLineItem(input: QuoteRequestItem, producerId: string, currency: De
     const qty = clampLotQuantity(lot, input.quantity)
     if (qty !== input.quantity || qty < lotQuantityRule(lot).min) throw new ApiError('Invalid lot quantity', 422)
     const unitPrice = roundPrice(convert(pricePerLotFor(lot, qty), product.pricing.currency, currency))
-    return { productId: product.id, productName: product.name, categorySlug: product.categorySlug, quantity: qty, unit: product.unit, unitPrice, subtotal: round2(unitPrice * qty), lot: { lotId: lot.id, lotNumber: lot.lotNumber, type: lot.type } }
+    return {
+      productId: product.id,
+      productName: product.name,
+      categorySlug: product.categorySlug,
+      quantity: qty,
+      unit: product.unit,
+      unitPrice,
+      subtotal: round2(unitPrice * qty),
+      lot: { lotId: lot.id, lotNumber: lot.lotNumber, type: lot.type },
+    }
   }
   if (!product.saleModes.includes('measure')) throw new ApiError('This product is sold by lot only', 422)
   if (input.quantity < product.moq) throw new ApiError('Quantity below MOQ', 422)
   const tier = tierFor(product.pricing.tiers, input.quantity)
   const unitPrice = tier ? roundPrice(convert(tier.unitPrice, product.pricing.currency, currency)) : 0
-  return { productId: product.id, productName: product.name, categorySlug: product.categorySlug, quantity: input.quantity, unit: product.unit, unitPrice, subtotal: round2(unitPrice * input.quantity) }
+  return {
+    productId: product.id,
+    productName: product.name,
+    categorySlug: product.categorySlug,
+    quantity: input.quantity,
+    unit: product.unit,
+    unitPrice,
+    subtotal: round2(unitPrice * input.quantity),
+  }
 }
 
 function quarterKey(iso: string) {
@@ -232,10 +281,20 @@ function partnershipsFor(role: PartyRole, partyId: string): Partnership[] {
     const sorted = [...deals].sort((a, b) => a.createdAt.localeCompare(b.createdAt))
     const valid = sorted.filter((d) => d.status !== 'cancelled')
     const delivered = sorted.filter((d) => d.onTime !== undefined)
-    const ratings = db.reviews.filter((r) => (role === 'buyer' ? r.buyerId === partyId && r.producerId === counterpartyId : r.producerId === partyId && r.buyerId === counterpartyId))
-    const meta = db.partnershipMeta.find((m) => m.ownerId === partyId && m.counterpartyId === counterpartyId) ?? { ownerId: partyId, counterpartyId, favorite: false, privateNotes: '' }
+    const ratings = db.reviews.filter((r) =>
+      role === 'buyer'
+        ? r.buyerId === partyId && r.producerId === counterpartyId
+        : r.producerId === partyId && r.buyerId === counterpartyId,
+    )
+    const meta = db.partnershipMeta.find((m) => m.ownerId === partyId && m.counterpartyId === counterpartyId) ?? {
+      ownerId: partyId,
+      counterpartyId,
+      favorite: false,
+      privateNotes: '',
+    }
     const byQuarter = new Map<string, number>()
-    for (const d of valid) byQuarter.set(quarterKey(d.createdAt), (byQuarter.get(quarterKey(d.createdAt)) ?? 0) + toEUR(d.total, d.currency))
+    for (const d of valid)
+      byQuarter.set(quarterKey(d.createdAt), (byQuarter.get(quarterKey(d.createdAt)) ?? 0) + toEUR(d.total, d.currency))
     const lastDealAt = sorted[sorted.length - 1]?.createdAt ?? now.toISOString()
     const activeCount = sorted.filter((d) => !['completed', 'cancelled'].includes(d.status)).length
     const recent = now.getTime() - new Date(lastDealAt).getTime() < 180 * 86_400_000
@@ -284,7 +343,11 @@ export interface DealService {
   resolveDispute(role: PartyRole, partyId: string, dealId: string, note: string): Promise<Deal>
   addReview(buyerId: string, dealId: string, input: ReviewInput): Promise<Review>
   partnerships(role: PartyRole, partyId: string): Promise<Partnership[]>
-  setPartnerMeta(partyId: string, counterpartyId: string, patch: Partial<Pick<PartnershipMeta, 'favorite' | 'tag' | 'privateNotes'>>): Promise<PartnershipMeta>
+  setPartnerMeta(
+    partyId: string,
+    counterpartyId: string,
+    patch: Partial<Pick<PartnershipMeta, 'favorite' | 'tag' | 'privateNotes'>>,
+  ): Promise<PartnershipMeta>
 }
 
 export const dealService: DealService = {
@@ -321,7 +384,8 @@ export const dealService: DealService = {
     mockRequest(() => {
       const buyer = db.buyers.find((b) => b.id === buyerId)
       if (!buyer) throw new NotFoundError('Buyer')
-      if (isSameCompany(buyerId, input.producerId)) throw new ApiError('A company cannot request a quote from itself', 422)
+      if (isSameCompany(buyerId, input.producerId))
+        throw new ApiError('A company cannot request a quote from itself', 422)
       if (!input.items.length) throw new ApiError('A quote request needs at least one item', 422)
       const first = db.products.find((p) => p.id === input.items[0]?.productId)
       if (!first) throw new NotFoundError('Product')
@@ -341,7 +405,15 @@ export const dealService: DealService = {
         deliveryAddress: input.deliveryAddress,
         requestedDeliveryDate: input.requestedDeliveryDate,
         status: 'quote_request',
-        events: [{ id: `${id}-ev0`, status: 'quote_request', at: at.toISOString(), actor: 'buyer', noteKey: input.reorderOf ? 'reorder' : 'rfq_created' }],
+        events: [
+          {
+            id: `${id}-ev0`,
+            status: 'quote_request',
+            at: at.toISOString(),
+            actor: 'buyer',
+            noteKey: input.reorderOf ? 'reorder' : 'rfq_created',
+          },
+        ],
         threadId: thread.id,
         notes: input.notes,
         documents: [],
@@ -352,7 +424,21 @@ export const dealService: DealService = {
       }
       db.deals.unshift(deal)
       thread.dealId = id
-      const message = serverPost(thread, 'buyer', rfqMessage(deal), input.lang, input.attachments.map((fileName) => ({ fileName, kind: /\.(png|jpe?g|webp)$/i.test(fileName) ? 'image' : /\.(dwg|dxf|step|stp)$/i.test(fileName) ? 'drawing' : 'pdf', sizeKb: 120 })))
+      const message = serverPost(
+        thread,
+        'buyer',
+        rfqMessage(deal),
+        input.lang,
+        input.attachments.map((fileName) => ({
+          fileName,
+          kind: /\.(png|jpe?g|webp)$/i.test(fileName)
+            ? 'image'
+            : /\.(dwg|dxf|step|stp)$/i.test(fileName)
+              ? 'drawing'
+              : 'pdf',
+          sizeKb: 120,
+        })),
+      )
       persistThread(thread, [message])
       persistDeal(deal)
       scheduleAutoQuote(id, thread.id)
@@ -366,7 +452,9 @@ export const dealService: DealService = {
       const at = liveNow().toISOString()
       deal.dispute = {
         ...input,
-        lotNumbers: deal.lineItems.filter((li) => input.productIds.includes(li.productId) && li.lot).map((li) => li.lot?.lotNumber ?? ''),
+        lotNumbers: deal.lineItems
+          .filter((li) => input.productIds.includes(li.productId) && li.lot)
+          .map((li) => li.lot?.lotNumber ?? ''),
         openedBy: role,
         openedAt: at,
         status: 'open',
@@ -386,7 +474,8 @@ export const dealService: DealService = {
   addReview: (buyerId, dealId, input) =>
     mockRequest(() => {
       const deal = findDeal('buyer', buyerId, dealId)
-      if (deal.status !== 'completed' || deal.reviewId) throw new ApiError('Only completed deals without a review can be reviewed', 409)
+      if (deal.status !== 'completed' || deal.reviewId)
+        throw new ApiError('Only completed deals without a review can be reviewed', 409)
       const values = Object.values(input.ratings)
       if (values.some((v) => v < 1 || v > 5)) throw new ApiError('Ratings must be 1–5', 422)
       const review: Review = {
@@ -412,13 +501,21 @@ export const dealService: DealService = {
       refreshRatings(deal.producerId)
       return review
     }),
-  partnerships: (role, partyId) => mockRequest(() => partnershipsFor(role, partyId).sort((a, b) => b.lastDealAt.localeCompare(a.lastDealAt))),
+  partnerships: (role, partyId) =>
+    mockRequest(() => partnershipsFor(role, partyId).sort((a, b) => b.lastDealAt.localeCompare(a.lastDealAt))),
   setPartnerMeta: (partyId, counterpartyId, patch) =>
     mockRequest(
       () => {
         const i = db.partnershipMeta.findIndex((m) => m.ownerId === partyId && m.counterpartyId === counterpartyId)
-        const base: PartnershipMeta = i >= 0 ? (db.partnershipMeta[i] as PartnershipMeta) : { ownerId: partyId, counterpartyId, favorite: false, privateNotes: '' }
-        const next: PartnershipMeta = { ...base, ...patch, privateNotes: (patch.privateNotes ?? base.privateNotes).slice(0, 2000) }
+        const base: PartnershipMeta =
+          i >= 0
+            ? (db.partnershipMeta[i] as PartnershipMeta)
+            : { ownerId: partyId, counterpartyId, favorite: false, privateNotes: '' }
+        const next: PartnershipMeta = {
+          ...base,
+          ...patch,
+          privateNotes: (patch.privateNotes ?? base.privateNotes).slice(0, 2000),
+        }
         if (i >= 0) db.partnershipMeta[i] = next
         else db.partnershipMeta.push(next)
         persistPartnerMeta(next)

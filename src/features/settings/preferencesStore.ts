@@ -1,6 +1,13 @@
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
-import type { CurrencyCode, LanguageCode, ThemePreference, UnitsSystem, UserLocation, UserPreferences } from '@/types/models'
+import type {
+  CurrencyCode,
+  LanguageCode,
+  ThemePreference,
+  UnitsSystem,
+  UserLocation,
+  UserPreferences,
+} from '@/types/models'
 import { DEFAULT_LANGUAGE, LANGUAGES, isLanguageCode } from '@/config/languages'
 import { safeStorage } from '@/shared/lib/storage'
 
@@ -73,10 +80,24 @@ export const usePreferences = create<UserPreferences & PreferencesActions>()(
       version: 2,
       migrate: (s) => {
         const prev = s as UserPreferences
-        return { ...prev, recommendations: DEFAULT_PREFERENCES.recommendations, location: prev.location?.source === 'default' ? DEFAULT_LOCATION : prev.location } as UserPreferences & PreferencesActions
+        return {
+          ...prev,
+          recommendations: DEFAULT_PREFERENCES.recommendations,
+          location: prev.location?.source === 'default' ? DEFAULT_LOCATION : prev.location,
+        } as UserPreferences & PreferencesActions
       },
       storage: createJSONStorage(() => safeStorage),
-      partialize: ({ setLanguage: _a, setCurrency: _b, setUnits: _c, setTheme: _d, setLocation: _e, setRadius: _f, update: _g, reset: _h, ...data }) => data,
+      partialize: ({
+        setLanguage: _a,
+        setCurrency: _b,
+        setUnits: _c,
+        setTheme: _d,
+        setLocation: _e,
+        setRadius: _f,
+        update: _g,
+        reset: _h,
+        ...data
+      }) => data,
     },
   ),
 )

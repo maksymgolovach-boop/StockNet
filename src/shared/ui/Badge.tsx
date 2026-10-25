@@ -1,7 +1,8 @@
 import type { HTMLAttributes, ReactNode } from 'react'
 import { cn } from '@/shared/lib/cn'
 
-export type BadgeTone = 'ink' | 'neutral' | 'primary' | 'accent' | 'verified' | 'expiring' | 'expired' | 'disputed' | 'unverified'
+export type BadgeTone =
+  'ink' | 'neutral' | 'primary' | 'accent' | 'verified' | 'expiring' | 'expired' | 'disputed' | 'unverified'
 
 const tones: Record<BadgeTone, string> = {
   ink: 'bg-ink text-bg border-ink',

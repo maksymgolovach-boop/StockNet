@@ -5,7 +5,13 @@ import { useFormat } from '@/features/i18n/useFormat'
 import { VERIFICATION_ORDER } from './trustScore'
 import { VerificationBadge } from './VerificationBadge'
 
-const ALL_CHECKS: VerificationCheckKind[] = ['company_registry', 'vat', 'documents', 'site_information', 'third_party_audit']
+const ALL_CHECKS: VerificationCheckKind[] = [
+  'company_registry',
+  'vat',
+  'documents',
+  'site_information',
+  'third_party_audit',
+]
 
 /** Every check with date and checker; the steps not yet done are shown greyed out. */
 export function VerificationDetails({ verification }: { verification: Verification }) {
@@ -23,17 +29,30 @@ export function VerificationDetails({ verification }: { verification: Verificati
           const check = done.get(kind)
           return (
             <li key={kind} className="flex items-start gap-3 border-b border-line py-2.5 last:border-b-0">
-              {check ? <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-verified" aria-hidden /> : <Circle className="mt-0.5 size-5 shrink-0 text-ink-subtle" aria-hidden />}
+              {check ? (
+                <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-verified" aria-hidden />
+              ) : (
+                <Circle className="mt-0.5 size-5 shrink-0 text-ink-subtle" aria-hidden />
+              )}
               <span className="flex flex-col">
                 <span className={check ? 'font-medium' : 'text-ink-subtle'}>{t(`verification.checks.${kind}`)}</span>
-                <span className="text-xs text-ink-subtle">{check ? t('verification.checkedOn', { date: fmt.date(check.checkedAt), by: check.by }) : t('verification.notChecked')}</span>
+                <span className="text-xs text-ink-subtle">
+                  {check
+                    ? t('verification.checkedOn', { date: fmt.date(check.checkedAt), by: check.by })
+                    : t('verification.notChecked')}
+                </span>
               </span>
             </li>
           )
         })}
       </ol>
       <p className="text-xs text-ink-subtle">
-        {t('verification.ladder', { levels: fmt.list(VERIFICATION_ORDER.map((l) => t(`verification.levels.${l}`)), 'unit') })}
+        {t('verification.ladder', {
+          levels: fmt.list(
+            VERIFICATION_ORDER.map((l) => t(`verification.levels.${l}`)),
+            'unit',
+          ),
+        })}
       </p>
     </div>
   )

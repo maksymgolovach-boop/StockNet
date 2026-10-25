@@ -19,13 +19,16 @@ export function TrustFilters({ api }: { api: FiltersApi }) {
           legend={t('filters.verificationMin')}
           value={f.verificationMin}
           onChange={(verificationMin) => api.setFilters({ verificationMin })}
-          options={[{ value: '', label: t('filters.any') }, ...LEVELS.map((l) => ({ value: l, label: t(`verification.levels.${l}`) }))]}
+          options={[
+            { value: '', label: t('filters.any') },
+            ...LEVELS.map((l) => ({ value: l, label: t(`verification.levels.${l}`) })),
+          ]}
         />
       </div>
       <div className="flex flex-col gap-1">
         <label htmlFor={`${id}-trust`} className="flex justify-between text-xs text-ink-muted">
           {t('filters.minTrust')}
-          <output className="font-medium text-ink tabular">{f.minTrust ? `≥ ${f.minTrust}` : t('filters.any')}</output>
+          <output className="tabular font-medium text-ink">{f.minTrust ? `≥ ${f.minTrust}` : t('filters.any')}</output>
         </label>
         <input
           id={`${id}-trust`}
@@ -38,8 +41,17 @@ export function TrustFilters({ api }: { api: FiltersApi }) {
           className="accent-[var(--primary)]"
         />
       </div>
-      <Switch checked={f.pastPartnersOnly} onChange={(pastPartnersOnly) => api.setFilters({ pastPartnersOnly })} label={t('filters.pastPartnersOnly')} />
-      <Switch checked={f.validCertsOnly} onChange={(validCertsOnly) => api.setFilters({ validCertsOnly })} label={t('filters.validCertsOnly')} hint={t('filters.validCertsHint')} />
+      <Switch
+        checked={f.pastPartnersOnly}
+        onChange={(pastPartnersOnly) => api.setFilters({ pastPartnersOnly })}
+        label={t('filters.pastPartnersOnly')}
+      />
+      <Switch
+        checked={f.validCertsOnly}
+        onChange={(validCertsOnly) => api.setFilters({ validCertsOnly })}
+        label={t('filters.validCertsOnly')}
+        hint={t('filters.validCertsHint')}
+      />
     </div>
   )
 }

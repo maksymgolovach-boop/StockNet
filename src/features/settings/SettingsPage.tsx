@@ -16,9 +16,25 @@ import { resetDemoData } from '@/services/demoData'
 import { LocationPicker } from './LocationPicker'
 import { usePreferences } from './preferencesStore'
 
-function Section({ id, icon, title, description, children }: { id: string; icon: ReactNode; title: string; description?: string; children: ReactNode }) {
+function Section({
+  id,
+  icon,
+  title,
+  description,
+  children,
+}: {
+  id: string
+  icon: ReactNode
+  title: string
+  description?: string
+  children: ReactNode
+}) {
   return (
-    <section id={id} aria-labelledby={`${id}-title`} className="scroll-mt-[calc(var(--chrome-h,8rem)+1rem)] rounded-[var(--radius-card)] border border-line bg-surface p-5">
+    <section
+      id={id}
+      aria-labelledby={`${id}-title`}
+      className="scroll-mt-[calc(var(--chrome-h,8rem)+1rem)] rounded-[var(--radius-card)] border border-line bg-surface p-5"
+    >
       <div className="mb-4 flex items-start gap-3">
         <span className="grid size-9 shrink-0 place-items-center rounded-full bg-surface-2 text-ink">{icon}</span>
         <div>
@@ -41,20 +57,30 @@ export function SettingsPage() {
   const id = useId()
   const prefs = usePreferences()
   const set = prefs.update
-  const notif = (patch: Partial<UserPreferences['notifications']>) => set({ notifications: { ...prefs.notifications, ...patch } })
+  const notif = (patch: Partial<UserPreferences['notifications']>) =>
+    set({ notifications: { ...prefs.notifications, ...patch } })
   const privacy = (patch: Partial<UserPreferences['privacy']>) => set({ privacy: { ...prefs.privacy, ...patch } })
-  const radiusIndex = Math.max(0, RADIUS_STEPS.findIndex((r) => r >= prefs.radiusKm))
+  const radiusIndex = Math.max(
+    0,
+    RADIUS_STEPS.findIndex((r) => r >= prefs.radiusKm),
+  )
 
   usePageTitle(t('pages.settings'))
 
   return (
     <div className="mx-auto grid max-w-[90rem] gap-6 px-4 py-6 lg:grid-cols-[14rem_minmax(0,1fr)] lg:px-6">
-      <nav aria-label={t('settings.nav')} className="min-w-0 lg:sticky lg:top-[calc(var(--chrome-h,8rem)+1rem)] lg:self-start">
+      <nav
+        aria-label={t('settings.nav')}
+        className="min-w-0 lg:sticky lg:top-[calc(var(--chrome-h,8rem)+1rem)] lg:self-start"
+      >
         <h1 className="mb-3 text-3xl font-semibold">{t('pages.settings')}</h1>
         <ul className="-mx-1 flex gap-1 overflow-x-auto px-1 pb-1 lg:flex-col">
           {SECTIONS.map((s) => (
             <li key={s}>
-              <a href={`#${s}`} className="block shrink-0 rounded-[var(--radius-control)] px-3 py-2 text-sm whitespace-nowrap hover:bg-surface-2">
+              <a
+                href={`#${s}`}
+                className="block shrink-0 rounded-[var(--radius-control)] px-3 py-2 text-sm whitespace-nowrap hover:bg-surface-2"
+              >
                 {t(`settings.sections.${s}`)}
               </a>
             </li>
@@ -65,7 +91,12 @@ export function SettingsPage() {
         <p className="text-sm text-ink-muted" role="note">
           {t('settings.autosave')}
         </p>
-        <Section id="region" icon={<Globe2 className="size-5" aria-hidden />} title={t('settings.sections.region')} description={t('settings.regionBody')}>
+        <Section
+          id="region"
+          icon={<Globe2 className="size-5" aria-hidden />}
+          title={t('settings.sections.region')}
+          description={t('settings.regionBody')}
+        >
           <div className="grid gap-4 sm:grid-cols-2">
             <LanguageSwitcher compact={false} showLabel />
             <div className="flex flex-col gap-2">
@@ -101,16 +132,23 @@ export function SettingsPage() {
               />
             </div>
           </div>
-          <p className="mt-3 text-xs text-ink-subtle">{t('settings.currencyNote', { list: CURRENCY_CODES.filter(isCurrencyCode).join(', ') })}</p>
+          <p className="mt-3 text-xs text-ink-subtle">
+            {t('settings.currencyNote', { list: CURRENCY_CODES.filter(isCurrencyCode).join(', ') })}
+          </p>
         </Section>
 
-        <Section id="location" icon={<MapPin className="size-5" aria-hidden />} title={t('settings.sections.location')} description={t('settings.locationBody')}>
+        <Section
+          id="location"
+          icon={<MapPin className="size-5" aria-hidden />}
+          title={t('settings.sections.location')}
+          description={t('settings.locationBody')}
+        >
           <div className="grid gap-4 sm:grid-cols-2">
             <LocationPicker />
             <div className="flex flex-col gap-1">
               <label htmlFor={`${id}-radius`} className="flex justify-between text-xs text-ink-muted">
                 {t('settings.defaultRadius')}
-                <output htmlFor={`${id}-radius`} className="font-medium text-ink tabular">
+                <output htmlFor={`${id}-radius`} className="tabular font-medium text-ink">
                   {fmt.distance(prefs.radiusKm)}
                 </output>
               </label>
@@ -129,10 +167,21 @@ export function SettingsPage() {
           </div>
         </Section>
 
-        <Section id="notifications" icon={<Bell className="size-5" aria-hidden />} title={t('settings.sections.notifications')} description={t('settings.notificationsBody')}>
+        <Section
+          id="notifications"
+          icon={<Bell className="size-5" aria-hidden />}
+          title={t('settings.sections.notifications')}
+          description={t('settings.notificationsBody')}
+        >
           <div className="grid gap-x-8 sm:grid-cols-2">
             {(['newMessages', 'quoteUpdates', 'dealStatus', 'expiringDocuments', 'priceDrops'] as const).map((k) => (
-              <Switch key={k} checked={prefs.notifications[k]} onChange={(v) => notif({ [k]: v })} label={t(`settings.notifications.${k}`)} hint={t(`settings.notifications.${k}Hint`)} />
+              <Switch
+                key={k}
+                checked={prefs.notifications[k]}
+                onChange={(v) => notif({ [k]: v })}
+                label={t(`settings.notifications.${k}`)}
+                hint={t(`settings.notifications.${k}Hint`)}
+              />
             ))}
           </div>
           <div className="mt-3 flex flex-col gap-1.5">
@@ -142,34 +191,64 @@ export function SettingsPage() {
               legend={t('settings.digest')}
               value={prefs.notifications.emailDigest}
               onChange={(v) => v && notif({ emailDigest: v })}
-              options={(['off', 'daily', 'weekly'] as const).map((v) => ({ value: v, label: t(`settings.digestOptions.${v}`) }))}
+              options={(['off', 'daily', 'weekly'] as const).map((v) => ({
+                value: v,
+                label: t(`settings.digestOptions.${v}`),
+              }))}
             />
           </div>
           <p className="mt-3 text-xs text-ink-subtle">{t('settings.demoNotifications')}</p>
         </Section>
 
-        <Section id="privacy" icon={<ShieldCheck className="size-5" aria-hidden />} title={t('settings.sections.privacy')} description={t('settings.privacyBody')}>
+        <Section
+          id="privacy"
+          icon={<ShieldCheck className="size-5" aria-hidden />}
+          title={t('settings.sections.privacy')}
+          description={t('settings.privacyBody')}
+        >
           <div className="flex flex-col gap-1">
-            <Switch checked={prefs.privacy.showReferenceCustomers} onChange={(v) => privacy({ showReferenceCustomers: v })} label={t('settings.privacy.showReferences')} hint={t('settings.privacy.showReferencesHint')} />
-            <Switch checked={prefs.privacy.allowListedAsReference ?? true} onChange={(v) => privacy({ allowListedAsReference: v })} label={t('settings.privacy.allowReference')} hint={t('settings.privacy.allowReferenceHint')} />
-            <Switch checked={prefs.privacy.showDealCountPublicly} onChange={(v) => privacy({ showDealCountPublicly: v })} label={t('settings.privacy.dealCount')} hint={t('settings.privacy.dealCountHint')} />
+            <Switch
+              checked={prefs.privacy.showReferenceCustomers}
+              onChange={(v) => privacy({ showReferenceCustomers: v })}
+              label={t('settings.privacy.showReferences')}
+              hint={t('settings.privacy.showReferencesHint')}
+            />
+            <Switch
+              checked={prefs.privacy.allowListedAsReference ?? true}
+              onChange={(v) => privacy({ allowListedAsReference: v })}
+              label={t('settings.privacy.allowReference')}
+              hint={t('settings.privacy.allowReferenceHint')}
+            />
+            <Switch
+              checked={prefs.privacy.showDealCountPublicly}
+              onChange={(v) => privacy({ showDealCountPublicly: v })}
+              label={t('settings.privacy.dealCount')}
+              hint={t('settings.privacy.dealCountHint')}
+            />
           </div>
           <p className="mt-3 text-xs text-ink-subtle">{t('settings.privacy.always')}</p>
         </Section>
 
-        <Section id="recommendations" icon={<Sparkles className="size-5" aria-hidden />} title={t('settings.sections.recommendations')} description={t('reco.tune.intro')}>
+        <Section
+          id="recommendations"
+          icon={<Sparkles className="size-5" aria-hidden />}
+          title={t('settings.sections.recommendations')}
+          description={t('reco.tune.intro')}
+        >
           <TuningPanel />
         </Section>
 
-        <Section id="data" icon={<RotateCcw className="size-5" aria-hidden />} title={t('settings.sections.data')} description={t('settings.dataBody')}>
+        <Section
+          id="data"
+          icon={<RotateCcw className="size-5" aria-hidden />}
+          title={t('settings.sections.data')}
+          description={t('settings.dataBody')}
+        >
           <div className="flex flex-wrap gap-2">
             <Button variant="secondary" onClick={prefs.reset}>
               {t('dev.resetPrefs')}
             </Button>
-            <Button
-              variant="danger"
-              onClick={resetDemoData}
-            >
+            <Button variant="danger" onClick={resetDemoData}>
               {t('dev.resetLots')}
             </Button>
           </div>

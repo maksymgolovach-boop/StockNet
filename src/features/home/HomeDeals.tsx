@@ -12,7 +12,11 @@ import { cn } from '@/shared/lib/cn'
 type Tab = 'lots' | 'expiry'
 
 const TABS: Record<Tab, { filters: Filters; sort: 'normalized_asc' | 'expiry'; link: string }> = {
-  lots: { filters: { ...emptyFilters(), saleMode: 'lot', lotConditions: ['surplus', 'clearance'] }, sort: 'normalized_asc', link: '/search?mode=lot&lcond=surplus,clearance&sort=normalized_asc' },
+  lots: {
+    filters: { ...emptyFilters(), saleMode: 'lot', lotConditions: ['surplus', 'clearance'] },
+    sort: 'normalized_asc',
+    link: '/search?mode=lot&lcond=surplus,clearance&sort=normalized_asc',
+  },
   expiry: { filters: { ...emptyFilters(), expiry: 'lt7' }, sort: 'expiry', link: '/search?exp=lt7&sort=expiry' },
 }
 
@@ -33,18 +37,35 @@ export function HomeDeals() {
           <p className="text-sm text-ink-muted">{t(tab === 'lots' ? 'home.dealsBody' : 'home.dealsExpiryBody')}</p>
           <div role="tablist" aria-label={t('home.dealsTitle')} className="mt-1 flex gap-1.5">
             {(['lots', 'expiry'] as const).map((k) => (
-              <button key={k} type="button" role="tab" aria-selected={tab === k} onClick={() => setTab(k)} className={cn('h-8 rounded-full border px-3 text-[0.8125rem] font-medium', tab === k ? 'border-ink bg-ink text-bg' : 'border-line-strong hover:bg-surface-2')}>
+              <button
+                key={k}
+                type="button"
+                role="tab"
+                aria-selected={tab === k}
+                onClick={() => setTab(k)}
+                className={cn(
+                  'h-8 rounded-full border px-3 text-[0.8125rem] font-medium',
+                  tab === k ? 'border-ink bg-ink text-bg' : 'border-line-strong hover:bg-surface-2',
+                )}
+              >
                 {t(`home.dealsTabs.${k}`)}
               </button>
             ))}
           </div>
         </div>
-        <ButtonLink to={TABS[tab].link} variant="secondary" size="sm" icon={<ArrowRight className="size-4 rtl:rotate-180" aria-hidden />}>
+        <ButtonLink
+          to={TABS[tab].link}
+          variant="secondary"
+          size="sm"
+          icon={<ArrowRight className="size-4 rtl:rotate-180" aria-hidden />}
+        >
           {data ? t('home.dealsAll', { count: data.total }) : t('common.viewAll')}
         </ButtonLink>
       </div>
       {data && data.total === 0 ? (
-        <p className="rounded-[var(--radius-card)] border border-dashed border-line-strong p-6 text-sm text-ink-muted">{t('home.dealsNone')}</p>
+        <p className="rounded-[var(--radius-card)] border border-dashed border-line-strong p-6 text-sm text-ink-muted">
+          {t('home.dealsNone')}
+        </p>
       ) : isPending ? (
         <LoadingRegion>
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">

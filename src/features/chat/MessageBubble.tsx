@@ -25,7 +25,10 @@ export function MessageBubble({ message, mine, senderName }: { message: Message;
       >
         <span className="sr-only">{mine ? t('chat.you') : senderName}:</span>
         {message.text && (
-          <p className="text-[0.9375rem] leading-relaxed break-words whitespace-pre-wrap" lang={showTranslation ? fmt.lang : message.contentLang}>
+          <p
+            className="text-[0.9375rem] leading-relaxed break-words whitespace-pre-wrap"
+            lang={showTranslation ? fmt.lang : message.contentLang}
+          >
             {showTranslation ? translation : message.text}
           </p>
         )}
@@ -38,7 +41,12 @@ export function MessageBubble({ message, mine, senderName }: { message: Message;
             ))}
           </ul>
         )}
-        <div className={cn('flex items-center justify-end gap-1 text-[0.6875rem] tabular', mine ? 'text-bg/70' : 'text-ink-subtle')}>
+        <div
+          className={cn(
+            'tabular flex items-center justify-end gap-1 text-[0.6875rem]',
+            mine ? 'text-bg/70' : 'text-ink-subtle',
+          )}
+        >
           {showTranslation && <span className="me-auto pe-2">{t('translate.machineLabel')}</span>}
           <time dateTime={message.sentAt}>{time}</time>
           {mine &&
@@ -50,9 +58,15 @@ export function MessageBubble({ message, mine, senderName }: { message: Message;
         </div>
       </div>
       {translation !== undefined && (
-        <button type="button" onClick={() => setTranslated((v) => !v)} className="inline-flex items-center gap-1 px-1 text-xs font-medium text-primary hover:underline">
+        <button
+          type="button"
+          onClick={() => setTranslated((v) => !v)}
+          className="inline-flex items-center gap-1 px-1 text-xs font-medium text-primary hover:underline"
+        >
           <Languages className="size-3.5" aria-hidden />
-          {showTranslation ? t('translate.showOriginal', { language: LANGUAGES[message.contentLang].nativeName }) : t('translate.translateTo', { language: LANGUAGES[fmt.lang].nativeName })}
+          {showTranslation
+            ? t('translate.showOriginal', { language: LANGUAGES[message.contentLang].nativeName })
+            : t('translate.translateTo', { language: LANGUAGES[fmt.lang].nativeName })}
         </button>
       )}
     </div>

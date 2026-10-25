@@ -55,10 +55,7 @@ export interface TextAttributeDefinition extends AttributeBase {
 }
 
 export type AttributeDefinition =
-  | NumberAttributeDefinition
-  | EnumAttributeDefinition
-  | BooleanAttributeDefinition
-  | TextAttributeDefinition
+  NumberAttributeDefinition | EnumAttributeDefinition | BooleanAttributeDefinition | TextAttributeDefinition
 
 export type AttributeType = AttributeDefinition['type']
 export type AttributeValue = number | string | boolean
@@ -141,12 +138,7 @@ export interface Money {
 
 export type VerificationLevel = 'unverified' | 'identity' | 'verified' | 'audited'
 
-export type VerificationCheckKind =
-  | 'company_registry'
-  | 'vat'
-  | 'documents'
-  | 'site_information'
-  | 'third_party_audit'
+export type VerificationCheckKind = 'company_registry' | 'vat' | 'documents' | 'site_information' | 'third_party_audit'
 
 export interface VerificationCheck {
   kind: VerificationCheckKind
@@ -160,13 +152,7 @@ export interface Verification {
 }
 
 export type TrustFactor =
-  | 'verification'
-  | 'onTimeDelivery'
-  | 'responseTime'
-  | 'disputeRate'
-  | 'repeatCustomers'
-  | 'reviewRating'
-  | 'accountAge'
+  'verification' | 'onTimeDelivery' | 'responseTime' | 'disputeRate' | 'repeatCustomers' | 'reviewRating' | 'accountAge'
 
 /** Raw, auditable inputs a trust score is computed from. */
 export interface TrustInputs {
@@ -247,13 +233,7 @@ export type ProducerType =
   | 'agrochemical_plant'
   | 'seed_company'
 
-export type BuyerType =
-  | 'retailer'
-  | 'distributor'
-  | 'wholesaler'
-  | 'contractor'
-  | 'manufacturer'
-  | 'restaurant_chain'
+export type BuyerType = 'retailer' | 'distributor' | 'wholesaler' | 'contractor' | 'manufacturer' | 'restaurant_chain'
 
 export interface Address {
   street: string
@@ -481,12 +461,7 @@ export interface DealEvent {
 }
 
 export type DealDocumentType =
-  | 'quote'
-  | 'order_confirmation'
-  | 'invoice'
-  | 'delivery_note'
-  | 'certificate'
-  | 'dispute_report'
+  'quote' | 'order_confirmation' | 'invoice' | 'delivery_note' | 'certificate' | 'dispute_report'
 
 export interface DealDocument {
   id: string

@@ -39,9 +39,11 @@ export function pricePerLotFor(lot: Pick<Lot, 'pricePerLot' | 'tiers'>, lots: nu
   return tier ? tier.pricePerLot : lot.pricePerLot
 }
 
-export const availableLots = (lot: Pick<Lot, 'stockCount' | 'reservedCount'>) => Math.max(0, lot.stockCount - lot.reservedCount)
+export const availableLots = (lot: Pick<Lot, 'stockCount' | 'reservedCount'>) =>
+  Math.max(0, lot.stockCount - lot.reservedCount)
 
-export const isExpired = (lot: Pick<Lot, 'expiryDate'>, at: Date = now()) => !!lot.expiryDate && new Date(lot.expiryDate) <= at
+export const isExpired = (lot: Pick<Lot, 'expiryDate'>, at: Date = now()) =>
+  !!lot.expiryDate && new Date(lot.expiryDate) <= at
 
 export function lotStatus(lot: Lot, at: Date = now()): LotStatus {
   if (lot.status === 'archived') return 'archived'
@@ -53,11 +55,14 @@ export function lotStatus(lot: Lot, at: Date = now()): LotStatus {
 
 export const isSellable = (lot: Lot, at: Date = now()) => lotStatus(lot, at) === 'available'
 
-export const sellableLots = (product: Pick<Product, 'lots'>, at: Date = now()) => product.lots.filter((l) => isSellable(l, at))
+export const sellableLots = (product: Pick<Product, 'lots'>, at: Date = now()) =>
+  product.lots.filter((l) => isSellable(l, at))
 
-export const hasLotOffer = (product: Pick<Product, 'saleModes' | 'lots'>) => product.saleModes.includes('lot') && sellableLots(product).length > 0
+export const hasLotOffer = (product: Pick<Product, 'saleModes' | 'lots'>) =>
+  product.saleModes.includes('lot') && sellableLots(product).length > 0
 
-export const isLotOnly = (product: Pick<Product, 'saleModes'>) => product.saleModes.length === 1 && product.saleModes[0] === 'lot'
+export const isLotOnly = (product: Pick<Product, 'saleModes'>) =>
+  product.saleModes.length === 1 && product.saleModes[0] === 'lot'
 
 /** Smallest orderable quantity and step, in lots. */
 export function lotQuantityRule(lot: Pick<Lot, 'divisibility' | 'moqLots'>) {
@@ -76,5 +81,9 @@ export function clampLotQuantity(lot: Lot, qty: number): number {
 /** The cheapest sellable lot by normalized price (falls back to lot price). */
 export function bestLot(product: Product): Lot | undefined {
   const lots = sellableLots(product)
-  return lots.sort((a, b) => (normalizedLotPrice(a, product.unit)?.amount ?? a.pricePerLot) - (normalizedLotPrice(b, product.unit)?.amount ?? b.pricePerLot))[0]
+  return lots.sort(
+    (a, b) =>
+      (normalizedLotPrice(a, product.unit)?.amount ?? a.pricePerLot) -
+      (normalizedLotPrice(b, product.unit)?.amount ?? b.pricePerLot),
+  )[0]
 }

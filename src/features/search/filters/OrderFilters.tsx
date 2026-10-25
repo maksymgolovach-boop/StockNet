@@ -11,7 +11,12 @@ export function OrderFilters({ api }: { api: FiltersApi }) {
   return (
     <div className="flex flex-col gap-3">
       <Switch checked={f.inStock} onChange={(inStock) => api.setFilters({ inStock })} label={t('filters.inStock')} />
-      <Switch checked={f.deliveryAvailable} onChange={(deliveryAvailable) => api.setFilters({ deliveryAvailable })} label={t('filters.deliveryAvailable')} hint={t('filters.deliveryAvailableHint')} />
+      <Switch
+        checked={f.deliveryAvailable}
+        onChange={(deliveryAvailable) => api.setFilters({ deliveryAvailable })}
+        label={t('filters.deliveryAvailable')}
+        hint={t('filters.deliveryAvailableHint')}
+      />
       <div className="flex flex-col gap-1.5">
         <span className="text-xs text-ink-muted">{t('filters.minRating')}</span>
         <RadioChips
@@ -19,10 +24,18 @@ export function OrderFilters({ api }: { api: FiltersApi }) {
           legend={t('filters.minRating')}
           value={f.minRating?.toString()}
           onChange={(v) => api.setFilters({ minRating: v === undefined ? undefined : Number(v) })}
-          options={[{ value: '', label: t('filters.any') }, ...['3', '4', '4.5'].map((v) => ({ value: v, label: `${v}+ ★` }))]}
+          options={[
+            { value: '', label: t('filters.any') },
+            ...['3', '4', '4.5'].map((v) => ({ value: v, label: `${v}+ ★` })),
+          ]}
         />
       </div>
-      <NumberField value={f.moqMax} label={t('filters.moqMax')} suffix={unit ? t(`units.${unit}`) : undefined} onCommit={(moqMax) => api.setFilters({ moqMax })} />
+      <NumberField
+        value={f.moqMax}
+        label={t('filters.moqMax')}
+        suffix={unit ? t(`units.${unit}`) : undefined}
+        onCommit={(moqMax) => api.setFilters({ moqMax })}
+      />
     </div>
   )
 }
@@ -44,19 +57,27 @@ export function TimeFilters({ api }: { api: FiltersApi }) {
             legend={t('filters.expiry')}
             value={f.expiry}
             onChange={(expiry) => api.setFilters({ expiry })}
-            options={[{ value: '', label: t('filters.any') }, ...EXPIRY_PRESETS.map((p) => ({ value: p, label: t(`filters.expiryPresets.${p}`) }))]}
+            options={[
+              { value: '', label: t('filters.any') },
+              ...EXPIRY_PRESETS.map((p) => ({ value: p, label: t(`filters.expiryPresets.${p}`) })),
+            ]}
           />
         </div>
       )}
       {showLead && (
         <div className="flex flex-col gap-1.5">
-          <span className="text-xs text-ink-muted">{t(config ? 'filters.leadTime' : 'filters.leadTimeNonPerishables')}</span>
+          <span className="text-xs text-ink-muted">
+            {t(config ? 'filters.leadTime' : 'filters.leadTimeNonPerishables')}
+          </span>
           <RadioChips
             name="lead"
             legend={t('filters.leadTime')}
             value={f.leadTime}
             onChange={(leadTime) => api.setFilters({ leadTime })}
-            options={[{ value: '', label: t('filters.any') }, ...LEAD_TIME_PRESETS.map((p) => ({ value: p, label: t(`filters.leadPresets.${p}`) }))]}
+            options={[
+              { value: '', label: t('filters.any') },
+              ...LEAD_TIME_PRESETS.map((p) => ({ value: p, label: t(`filters.leadPresets.${p}`) })),
+            ]}
           />
         </div>
       )}

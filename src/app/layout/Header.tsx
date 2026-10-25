@@ -20,7 +20,10 @@ import { AccountChip } from './AccountChip'
 function UnreadDot({ count }: { count: number }) {
   if (count === 0) return null
   return (
-    <span className="absolute -end-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-accent px-1 text-[0.625rem] font-semibold text-on-accent tabular" aria-hidden>
+    <span
+      className="tabular absolute -end-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-accent px-1 text-[0.625rem] font-semibold text-on-accent"
+      aria-hidden
+    >
       {count > 9 ? '9+' : count}
     </span>
   )
@@ -48,9 +51,17 @@ export function Header() {
   const activeRoot = categoryMatch?.params.slug ? getCategory(categoryMatch.params.slug)?.rootSlug : undefined
 
   return (
-    <header ref={headerRef} className="sticky top-0 z-[500] border-b border-line bg-surface/95 backdrop-blur supports-[backdrop-filter]:bg-surface/85">
+    <header
+      ref={headerRef}
+      className="sticky top-0 z-[500] border-b border-line bg-surface/95 backdrop-blur supports-[backdrop-filter]:bg-surface/85"
+    >
       <div className="mx-auto flex h-16 max-w-[90rem] items-center gap-3 px-4 lg:gap-5 lg:px-6">
-        <IconButton label={t('nav.openMenu')} className="lg:hidden" onClick={() => setMenuOpen(true)} aria-expanded={menuOpen}>
+        <IconButton
+          label={t('nav.openMenu')}
+          className="lg:hidden"
+          onClick={() => setMenuOpen(true)}
+          aria-expanded={menuOpen}
+        >
           <Menu className="size-5" aria-hidden />
         </IconButton>
         <Logo />
@@ -88,7 +99,9 @@ export function Header() {
           <NavLink
             to="/messages"
             className="relative grid size-10 place-items-center rounded-[var(--radius-control)] text-ink-muted hover:bg-surface-2 lg:hidden"
-            aria-label={unread > 0 ? `${t('nav.messages')}, ${t('header.unreadMessages', { count: unread })}` : t('nav.messages')}
+            aria-label={
+              unread > 0 ? `${t('nav.messages')}, ${t('header.unreadMessages', { count: unread })}` : t('nav.messages')
+            }
           >
             <span className="relative">
               <MessageSquare className="size-[1.125rem]" aria-hidden />
@@ -98,7 +111,12 @@ export function Header() {
           <ThemeToggle />
           <NavLink to="/settings" className="hidden lg:block" aria-label={t('nav.settings')}>
             {({ isActive }) => (
-              <span className={cn('grid size-10 place-items-center rounded-[var(--radius-control)] hover:bg-surface-2', isActive ? 'text-primary' : 'text-ink-muted')}>
+              <span
+                className={cn(
+                  'grid size-10 place-items-center rounded-[var(--radius-control)] hover:bg-surface-2',
+                  isActive ? 'text-primary' : 'text-ink-muted',
+                )}
+              >
                 <Settings className="size-[1.125rem]" aria-hidden />
               </span>
             )}

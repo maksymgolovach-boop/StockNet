@@ -48,7 +48,8 @@ function productDoc(p: Product, producer: Producer | undefined): Doc {
   return { ...doc, all: [doc.name, doc.keywords, doc.specs, doc.category, doc.producer].join(' | ') }
 }
 
-const wordStart = (text: string, token: string) => new RegExp(`(^|[^a-z0-9])${token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`).test(text)
+const wordStart = (text: string, token: string) =>
+  new RegExp(`(^|[^a-z0-9])${token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`).test(text)
 
 function exactScore(doc: Doc, token: string, wordOnly: boolean): number | null {
   for (const field of Object.keys(FIELD_PENALTY) as (keyof typeof FIELD_PENALTY)[]) {
@@ -134,10 +135,23 @@ export class ProductSearchIndex {
 export function searchCategories(query: string): string[] {
   const tokens = tokenize(query)
   if (!tokens.length) return []
-  const docs = getAllCategories().map((c) => ({ slug: c.slug, text: normalize(categoryNames(c.slug).join(' | ')), level: c.level }))
-  const fuse = new Fuse(docs, { keys: ['text'], threshold: 0.3, ignoreLocation: true, includeScore: true, minMatchCharLength: 3 })
+  const docs = getAllCategories().map((c) => ({
+    slug: c.slug,
+    text: normalize(categoryNames(c.slug).join(' | ')),
+    level: c.level,
+  }))
+  const fuse = new Fuse(docs, {
+    keys: ['text'],
+    threshold: 0.3,
+    ignoreLocation: true,
+    includeScore: true,
+    minMatchCharLength: 3,
+  })
   const exact = docs.filter((d) => tokens.every((t) => d.text.includes(t)))
-  const fuzzy = !exact.length && tokens.length === 1 && !hasDigit(tokens[0] ?? '') ? fuse.search(tokens[0] ?? '').map((r) => r.item) : []
+  const fuzzy =
+    !exact.length && tokens.length === 1 && !hasDigit(tokens[0] ?? '')
+      ? fuse.search(tokens[0] ?? '').map((r) => r.item)
+      : []
   return [...new Set([...exact, ...fuzzy].sort((a, b) => a.level - b.level).map((d) => d.slug))]
 }
 

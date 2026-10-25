@@ -36,7 +36,13 @@ export function SearchBox({ size = 'md', className, shortcut = false }: SearchBo
     if (!shortcut) return
     const onKey = (e: globalThis.KeyboardEvent) => {
       const target = e.target as HTMLElement
-      if (e.key !== '/' || e.ctrlKey || e.metaKey || target.closest('input, textarea, select, [contenteditable="true"]')) return
+      if (
+        e.key !== '/' ||
+        e.ctrlKey ||
+        e.metaKey ||
+        target.closest('input, textarea, select, [contenteditable="true"]')
+      )
+        return
       e.preventDefault()
       inputRef.current?.focus()
       setOpen(true)
@@ -89,7 +95,13 @@ export function SearchBox({ size = 'md', className, shortcut = false }: SearchBo
       <label htmlFor={`${listId}-input`} className="sr-only">
         {t('header.searchLabel')}
       </label>
-      <Search aria-hidden className={cn('pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-ink-subtle', size === 'lg' ? 'size-5' : 'size-4')} />
+      <Search
+        aria-hidden
+        className={cn(
+          'pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-ink-subtle',
+          size === 'lg' ? 'size-5' : 'size-4',
+        )}
+      />
       <input
         ref={inputRef}
         id={`${listId}-input`}
@@ -118,15 +130,25 @@ export function SearchBox({ size = 'md', className, shortcut = false }: SearchBo
       />
       {size === 'md' && (
         <span className="pointer-events-none absolute end-2.5 top-1/2 -translate-y-1/2" aria-hidden>
-          {loading ? <Loader2 className="size-4 animate-spin text-ink-subtle" /> : shortcut && !value && <kbd className="rounded border border-line px-1.5 text-[0.6875rem] text-ink-subtle">/</kbd>}
+          {loading ? (
+            <Loader2 className="size-4 animate-spin text-ink-subtle" />
+          ) : (
+            shortcut &&
+            !value && <kbd className="rounded border border-line px-1.5 text-[0.6875rem] text-ink-subtle">/</kbd>
+          )}
         </span>
       )}
       {size === 'lg' && (
-        <button type="submit" className="absolute end-1.5 top-1/2 h-10 -translate-y-1/2 rounded-[var(--radius-control)] bg-primary px-4 text-sm font-medium text-on-primary hover:bg-primary-hover">
+        <button
+          type="submit"
+          className="absolute end-1.5 top-1/2 h-10 -translate-y-1/2 rounded-[var(--radius-control)] bg-primary px-4 text-sm font-medium text-on-primary hover:bg-primary-hover"
+        >
           {t('header.searchSubmit')}
         </button>
       )}
-      {expanded && <SuggestionList id={listId} options={options} active={active} query={value} onPick={go} onHover={setActive} />}
+      {expanded && (
+        <SuggestionList id={listId} options={options} active={active} query={value} onPick={go} onHover={setActive} />
+      )}
     </form>
   )
 }

@@ -53,7 +53,10 @@ export function ThreadList({ threads, activeId, resolve }: Props) {
       <div className="flex flex-col gap-2 border-b border-line p-3">
         <label className="relative block">
           <span className="sr-only">{t('chat.searchThreads')}</span>
-          <Search className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-ink-subtle" aria-hidden />
+          <Search
+            className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-ink-subtle"
+            aria-hidden
+          />
           <input
             type="search"
             value={query}
@@ -69,7 +72,10 @@ export function ThreadList({ threads, activeId, resolve }: Props) {
               type="button"
               aria-pressed={unreadOnly === u}
               onClick={() => setUnreadOnly(u)}
-              className={cn('h-8 rounded-full px-3 font-medium', unreadOnly === u ? 'bg-ink text-bg' : 'text-ink-muted hover:bg-surface-2')}
+              className={cn(
+                'h-8 rounded-full px-3 font-medium',
+                unreadOnly === u ? 'bg-ink text-bg' : 'text-ink-muted hover:bg-surface-2',
+              )}
             >
               {u ? t('chat.unread') : t('chat.all')}
             </button>
@@ -78,7 +84,11 @@ export function ThreadList({ threads, activeId, resolve }: Props) {
       </div>
       {visible.length === 0 ? (
         <div className="p-3">
-          <EmptyState compact title={t('chat.noThreads')} body={query || unreadOnly ? t('chat.noThreadsFiltered') : t('chat.noThreadsBody')} />
+          <EmptyState
+            compact
+            title={t('chat.noThreads')}
+            body={query || unreadOnly ? t('chat.noThreadsFiltered') : t('chat.noThreadsBody')}
+          />
         </div>
       ) : (
         <ul className="min-h-0 flex-1 overflow-y-auto" aria-label={t('chat.threads')}>
@@ -93,19 +103,29 @@ export function ThreadList({ threads, activeId, resolve }: Props) {
                   to={`/messages/${x.id}`}
                   aria-current={x.id === activeId ? 'page' : undefined}
                   className={cn(
-                    'flex gap-3 border-b border-line border-s-4 px-3 py-3 hover:bg-surface-2',
+                    'flex gap-3 border-s-4 border-b border-line px-3 py-3 hover:bg-surface-2',
                     x.id === activeId ? 'border-s-primary bg-surface-2' : 'border-s-transparent',
                   )}
                 >
                   {partner && <ProducerAvatar producer={partner} size="sm" />}
                   <div className="flex min-w-0 flex-1 flex-col gap-0.5">
                     <div className="flex items-center gap-2">
-                      <span className={cn('min-w-0 flex-1 truncate', unread ? 'font-semibold' : 'font-medium')}>{partner?.name ?? '…'}</span>
-                      <time dateTime={x.lastMessageAt} className={cn('shrink-0 text-xs tabular', unread ? 'font-semibold text-primary' : 'text-ink-subtle')}>
+                      <span className={cn('min-w-0 flex-1 truncate', unread ? 'font-semibold' : 'font-medium')}>
+                        {partner?.name ?? '…'}
+                      </span>
+                      <time
+                        dateTime={x.lastMessageAt}
+                        className={cn(
+                          'tabular shrink-0 text-xs',
+                          unread ? 'font-semibold text-primary' : 'text-ink-subtle',
+                        )}
+                      >
                         {shortTime(x.lastMessageAt)}
                       </time>
                     </div>
-                    {productName(x.productId) && <span className="truncate text-xs text-ink-subtle">{productName(x.productId)}</span>}
+                    {productName(x.productId) && (
+                      <span className="truncate text-xs text-ink-subtle">{productName(x.productId)}</span>
+                    )}
                     <div className="flex items-center gap-2">
                       <span className={cn('min-w-0 flex-1 truncate text-sm', unread ? 'text-ink' : 'text-ink-muted')}>
                         {typing[x.id] ? (
@@ -113,7 +133,9 @@ export function ThreadList({ threads, activeId, resolve }: Props) {
                         ) : last ? (
                           <>
                             {mine && <span className="text-ink-subtle">{t('chat.you')}: </span>}
-                            {last.attachments.length > 0 && <Paperclip className="me-1 inline size-3.5 align-[-2px]" aria-hidden />}
+                            {last.attachments.length > 0 && (
+                              <Paperclip className="me-1 inline size-3.5 align-[-2px]" aria-hidden />
+                            )}
                             {last.text}
                           </>
                         ) : (
@@ -121,7 +143,7 @@ export function ThreadList({ threads, activeId, resolve }: Props) {
                         )}
                       </span>
                       {unread > 0 && (
-                        <span className="grid h-5 min-w-5 shrink-0 place-items-center rounded-full bg-primary px-1.5 text-xs font-semibold text-on-primary tabular">
+                        <span className="tabular grid h-5 min-w-5 shrink-0 place-items-center rounded-full bg-primary px-1.5 text-xs font-semibold text-on-primary">
                           {unread}
                           <span className="sr-only">{t('chat.unreadCount', { count: unread })}</span>
                         </span>

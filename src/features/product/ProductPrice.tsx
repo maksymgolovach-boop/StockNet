@@ -13,12 +13,18 @@ function LotPrice({ product, lotId, alignClass }: { product: Product; lotId?: st
   const { t } = useTranslation()
   const lf = useLotFormat()
   const lot = product.lots.find((l) => l.id === lotId) ?? bestLot(product)
-  if (!lot) return <span className={cn('flex flex-col text-sm font-semibold', alignClass)}>{t('lots.noneAvailable')}</span>
+  if (!lot)
+    return <span className={cn('flex flex-col text-sm font-semibold', alignClass)}>{t('lots.noneAvailable')}</span>
   const norm = normalizedLotPrice(lot, product.unit)
   return (
     <div className={cn('flex flex-col gap-0.5', alignClass)}>
-      <span className="relative z-10 text-lg font-semibold leading-tight">
-        <Price amount={lot.pricePerLot} currency={product.pricing.currency} unitLabel={lf.unit} compact={lot.pricePerLot >= 100} />
+      <span className="relative z-10 text-lg leading-tight font-semibold">
+        <Price
+          amount={lot.pricePerLot}
+          currency={product.pricing.currency}
+          unitLabel={lf.unit}
+          compact={lot.pricePerLot >= 100}
+        />
       </span>
       {norm && (
         <span className="relative z-10 text-xs text-ink-muted">
@@ -33,18 +39,40 @@ function LotPrice({ product, lotId, alignClass }: { product: Product; lotId?: st
   )
 }
 
-export function ProductPrice({ product, align = 'end', lotId }: { product: Product; align?: 'start' | 'end' | 'responsive'; lotId?: string }) {
+export function ProductPrice({
+  product,
+  align = 'end',
+  lotId,
+}: {
+  product: Product
+  align?: 'start' | 'end' | 'responsive'
+  lotId?: string
+}) {
   const { t } = useTranslation()
   const fmt = useFormat()
   if (isLotOnly(product)) {
-    const alignClass = align === 'end' ? 'items-end text-end' : align === 'responsive' ? 'items-start @3xl:items-end @3xl:text-end' : 'items-start'
+    const alignClass =
+      align === 'end'
+        ? 'items-end text-end'
+        : align === 'responsive'
+          ? 'items-start @3xl:items-end @3xl:text-end'
+          : 'items-start'
     return <LotPrice product={product} lotId={lotId} alignClass={alignClass} />
   }
   const { pricing, unit, moq } = product
   const tier = pricing.tiers[0]
   const discount = product.clearance?.discountPct
   return (
-    <div className={cn('flex flex-col gap-0.5', align === 'end' ? 'items-end text-end' : align === 'responsive' ? 'items-start @3xl:items-end @3xl:text-end' : 'items-start')}>
+    <div
+      className={cn(
+        'flex flex-col gap-0.5',
+        align === 'end'
+          ? 'items-end text-end'
+          : align === 'responsive'
+            ? 'items-start @3xl:items-end @3xl:text-end'
+            : 'items-start',
+      )}
+    >
       {pricing.mode === 'on_request' || !tier ? (
         <span className="text-sm font-semibold">{t('common.priceOnRequest')}</span>
       ) : (
@@ -54,12 +82,15 @@ export function ProductPrice({ product, align = 'end', lotId }: { product: Produ
               <Price amount={tier.unitPrice / (1 - discount / 100)} currency={pricing.currency} unit={unit} compact />
             </span>
           )}
-          <span className="relative z-10 text-lg font-semibold leading-tight">
+          <span className="relative z-10 text-lg leading-tight font-semibold">
             <Price amount={tier.unitPrice} currency={pricing.currency} unit={unit} compact={tier.unitPrice >= 100} />
           </span>
           {pricing.mode === 'indexed' && pricing.index && (
             <Tooltip content={t('fx.priceMayChange', { index: pricing.index.name })}>
-              <span tabIndex={0} className="relative z-10 inline-flex items-center gap-1 text-xs font-medium text-accent">
+              <span
+                tabIndex={0}
+                className="relative z-10 inline-flex items-center gap-1 text-xs font-medium text-accent"
+              >
                 <TrendingUp className="size-3" aria-hidden />
                 {t('common.indexedPrice')}
               </span>

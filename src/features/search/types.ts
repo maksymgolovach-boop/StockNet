@@ -1,4 +1,14 @@
-import type { Filters, GeoBounds, GeoPoint, LotCondition, LotType, Product, SortOption, UnitCode, VerificationLevel } from '@/types/models'
+import type {
+  Filters,
+  GeoBounds,
+  GeoPoint,
+  LotCondition,
+  LotType,
+  Product,
+  SortOption,
+  UnitCode,
+  VerificationLevel,
+} from '@/types/models'
 
 export type ResultsView = 'list' | 'grid' | 'map'
 

@@ -33,7 +33,10 @@ export function MapLocationSearch({ onPick }: { onPick: (point: GeoPoint) => voi
       <label htmlFor={id} className="sr-only">
         {t('map.locationSearch')}
       </label>
-      <MapPinned className="pointer-events-none absolute start-2.5 top-1/2 size-4 -translate-y-1/2 text-ink-subtle" aria-hidden />
+      <MapPinned
+        className="pointer-events-none absolute start-2.5 top-1/2 size-4 -translate-y-1/2 text-ink-subtle"
+        aria-hidden
+      />
       <input
         id={id}
         list={`${id}-list`}

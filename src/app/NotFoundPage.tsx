@@ -11,7 +11,11 @@ export function NotFoundPage() {
         icon={<SearchX className="size-5" aria-hidden />}
         title={t('errors.notFoundTitle')}
         body={t('errors.notFoundBody')}
-        action={<ButtonLink to="/" variant="secondary" size="sm">{t('errors.goHome')}</ButtonLink>}
+        action={
+          <ButtonLink to="/" variant="secondary" size="sm">
+            {t('errors.goHome')}
+          </ButtonLink>
+        }
       />
     </div>
   )

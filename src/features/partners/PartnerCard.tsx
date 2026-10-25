@@ -14,7 +14,14 @@ import { cn } from '@/shared/lib/cn'
 import { useValueChange } from '@/shared/hooks/useValueChange'
 import { VolumeChart } from './VolumeChart'
 
-const PARTNER_TAGS = ['primary_supplier', 'local_supplier', 'preferred', 'backup', 'under_review', 'key_account'] as const
+const PARTNER_TAGS = [
+  'primary_supplier',
+  'local_supplier',
+  'preferred',
+  'backup',
+  'under_review',
+  'key_account',
+] as const
 
 interface Props {
   p: Partnership
@@ -37,7 +44,10 @@ export function PartnerCard({ p, partner, role, onMeta, saving }: Props) {
     [t('partners.last'), fmt.date(p.lastDealAt, { day: 'numeric', month: 'short', year: 'numeric' })],
     [t('partners.deals'), t('partners.dealsValue', { count: p.dealCount, completed: p.completedCount })],
     [t('partners.volume'), volume === null ? '—' : format(volume, display, { compact: true })],
-    [t(role === 'buyer' ? 'partners.ratingGiven' : 'partners.ratingReceived'), p.avgRatingGiven === null ? '—' : `${fmt.number(p.avgRatingGiven, { minimumFractionDigits: 1 })} ★`],
+    [
+      t(role === 'buyer' ? 'partners.ratingGiven' : 'partners.ratingReceived'),
+      p.avgRatingGiven === null ? '—' : `${fmt.number(p.avgRatingGiven, { minimumFractionDigits: 1 })} ★`,
+    ],
     [t('partners.onTime'), p.onTimeRate === null ? '—' : fmt.percent(p.onTimeRate)],
   ]
   const notesId = `notes-${p.counterpartyId}`
@@ -78,7 +88,7 @@ export function PartnerCard({ p, partner, role, onMeta, saving }: Props) {
         {stats.map(([k, v]) => (
           <div key={k} className="min-w-0">
             <dt className="text-xs text-ink-muted">{k}</dt>
-            <dd className="truncate font-medium tabular">{v}</dd>
+            <dd className="tabular truncate font-medium">{v}</dd>
           </div>
         ))}
       </dl>
@@ -88,7 +98,12 @@ export function PartnerCard({ p, partner, role, onMeta, saving }: Props) {
           <label htmlFor={tagId} className="text-xs font-medium text-ink-muted">
             {t('partners.tag')}
           </label>
-          <select id={tagId} value={p.tag ?? ''} onChange={(e) => onMeta({ tag: e.target.value || undefined })} className="h-9 rounded-[var(--radius-control)] border border-line-strong bg-surface px-2 text-sm">
+          <select
+            id={tagId}
+            value={p.tag ?? ''}
+            onChange={(e) => onMeta({ tag: e.target.value || undefined })}
+            className="h-9 rounded-[var(--radius-control)] border border-line-strong bg-surface px-2 text-sm"
+          >
             <option value="">{t('partners.noTag')}</option>
             {PARTNER_TAGS.map((tag) => (
               <option key={tag} value={tag}>
@@ -122,7 +137,10 @@ export function PartnerCard({ p, partner, role, onMeta, saving }: Props) {
             {t('partners.requestQuote')}
           </Link>
         )}
-        <Link to={role === 'buyer' ? `/messages?producer=${p.counterpartyId}` : `/messages?buyer=${p.counterpartyId}`} className={buttonClass('secondary', 'sm')}>
+        <Link
+          to={role === 'buyer' ? `/messages?producer=${p.counterpartyId}` : `/messages?buyer=${p.counterpartyId}`}
+          className={buttonClass('secondary', 'sm')}
+        >
           <MessageSquare className="size-3.5" aria-hidden />
           {t('partners.message')}
         </Link>

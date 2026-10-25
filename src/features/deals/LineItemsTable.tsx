@@ -17,28 +17,41 @@ export function LineItemsTable({ deal }: { deal: Deal }) {
         <caption className="sr-only">{t('dealDetail.lineItems')}</caption>
         <thead className="bg-surface-2">
           <tr>
-            <th scope="col" className={`${th} text-start`}>{t('dealDetail.cols.product')}</th>
-            <th scope="col" className={`${th} text-end`}>{t('dealDetail.cols.quantity')}</th>
-            <th scope="col" className={`${th} text-end`}>{t('dealDetail.cols.unitPrice')}</th>
-            <th scope="col" className={`${th} text-end`}>{t('dealDetail.cols.subtotal')}</th>
+            <th scope="col" className={`${th} text-start`}>
+              {t('dealDetail.cols.product')}
+            </th>
+            <th scope="col" className={`${th} text-end`}>
+              {t('dealDetail.cols.quantity')}
+            </th>
+            <th scope="col" className={`${th} text-end`}>
+              {t('dealDetail.cols.unitPrice')}
+            </th>
+            <th scope="col" className={`${th} text-end`}>
+              {t('dealDetail.cols.subtotal')}
+            </th>
           </tr>
         </thead>
         <tbody>
           {deal.lineItems.map((li, i) => (
             <tr key={`${li.productId}-${i}`} className="border-t border-line align-top">
               <td className="px-3 py-3">
-                <Link to={`/product/${li.productId}${li.lot ? `?lot=${li.lot.lotId}` : ''}`} className="font-medium hover:text-primary hover:underline">
+                <Link
+                  to={`/product/${li.productId}${li.lot ? `?lot=${li.lot.lotId}` : ''}`}
+                  className="font-medium hover:text-primary hover:underline"
+                >
                   {li.productName}
                 </Link>
                 <span className="mt-1 block">
                   <LotRef item={li} />
                 </span>
               </td>
-              <td className="px-3 py-3 text-end whitespace-nowrap tabular">{qty(li)}</td>
-              <td className="px-3 py-3 text-end whitespace-nowrap tabular">
+              <td className="tabular px-3 py-3 text-end whitespace-nowrap">{qty(li)}</td>
+              <td className="tabular px-3 py-3 text-end whitespace-nowrap">
                 {format(li.unitPrice, deal.currency)} / {li.lot ? t('lots.unit') : t(`units.${li.unit}`)}
               </td>
-              <td className="px-3 py-3 text-end font-medium whitespace-nowrap tabular">{format(li.subtotal, deal.currency)}</td>
+              <td className="tabular px-3 py-3 text-end font-medium whitespace-nowrap">
+                {format(li.subtotal, deal.currency)}
+              </td>
             </tr>
           ))}
         </tbody>
@@ -47,9 +60,11 @@ export function LineItemsTable({ deal }: { deal: Deal }) {
             <th scope="row" colSpan={3} className="px-3 py-3 text-end text-sm font-semibold">
               {t('dealDetail.total', { currency: deal.currency })}
             </th>
-            <td className="px-3 py-3 text-end text-base font-semibold whitespace-nowrap tabular">
+            <td className="tabular px-3 py-3 text-end text-base font-semibold whitespace-nowrap">
               {format(deal.total, deal.currency)}
-              {converted !== null && <span className="block text-xs font-normal text-ink-muted">≈ {format(converted, display)}</span>}
+              {converted !== null && (
+                <span className="block text-xs font-normal text-ink-muted">≈ {format(converted, display)}</span>
+              )}
             </td>
           </tr>
         </tfoot>

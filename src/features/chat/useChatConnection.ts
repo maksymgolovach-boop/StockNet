@@ -13,7 +13,10 @@ export function useChatConnection() {
   const setTyping = useChatUi((s) => s.setTyping)
 
   useEffect(() => {
-    const sides = [['buyer', buyerId], ['producer', producerId]] as const
+    const sides = [
+      ['buyer', buyerId],
+      ['producer', producerId],
+    ] as const
     const offs = sides.map(([side, actorId]) =>
       chatTransport.connect(side, actorId, (event) => {
         if (event.type === 'typing') {
@@ -21,17 +24,23 @@ export function useChatConnection() {
           return
         }
         if (event.type === 'deal') {
-          for (const key of ['deal', 'deals', 'partnerships', 'producerLots', 'search', 'products']) void qc.invalidateQueries({ queryKey: [key] })
+          for (const key of ['deal', 'deals', 'partnerships', 'producerLots', 'search', 'products'])
+            void qc.invalidateQueries({ queryKey: [key] })
           return
         }
         if (event.type === 'thread') {
           void qc.invalidateQueries({ queryKey: ['threads'] })
           return
         }
-        const key = queryKeys.messages(side, actorId, event.type === 'message' ? event.message.threadId : event.threadId)
+        const key = queryKeys.messages(
+          side,
+          actorId,
+          event.type === 'message' ? event.message.threadId : event.threadId,
+        )
         qc.setQueryData<Message[]>(key, (prev) => {
           if (!prev) return prev
-          if (event.type === 'message') return prev.some((m) => m.id === event.message.id) ? prev : [...prev, event.message]
+          if (event.type === 'message')
+            return prev.some((m) => m.id === event.message.id) ? prev : [...prev, event.message]
           return prev.map((m) => (m.senderRole !== event.readerRole && !m.readAt ? { ...m, readAt: event.readAt } : m))
         })
         void qc.invalidateQueries({ queryKey: ['threads'] })

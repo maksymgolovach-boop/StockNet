@@ -2,7 +2,14 @@ import { useCallback, useMemo } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import type { AttributeFilterValue, Filters, SortOption } from '@/types/models'
 import { getCategoryConfig } from '@/config/categories'
-import { PAGE_SIZE, emptyFilters, parseSearchState, serializeSearchState, type MapUrlState, type SearchState } from './filtersCodec'
+import {
+  PAGE_SIZE,
+  emptyFilters,
+  parseSearchState,
+  serializeSearchState,
+  type MapUrlState,
+  type SearchState,
+} from './filtersCodec'
 import type { ResultsView } from './types'
 
 /**
@@ -35,7 +42,10 @@ export function useFilters() {
         if (!config?.perishable) filters.expiry = undefined
         if (config?.perishable) filters.leadTime = undefined
       }
-      const sort = state.sort === 'expiry' && filters.category && !getCategoryConfig(filters.category)?.perishable ? 'relevance' : state.sort
+      const sort =
+        state.sort === 'expiry' && filters.category && !getCategoryConfig(filters.category)?.perishable
+          ? 'relevance'
+          : state.sort
       commit({ ...state, filters, sort, limit: PAGE_SIZE, map: { ...state.map, bounds: undefined } })
     },
     [state, commit],
@@ -59,10 +69,18 @@ export function useFilters() {
     setView: (view: ResultsView) => commit({ ...state, view }),
     showMore: () => commit({ ...state, limit: state.limit + PAGE_SIZE }, { replace: true }),
     clearAll: () =>
-      commit({ ...state, filters: { ...emptyFilters(), q: state.filters.q, category: state.filters.category }, limit: PAGE_SIZE, map: { ...state.map, bounds: undefined } }),
+      commit({
+        ...state,
+        filters: { ...emptyFilters(), q: state.filters.q, category: state.filters.category },
+        limit: PAGE_SIZE,
+        map: { ...state.map, bounds: undefined },
+      }),
     /** Map viewport changes replace the history entry; applying an area pushes one. */
     setMap: (patch: Partial<MapUrlState>, { replace = true } = {}) =>
-      commit({ ...state, map: { ...state.map, ...patch }, limit: 'bounds' in patch ? PAGE_SIZE : state.limit }, { replace }),
+      commit(
+        { ...state, map: { ...state.map, ...patch }, limit: 'bounds' in patch ? PAGE_SIZE : state.limit },
+        { replace },
+      ),
   }
 }
 

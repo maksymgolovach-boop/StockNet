@@ -24,15 +24,29 @@ export function ProductActions({ product, showQuote = true }: { product: Product
   return (
     <div className="flex flex-col gap-2">
       {showQuote && (
-        <ButtonLink to={`/deals/new?product=${product.id}`} size="lg" icon={<FileSignature className="size-4" aria-hidden />}>
+        <ButtonLink
+          to={`/deals/new?product=${product.id}`}
+          size="lg"
+          icon={<FileSignature className="size-4" aria-hidden />}
+        >
           {t('product.requestQuote')}
         </ButtonLink>
       )}
       <div className="grid grid-cols-[1fr_auto] gap-2">
-        <ButtonLink to={`/messages?producer=${product.producerId}&product=${product.id}`} variant="secondary" icon={<MessageSquare className="size-4" aria-hidden />}>
+        <ButtonLink
+          to={`/messages?producer=${product.producerId}&product=${product.id}`}
+          variant="secondary"
+          icon={<MessageSquare className="size-4" aria-hidden />}
+        >
           {t('product.contactProducer')}
         </ButtonLink>
-        <Button variant="secondary" onClick={() => toggle(product.id)} aria-pressed={saved} aria-label={t(saved ? 'product.unsave' : 'product.save')} title={t(saved ? 'product.unsave' : 'product.save')}>
+        <Button
+          variant="secondary"
+          onClick={() => toggle(product.id)}
+          aria-pressed={saved}
+          aria-label={t(saved ? 'product.unsave' : 'product.save')}
+          title={t(saved ? 'product.unsave' : 'product.save')}
+        >
           <Heart className={cn('size-4', saved && 'fill-primary text-primary')} aria-hidden />
         </Button>
       </div>

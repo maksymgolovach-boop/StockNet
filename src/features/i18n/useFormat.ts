@@ -22,7 +22,8 @@ export function useFormat() {
   const locale = intlLocaleOf(lang)
 
   return useMemo(() => {
-    const number = (value: number, options?: Intl.NumberFormatOptions) => new Intl.NumberFormat(locale, options).format(value)
+    const number = (value: number, options?: Intl.NumberFormatOptions) =>
+      new Intl.NumberFormat(locale, options).format(value)
     const unitLabel = (unit: string) => t(`units.${unit}`, { defaultValue: unit })
 
     return {
@@ -32,7 +33,8 @@ export function useFormat() {
       percent: (ratio: number, digits = 0) => number(ratio, { style: 'percent', maximumFractionDigits: digits }),
       date: (iso: string, options: Intl.DateTimeFormatOptions = { dateStyle: 'medium' }) =>
         new Intl.DateTimeFormat(locale, options).format(new Date(iso)),
-      dateTime: (iso: string) => new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(iso)),
+      dateTime: (iso: string) =>
+        new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(iso)),
       relative: (iso: string) => {
         const seconds = (new Date(iso).getTime() - liveNow().getTime()) / 1000
         const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' })
@@ -41,7 +43,8 @@ export function useFormat() {
         }
         return rtf.format(Math.round(seconds / 60), 'minute')
       },
-      list: (items: string[], type: Intl.ListFormatType = 'conjunction') => new Intl.ListFormat(locale, { style: 'long', type }).format(items),
+      list: (items: string[], type: Intl.ListFormatType = 'conjunction') =>
+        new Intl.ListFormat(locale, { style: 'long', type }).format(items),
       region: (code: string) => new Intl.DisplayNames([locale], { type: 'region' }).of(code) ?? code,
       unitLabel,
       /** Distance in km or miles depending on the units preference. */

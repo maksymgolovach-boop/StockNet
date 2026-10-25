@@ -14,7 +14,10 @@ export function CurrencySwitcher({ compact = true, showLabel = false }: { compac
       compact={compact}
       value={display}
       onChange={(e) => isCurrencyCode(e.target.value) && setCurrency(e.target.value)}
-      options={CURRENCY_CODES.map((c) => ({ value: c, label: compact && !showLabel ? c : `${c} — ${t(`currency.${c}`)}` }))}
+      options={CURRENCY_CODES.map((c) => ({
+        value: c,
+        label: compact && !showLabel ? c : `${c} — ${t(`currency.${c}`)}`,
+      }))}
     />
   )
 }

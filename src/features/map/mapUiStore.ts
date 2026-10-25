@@ -28,7 +28,10 @@ export const useMapUi = create<MapUiState>()(
       visitedProducerIds: [],
       setHovered: (hoveredProducerId) => set({ hoveredProducerId }),
       select: (selectedProducerId, selectionSource = 'map') => set({ selectedProducerId, selectionSource }),
-      markVisited: (id) => set((s) => (s.visitedProducerIds.includes(id) ? s : { visitedProducerIds: [...s.visitedProducerIds, id].slice(-200) })),
+      markVisited: (id) =>
+        set((s) =>
+          s.visitedProducerIds.includes(id) ? s : { visitedProducerIds: [...s.visitedProducerIds, id].slice(-200) },
+        ),
     }),
     {
       name: 'sy-map-ui',

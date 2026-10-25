@@ -10,7 +10,8 @@ import { useLotFormat } from '@/features/lots/useLotFormat'
 import { cn } from '@/shared/lib/cn'
 import type { RfqValues } from './rfqSchema'
 
-const input = 'h-10 w-full rounded-[var(--radius-control)] border border-line-strong bg-surface px-3 text-sm aria-[invalid=true]:border-expired'
+const input =
+  'h-10 w-full rounded-[var(--radius-control)] border border-line-strong bg-surface px-3 text-sm aria-[invalid=true]:border-expired'
 
 interface Props {
   index: number
@@ -56,7 +57,13 @@ export function RfqItemRow({ index: i, products, control, register, setValue, er
           <label htmlFor={id('product')} className="text-xs font-medium text-ink-muted">
             {t('rfq.product')} {i + 1}
           </label>
-          <select id={id('product')} value={item?.productId ?? ''} onChange={(ev) => pickProduct(ev.target.value)} aria-invalid={!!msg('productId')} className={input}>
+          <select
+            id={id('product')}
+            value={item?.productId ?? ''}
+            onChange={(ev) => pickProduct(ev.target.value)}
+            aria-invalid={!!msg('productId')}
+            className={input}
+          >
             <option value="">{t('lots.form.chooseProduct')}</option>
             {products.map((p) => (
               <option key={p.id} value={p.id}>
@@ -67,7 +74,12 @@ export function RfqItemRow({ index: i, products, control, register, setValue, er
           {msg('productId') && <p className="text-xs text-expired">{t(msg('productId') as string)}</p>}
         </div>
         {onRemove && (
-          <button type="button" onClick={onRemove} aria-label={t('rfq.removeItem', { index: i + 1 })} className="mt-5 grid size-10 shrink-0 place-items-center rounded-[var(--radius-control)] text-ink-muted hover:bg-surface-2">
+          <button
+            type="button"
+            onClick={onRemove}
+            aria-label={t('rfq.removeItem', { index: i + 1 })}
+            className="mt-5 grid size-10 shrink-0 place-items-center rounded-[var(--radius-control)] text-ink-muted hover:bg-surface-2"
+          >
             <Trash2 className="size-4" aria-hidden />
           </button>
         )}
@@ -75,7 +87,11 @@ export function RfqItemRow({ index: i, products, control, register, setValue, er
       {product && (
         <>
           {product.saleModes.includes('measure') && lots.length > 0 && (
-            <div role="radiogroup" aria-label={t('lots.filters.saleMode')} className="grid grid-cols-2 gap-1 self-start rounded-[var(--radius-control)] bg-surface-2 p-1 text-sm sm:w-72">
+            <div
+              role="radiogroup"
+              aria-label={t('lots.filters.saleMode')}
+              className="grid grid-cols-2 gap-1 self-start rounded-[var(--radius-control)] bg-surface-2 p-1 text-sm sm:w-72"
+            >
               {(['measure', 'lot'] as const).map((mode) => (
                 <button
                   key={mode}
@@ -84,10 +100,16 @@ export function RfqItemRow({ index: i, products, control, register, setValue, er
                   aria-checked={item?.mode === mode}
                   onClick={() => {
                     setValue(`items.${i}.mode`, mode)
-                    setValue(`items.${i}.quantity`, String(mode === 'lot' && lots[0] ? lotQuantityRule(lots[0]).min : product.moq))
+                    setValue(
+                      `items.${i}.quantity`,
+                      String(mode === 'lot' && lots[0] ? lotQuantityRule(lots[0]).min : product.moq),
+                    )
                     if (mode === 'lot' && !item?.lotId) setValue(`items.${i}.lotId`, lots[0]?.id ?? '')
                   }}
-                  className={cn('h-8 rounded-[calc(var(--radius-control)-2px)] font-medium', item?.mode === mode ? 'bg-ink text-bg' : 'text-ink-muted')}
+                  className={cn(
+                    'h-8 rounded-[calc(var(--radius-control)-2px)] font-medium',
+                    item?.mode === mode ? 'bg-ink text-bg' : 'text-ink-muted',
+                  )}
                 >
                   {t(`lots.buyBy.${mode}`)}
                 </button>
@@ -100,7 +122,12 @@ export function RfqItemRow({ index: i, products, control, register, setValue, er
                 <label htmlFor={id('lot')} className="text-xs font-medium text-ink-muted">
                   {t('rfq.lot')}
                 </label>
-                <select id={id('lot')} {...register(`items.${i}.lotId`)} aria-invalid={!!msg('lotId')} className={input}>
+                <select
+                  id={id('lot')}
+                  {...register(`items.${i}.lotId`)}
+                  aria-invalid={!!msg('lotId')}
+                  className={input}
+                >
                   {lots.map((l) => (
                     <option key={l.id} value={l.id}>
                       {l.lotNumber} · {lf.type(l.type)} · {lf.content(l.content)} · {lf.available(availableLots(l))}
@@ -110,24 +137,50 @@ export function RfqItemRow({ index: i, products, control, register, setValue, er
                 {msg('lotId') && <p className="text-xs text-expired">{t(msg('lotId') as string)}</p>}
               </div>
             ) : (
-              <p className="self-center text-xs text-ink-muted">{t('product.moqLong', { qty: fmt.quantity(product.moq, product.unit, { withImperial: false }) })}</p>
+              <p className="self-center text-xs text-ink-muted">
+                {t('product.moqLong', { qty: fmt.quantity(product.moq, product.unit, { withImperial: false }) })}
+              </p>
             )}
             <div className="flex flex-col gap-1">
               <label htmlFor={id('qty')} className="text-xs font-medium text-ink-muted">
-                {item?.mode === 'lot' ? t('lots.quantityLabel') : t('rfq.quantityIn', { unit: t(`units.${product.unit}`) })}
+                {item?.mode === 'lot'
+                  ? t('lots.quantityLabel')
+                  : t('rfq.quantityIn', { unit: t(`units.${product.unit}`) })}
               </label>
-              <input id={id('qty')} {...register(`items.${i}.quantity`)} inputMode="decimal" step={rule?.step} aria-invalid={!!msg('quantity')} className={input} />
+              <input
+                id={id('qty')}
+                {...register(`items.${i}.quantity`)}
+                inputMode="decimal"
+                step={rule?.step}
+                aria-invalid={!!msg('quantity')}
+                className={input}
+              />
               {msg('quantity') ? (
-                <p className="text-xs text-expired">{t(msg('quantity') as string, { min: rule ? lf.lots(rule.min) : product.moq, step: rule?.step, max: lot ? availableLots(lot) : '' })}</p>
+                <p className="text-xs text-expired">
+                  {t(msg('quantity') as string, {
+                    min: rule ? lf.lots(rule.min) : product.moq,
+                    step: rule?.step,
+                    max: lot ? availableLots(lot) : '',
+                  })}
+                </p>
               ) : rule ? (
-                <p className="text-xs text-ink-subtle">{rule.divisible ? t('lots.divisibleShort', { step: fmt.number(rule.step) }) : t('lots.indivisibleShort')}</p>
+                <p className="text-xs text-ink-subtle">
+                  {rule.divisible
+                    ? t('lots.divisibleShort', { step: fmt.number(rule.step) })
+                    : t('lots.indivisibleShort')}
+                </p>
               ) : null}
             </div>
             <div className="flex flex-col items-start gap-0.5 text-sm sm:items-end sm:pt-5">
               {unitPrice !== undefined && (
                 <>
                   <span className="text-xs text-ink-muted">
-                    <Price amount={unitPrice} currency={product.pricing.currency} unit={item?.mode === 'lot' ? undefined : product.unit} unitLabel={item?.mode === 'lot' ? t('lots.unit') : undefined} />
+                    <Price
+                      amount={unitPrice}
+                      currency={product.pricing.currency}
+                      unit={item?.mode === 'lot' ? undefined : product.unit}
+                      unitLabel={item?.mode === 'lot' ? t('lots.unit') : undefined}
+                    />
                   </span>
                   {q > 0 && (
                     <span className="font-semibold">
@@ -136,7 +189,9 @@ export function RfqItemRow({ index: i, products, control, register, setValue, er
                   )}
                 </>
               )}
-              {product.pricing.mode === 'on_request' && item?.mode === 'measure' && <span className="text-xs text-ink-muted">{t('common.priceOnRequest')}</span>}
+              {product.pricing.mode === 'on_request' && item?.mode === 'measure' && (
+                <span className="text-xs text-ink-muted">{t('common.priceOnRequest')}</span>
+              )}
             </div>
           </div>
         </>

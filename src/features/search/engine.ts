@@ -5,8 +5,23 @@ import { distanceKm, isInBounds, roadDistanceKm } from '@/shared/lib/geo'
 import { daysFromNow } from '@/shared/lib/dates'
 import { meetsVerification } from '@/features/trust/trustScore'
 import { documentStatus, hasValidCertificates } from '@/features/trust/documentStatus'
-import { availableLots, hasLotOffer, isLotOnly, lotMeasure, normalizedLotPrice, sellableLots } from '@/features/lots/lotMath'
-import type { FacetCount, LotSummary, MapPin, ProducerSummary, SearchContext, SearchResponse, SearchResultItem } from './types'
+import {
+  availableLots,
+  hasLotOffer,
+  isLotOnly,
+  lotMeasure,
+  normalizedLotPrice,
+  sellableLots,
+} from '@/features/lots/lotMath'
+import type {
+  FacetCount,
+  LotSummary,
+  MapPin,
+  ProducerSummary,
+  SearchContext,
+  SearchResponse,
+  SearchResultItem,
+} from './types'
 
 type FacetKey = 'category' | 'countries' | 'certifications' | 'lot'
 
@@ -30,7 +45,11 @@ function attributeMatches(product: Product, key: string, filter: AttributeFilter
   if (value === undefined) return false
   switch (filter.kind) {
     case 'range':
-      return typeof value === 'number' && (filter.min === undefined || value >= filter.min) && (filter.max === undefined || value <= filter.max)
+      return (
+        typeof value === 'number' &&
+        (filter.min === undefined || value >= filter.min) &&
+        (filter.max === undefined || value <= filter.max)
+      )
     case 'enum':
       return filter.values.length === 0 || filter.values.includes(String(value))
     case 'boolean':
@@ -134,7 +153,11 @@ function passes(item: SearchResultItem, f: Filters, producer: Producer, skip?: F
   if (f.verificationMin && !meetsVerification(producer.verification.level, f.verificationMin)) return false
   if (f.minTrust !== undefined && producer.trust.score < f.minTrust) return false
   if (f.pastPartnersOnly && item.pastPartnerDeals === 0) return false
-  if (f.validCertsOnly && (!hasValidCertificates(producer.documents) || p.documents.some((d) => documentStatus(d) === 'expired'))) return false
+  if (
+    f.validCertsOnly &&
+    (!hasValidCertificates(producer.documents) || p.documents.some((d) => documentStatus(d) === 'expired'))
+  )
+    return false
   if (f.expiry) {
     if (!p.expiryDate) return false
     const days = daysFromNow(p.expiryDate)
@@ -168,9 +191,16 @@ function compare(sort: SortOption, hasQuery: boolean) {
       case 'distance':
         return a.distanceKm - b.distanceKm
       case 'expiry':
-        return nullsLast(a.product.expiryDate ? Date.parse(a.product.expiryDate) : null, b.product.expiryDate ? Date.parse(b.product.expiryDate) : null, 1)
+        return nullsLast(
+          a.product.expiryDate ? Date.parse(a.product.expiryDate) : null,
+          b.product.expiryDate ? Date.parse(b.product.expiryDate) : null,
+          1,
+        )
       case 'availability':
-        return AVAILABILITY_RANK[a.product.availability.status] - AVAILABILITY_RANK[b.product.availability.status] || a.product.availability.leadTimeDays - b.product.availability.leadTimeDays
+        return (
+          AVAILABILITY_RANK[a.product.availability.status] - AVAILABILITY_RANK[b.product.availability.status] ||
+          a.product.availability.leadTimeDays - b.product.availability.leadTimeDays
+        )
       case 'newest':
         return b.product.createdAt.localeCompare(a.product.createdAt)
       case 'rating':
@@ -183,7 +213,10 @@ function compare(sort: SortOption, hasQuery: boolean) {
         return nullsLast(a.comparablePrice, b.comparablePrice, 1)
       case 'relevance': {
         const boost = (i: SearchResultItem) =>
-          (hasQuery ? i.score : 0) * 100 - Math.min(i.pastPartnerDeals, 5) * 2 - i.producer.trustScore / 10 + Math.min(i.distanceKm, 1500) / 150
+          (hasQuery ? i.score : 0) * 100 -
+          Math.min(i.pastPartnerDeals, 5) * 2 -
+          i.producer.trustScore / 10 +
+          Math.min(i.distanceKm, 1500) / 150
         return boost(a) - boost(b)
       }
     }
@@ -278,7 +311,8 @@ export function runSearch(
   const matching = candidates.filter((c) => passes(c.item, filters, c.producer)).map((c) => c.item)
   matching.sort(compare(sort, textScores !== null))
 
-  const without = (key: FacetKey) => candidates.filter((c) => passes(c.item, filters, c.producer, key)).map((c) => c.item)
+  const without = (key: FacetKey) =>
+    candidates.filter((c) => passes(c.item, filters, c.producer, key)).map((c) => c.item)
   const parent = filters.category && getCategory(filters.category) ? filters.category : null
   const children = getCategoryChildren(parent)
   const categoryBase = without('category')

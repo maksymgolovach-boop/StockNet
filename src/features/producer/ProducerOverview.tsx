@@ -29,7 +29,10 @@ export function ProducerOverview({ producer }: { producer: Producer }) {
     [t('producer.facts.type'), t(`producerTypes.${producer.type}`)],
     [t('producer.facts.founded'), String(producer.foundedYear)],
     [t('producer.facts.employees'), producer.employees],
-    [t('producer.facts.address'), `${producer.address.street}, ${producer.address.postcode} ${producer.address.city}, ${fmt.region(producer.address.country)}`],
+    [
+      t('producer.facts.address'),
+      `${producer.address.street}, ${producer.address.postcode} ${producer.address.city}, ${fmt.region(producer.address.country)}`,
+    ],
     [t('producer.facts.deliveryRadius'), fmt.distance(producer.deliveryRadiusKm)],
     [t('producer.facts.languages'), fmt.list(producer.spokenLanguages.map((l) => LANGUAGES[l].nativeName))],
     [t('producer.facts.memberSince'), fmt.date(producer.memberSince, { month: 'long', year: 'numeric' })],
@@ -48,7 +51,10 @@ export function ProducerOverview({ producer }: { producer: Producer }) {
           <ul className="flex flex-wrap gap-2">
             {producer.rootCategories.map((slug) => (
               <li key={slug}>
-                <Link to={`/category/${slug}`} className="inline-flex h-9 items-center gap-2 rounded-full border border-line-strong bg-surface px-3 text-sm hover:border-primary hover:text-primary">
+                <Link
+                  to={`/category/${slug}`}
+                  className="inline-flex h-9 items-center gap-2 rounded-full border border-line-strong bg-surface px-3 text-sm hover:border-primary hover:text-primary"
+                >
                   <CategoryIcon name={getCategoryConfig(slug)?.icon ?? ''} className="size-4" />
                   {t(`categories.${slug}`)}
                 </Link>
@@ -61,15 +67,17 @@ export function ProducerOverview({ producer }: { producer: Producer }) {
           <dl className="grid grid-cols-3 gap-3">
             <div className="rounded-[var(--radius-card)] border border-line bg-surface p-3">
               <dt className="text-xs text-ink-muted">{t('producer.completedDeals')}</dt>
-              <dd className="text-2xl font-semibold tabular">{countHidden ? '—' : fmt.number(producer.publicStats.completedDeals)}</dd>
+              <dd className="tabular text-2xl font-semibold">
+                {countHidden ? '—' : fmt.number(producer.publicStats.completedDeals)}
+              </dd>
             </div>
             <div className="rounded-[var(--radius-card)] border border-line bg-surface p-3">
               <dt className="text-xs text-ink-muted">{t('producer.repeatCustomers')}</dt>
-              <dd className="text-2xl font-semibold tabular">{fmt.percent(producer.publicStats.repeatCustomerRate)}</dd>
+              <dd className="tabular text-2xl font-semibold">{fmt.percent(producer.publicStats.repeatCustomerRate)}</dd>
             </div>
             <div className="rounded-[var(--radius-card)] border border-line bg-surface p-3">
               <dt className="text-xs text-ink-muted">{t('producer.yearsActive')}</dt>
-              <dd className="text-2xl font-semibold tabular">{producer.publicStats.yearsActive}</dd>
+              <dd className="tabular text-2xl font-semibold">{producer.publicStats.yearsActive}</dd>
             </div>
           </dl>
           <p className="flex items-center gap-1.5 text-xs text-ink-subtle">

@@ -36,7 +36,10 @@ export function useChat(threadId: string | undefined, side: PartyRole) {
     },
   })
 
-  const send = useCallback((text: string, attachments: Omit<Attachment, 'id'>[]) => mutation.mutateAsync({ text, attachments }), [mutation])
+  const send = useCallback(
+    (text: string, attachments: Omit<Attachment, 'id'>[]) => mutation.mutateAsync({ text, attachments }),
+    [mutation],
+  )
 
   return { messages, typing, send, sending: mutation.isPending, sendError: mutation.error, role: side, actorId }
 }

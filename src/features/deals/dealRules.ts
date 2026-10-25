@@ -1,7 +1,16 @@
 import type { Deal, DealDocumentType, DealStatus, PartyRole } from '@/types/models'
 import { liveNow } from '@/shared/lib/dates'
 
-export type DealActionId = 'sendQuote' | 'decline' | 'acceptQuote' | 'negotiate' | 'cancel' | 'dispatch' | 'markDelivered' | 'confirmReceipt' | 'complete'
+export type DealActionId =
+  | 'sendQuote'
+  | 'decline'
+  | 'acceptQuote'
+  | 'negotiate'
+  | 'cancel'
+  | 'dispatch'
+  | 'markDelivered'
+  | 'confirmReceipt'
+  | 'complete'
 
 export interface DealTransition {
   action: DealActionId
@@ -10,7 +19,15 @@ export interface DealTransition {
   tone: 'primary' | 'secondary' | 'danger'
 }
 
-export const LIFECYCLE: DealStatus[] = ['quote_request', 'quote_received', 'negotiation', 'order_confirmed', 'in_delivery', 'delivered', 'completed']
+export const LIFECYCLE: DealStatus[] = [
+  'quote_request',
+  'quote_received',
+  'negotiation',
+  'order_confirmed',
+  'in_delivery',
+  'delivered',
+  'completed',
+]
 
 export const TRANSITIONS: Record<DealStatus, DealTransition[]> = {
   quote_request: [
@@ -42,7 +59,15 @@ export const TRANSITIONS: Record<DealStatus, DealTransition[]> = {
   disputed: [],
 }
 
-export const ACTIVE_STATUSES = new Set<DealStatus>(['quote_request', 'quote_received', 'negotiation', 'order_confirmed', 'in_delivery', 'delivered', 'disputed'])
+export const ACTIVE_STATUSES = new Set<DealStatus>([
+  'quote_request',
+  'quote_received',
+  'negotiation',
+  'order_confirmed',
+  'in_delivery',
+  'delivered',
+  'disputed',
+])
 export const OPEN_QUOTE_STATUSES = new Set<DealStatus>(['quote_request', 'quote_received', 'negotiation'])
 
 export const DOCUMENT_ON: Partial<Record<DealStatus, DealDocumentType>> = {
@@ -53,7 +78,8 @@ export const DOCUMENT_ON: Partial<Record<DealStatus, DealDocumentType>> = {
   disputed: 'dispute_report',
 }
 
-export const transitionsFor = (deal: Pick<Deal, 'status'>, role: PartyRole) => TRANSITIONS[deal.status].filter((t) => t.actor === role)
+export const transitionsFor = (deal: Pick<Deal, 'status'>, role: PartyRole) =>
+  TRANSITIONS[deal.status].filter((t) => t.actor === role)
 
 const DISPUTE_WINDOW_DAYS = 30
 

@@ -32,8 +32,12 @@ function Amount({ row, align = 'end' }: { row: DealRow; align?: 'start' | 'end' 
   const { deal } = row
   return (
     <span className={align === 'end' ? 'flex flex-col items-end' : 'flex flex-col'}>
-      <span className="font-semibold tabular">{format(deal.total, deal.currency)}</span>
-      {deal.currency !== display && row.displayTotal !== null && <span className="text-xs text-ink-subtle tabular">≈ {format(row.displayTotal, display, { compact: true })}</span>}
+      <span className="tabular font-semibold">{format(deal.total, deal.currency)}</span>
+      {deal.currency !== display && row.displayTotal !== null && (
+        <span className="tabular text-xs text-ink-subtle">
+          ≈ {format(row.displayTotal, display, { compact: true })}
+        </span>
+      )}
     </span>
   )
 }
@@ -49,19 +53,34 @@ export function DealsTable({ rows }: { rows: DealRow[] }) {
           <caption className="sr-only">{t('dealsPage.tableCaption')}</caption>
           <thead className="bg-surface-2">
             <tr>
-              <th scope="col" className={`${th} text-start`}>{t('partner.cols.deal')}</th>
-              <th scope="col" className={`${th} text-start`}>{t('dealsPage.counterparty')}</th>
-              <th scope="col" className={`${th} text-start`}>{t('partner.cols.products')}</th>
-              <th scope="col" className={`${th} text-end`}>{t('partner.cols.total')}</th>
-              <th scope="col" className={`${th} text-start`}>{t('partner.cols.status')}</th>
-              <th scope="col" className={`${th} text-start`}>{t('dealsPage.lastUpdate')}</th>
+              <th scope="col" className={`${th} text-start`}>
+                {t('partner.cols.deal')}
+              </th>
+              <th scope="col" className={`${th} text-start`}>
+                {t('dealsPage.counterparty')}
+              </th>
+              <th scope="col" className={`${th} text-start`}>
+                {t('partner.cols.products')}
+              </th>
+              <th scope="col" className={`${th} text-end`}>
+                {t('partner.cols.total')}
+              </th>
+              <th scope="col" className={`${th} text-start`}>
+                {t('partner.cols.status')}
+              </th>
+              <th scope="col" className={`${th} text-start`}>
+                {t('dealsPage.lastUpdate')}
+              </th>
             </tr>
           </thead>
           <tbody>
             {rows.map((row) => (
               <tr key={row.deal.id} className="relative border-t border-line hover:bg-surface-2">
                 <td className="px-3 py-3 font-mono text-[0.8125rem] whitespace-nowrap">
-                  <Link to={`/deals/${row.deal.id}`} className="font-semibold text-primary after:absolute after:inset-0 hover:underline">
+                  <Link
+                    to={`/deals/${row.deal.id}`}
+                    className="font-semibold text-primary after:absolute after:inset-0 hover:underline"
+                  >
                     {row.deal.id}
                   </Link>
                 </td>
@@ -80,7 +99,10 @@ export function DealsTable({ rows }: { rows: DealRow[] }) {
                 <td className="px-3 py-3">
                   <DealStatusBadge status={row.deal.status} />
                 </td>
-                <td className="px-3 py-3 text-xs whitespace-nowrap text-ink-muted" title={fmt.dateTime(row.deal.updatedAt)}>
+                <td
+                  className="px-3 py-3 text-xs whitespace-nowrap text-ink-muted"
+                  title={fmt.dateTime(row.deal.updatedAt)}
+                >
                   {fmt.relative(row.deal.updatedAt)}
                 </td>
               </tr>
@@ -90,9 +112,15 @@ export function DealsTable({ rows }: { rows: DealRow[] }) {
       </div>
       <ul className="flex flex-col gap-2 md:hidden" aria-label={t('dealsPage.tableCaption')}>
         {rows.map((row) => (
-          <li key={row.deal.id} className="relative flex flex-col gap-2 rounded-[var(--radius-card)] border border-line bg-surface p-3">
+          <li
+            key={row.deal.id}
+            className="relative flex flex-col gap-2 rounded-[var(--radius-card)] border border-line bg-surface p-3"
+          >
             <div className="flex items-center justify-between gap-2">
-              <Link to={`/deals/${row.deal.id}`} className="font-mono text-[0.8125rem] font-semibold text-primary after:absolute after:inset-0">
+              <Link
+                to={`/deals/${row.deal.id}`}
+                className="font-mono text-[0.8125rem] font-semibold text-primary after:absolute after:inset-0"
+              >
                 {row.deal.id}
               </Link>
               <DealStatusBadge status={row.deal.status} />

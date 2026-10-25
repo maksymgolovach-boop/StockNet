@@ -52,7 +52,10 @@ export function Tooltip({ content, children, side = 'top', className }: TooltipP
             id={id}
             role="tooltip"
             style={{ left: pos?.left ?? -9999, top: pos?.top ?? -9999 }}
-            className={cn('pointer-events-none fixed z-[3000] w-max max-w-64 rounded-md bg-ink px-2.5 py-1.5 text-xs font-normal leading-snug text-bg shadow-pop', className)}
+            className={cn(
+              'pointer-events-none fixed z-[3000] w-max max-w-64 rounded-md bg-ink px-2.5 py-1.5 text-xs leading-snug font-normal text-bg shadow-pop',
+              className,
+            )}
           >
             {content}
           </span>,

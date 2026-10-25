@@ -14,7 +14,15 @@ export interface PartnerHistory {
   onTimeRate: number | null
 }
 
-const ACTIVE = new Set(['quote_request', 'quote_received', 'negotiation', 'order_confirmed', 'in_delivery', 'delivered', 'disputed'])
+const ACTIVE = new Set([
+  'quote_request',
+  'quote_received',
+  'negotiation',
+  'order_confirmed',
+  'in_delivery',
+  'delivered',
+  'disputed',
+])
 
 /** The company's private history with one counterparty (only ever computed from the user's own deals). */
 export function usePartnerHistory(counterpartyId: string | undefined, side: PartyRole): PartnerHistory | null {
@@ -23,7 +31,11 @@ export function usePartnerHistory(counterpartyId: string | undefined, side: Part
   return useMemo(() => {
     if (!data || !counterpartyId) return null
     const deals = data
-      .filter((d) => (side === 'buyer' ? d.buyerId === buyerId && d.producerId === counterpartyId : d.producerId === producerId && d.buyerId === counterpartyId))
+      .filter((d) =>
+        side === 'buyer'
+          ? d.buyerId === buyerId && d.producerId === counterpartyId
+          : d.producerId === producerId && d.buyerId === counterpartyId,
+      )
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
     if (!deals.length) return null
     const delivered = deals.filter((d) => d.onTime !== undefined)

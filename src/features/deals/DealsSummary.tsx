@@ -16,14 +16,20 @@ export function DealsSummary({ rows }: { rows: DealRow[] }) {
     [t('dealsPage.summary.volume'), format(volume, display, { compact: true })],
     [t('dealsPage.summary.active'), fmt.number(rows.filter((r) => ACTIVE_STATUSES.has(r.deal.status)).length)],
     [t('dealsPage.summary.average'), valid.length ? format(volume / valid.length, display, { compact: true }) : '—'],
-    [t('dealsPage.summary.onTime'), delivered.length ? fmt.percent(delivered.filter((r) => r.deal.onTime).length / delivered.length) : '—'],
+    [
+      t('dealsPage.summary.onTime'),
+      delivered.length ? fmt.percent(delivered.filter((r) => r.deal.onTime).length / delivered.length) : '—',
+    ],
   ]
   return (
     <dl className="grid grid-cols-2 gap-3 md:grid-cols-5">
       {stats.map(([k, v]) => (
-        <div key={k} className="rounded-[var(--radius-card)] border border-line bg-surface p-3 last:col-span-2 md:last:col-span-1">
+        <div
+          key={k}
+          className="rounded-[var(--radius-card)] border border-line bg-surface p-3 last:col-span-2 md:last:col-span-1"
+        >
           <dt className="text-xs text-ink-muted">{k}</dt>
-          <dd className="text-2xl font-semibold tabular">{v}</dd>
+          <dd className="tabular text-2xl font-semibold">{v}</dd>
         </div>
       ))}
     </dl>

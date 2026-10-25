@@ -76,7 +76,8 @@ function push(thread: Thread, message: Message) {
 
 function markReadInDb(thread: Thread, readerRole: PartyRole) {
   const readAt = liveNow().toISOString()
-  for (const m of db.messages) if (m.threadId === thread.id && m.senderRole !== readerRole && !m.readAt) m.readAt = readAt
+  for (const m of db.messages)
+    if (m.threadId === thread.id && m.senderRole !== readerRole && !m.readAt) m.readAt = readAt
   if (readerRole === 'buyer') thread.unreadForBuyer = 0
   else thread.unreadForProducer = 0
   emit(thread, { type: 'read', threadId: thread.id, readerRole, readAt })
@@ -116,11 +117,21 @@ function scheduleCounterpart(thread: Thread, senderRole: PartyRole, text: string
 }
 
 /** Server-side: finds or creates the buyer–producer thread and pins the product. */
-export function ensureThread({ buyerId, producerId, productId }: { buyerId: string; producerId: string; productId?: string }): Thread {
-  if (!db.producers.some((p) => p.id === producerId) || !db.buyers.some((b) => b.id === buyerId)) throw new NotFoundError('Partner')
+export function ensureThread({
+  buyerId,
+  producerId,
+  productId,
+}: {
+  buyerId: string
+  producerId: string
+  productId?: string
+}): Thread {
+  if (!db.producers.some((p) => p.id === producerId) || !db.buyers.some((b) => b.id === buyerId))
+    throw new NotFoundError('Partner')
   if (isSameCompany(buyerId, producerId)) throw new ApiError('A company cannot open a conversation with itself', 422)
   const existing = db.threads.find((t) => t.buyerId === buyerId && t.producerId === producerId)
-  const validProduct = productId && db.products.some((p) => p.id === productId && p.producerId === producerId) ? productId : undefined
+  const validProduct =
+    productId && db.products.some((p) => p.id === productId && p.producerId === producerId) ? productId : undefined
   if (existing) {
     if (validProduct && existing.productId !== validProduct) {
       existing.productId = validProduct
@@ -145,7 +156,13 @@ export function ensureThread({ buyerId, producerId, productId }: { buyerId: stri
 }
 
 /** Server-side: posts a message (with mock translations) and notifies connected clients. */
-export function serverPost(thread: Thread, role: PartyRole, text: Record<LanguageCode, string>, lang: LanguageCode, attachments: Omit<Attachment, 'id'>[] = []): Message {
+export function serverPost(
+  thread: Thread,
+  role: PartyRole,
+  text: Record<LanguageCode, string>,
+  lang: LanguageCode,
+  attachments: Omit<Attachment, 'id'>[] = [],
+): Message {
   seq += 1
   const mockTranslations: Message['mockTranslations'] = {}
   for (const l of ['en', 'de', 'ro'] as const) if (l !== lang) mockTranslations[l] = text[l]
@@ -167,7 +184,9 @@ export function serverPost(thread: Thread, role: PartyRole, text: Record<Languag
 
 /** Server-side: tells both parties' open sessions that a deal changed. */
 export function emitDealChanged(deal: { id: string; buyerId: string; producerId: string }) {
-  for (const c of connections) if ((c.role === 'buyer' ? deal.buyerId : deal.producerId) === c.partyId) c.listener({ type: 'deal', dealId: deal.id })
+  for (const c of connections)
+    if ((c.role === 'buyer' ? deal.buyerId : deal.producerId) === c.partyId)
+      c.listener({ type: 'deal', dealId: deal.id })
 }
 
 export const threadLanguage = (thread: Thread, role: PartyRole) => languageOf(thread, role)
@@ -206,7 +225,8 @@ export const mockChatTransport: ChatTransport = {
       () => {
         const thread = findThread(threadId, role, partyId)
         const unread = role === 'buyer' ? thread.unreadForBuyer : thread.unreadForProducer
-        if (unread > 0 || db.messages.some((m) => m.threadId === threadId && m.senderRole !== role && !m.readAt)) markReadInDb(thread, role)
+        if (unread > 0 || db.messages.some((m) => m.threadId === threadId && m.senderRole !== role && !m.readAt))
+          markReadInDb(thread, role)
       },
       { latencyFactor: 0.2 },
     ),

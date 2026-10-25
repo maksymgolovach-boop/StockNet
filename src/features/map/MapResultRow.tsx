@@ -18,7 +18,7 @@ export function MapResultRow({ item }: { item: SearchResultItem }) {
     <article className="relative flex gap-3 rounded-[var(--radius-card)] border border-line bg-surface p-2.5 hover:border-line-strong">
       <ProductMedia media={p.media[0]} categorySlug={p.categorySlug} className="size-16 shrink-0 rounded-md" />
       <div className="flex min-w-0 flex-1 flex-col gap-1">
-        <h3 className="line-clamp-2 font-sans text-[0.8125rem] font-semibold leading-snug" lang={p.contentLang}>
+        <h3 className="line-clamp-2 font-sans text-[0.8125rem] leading-snug font-semibold" lang={p.contentLang}>
           <Link to={`/product/${p.id}`} className="after:absolute after:inset-0 hover:text-primary">
             {p.name}
           </Link>

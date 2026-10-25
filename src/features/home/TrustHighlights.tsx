@@ -19,9 +19,24 @@ export function TrustHighlights() {
   if (isError) return <ErrorState compact error={error} onRetry={() => void refetch()} />
 
   const items = [
-    { icon: BadgeCheck, tone: 'text-verified bg-verified-soft', title: t('home.trustVerified', { count: data.verifiedOrAudited, total: data.producers }), body: t('home.trustVerifiedBody') },
-    { icon: FileCheck2, tone: 'text-expiring bg-expiring-soft', title: t('home.trustDocuments', { count: data.documents }), body: t('home.trustDocumentsBody') },
-    { icon: MessageSquareQuote, tone: 'text-primary bg-primary-soft', title: t('home.trustReviews', { count: data.reviews }), body: t('home.trustReviewsBody') },
+    {
+      icon: BadgeCheck,
+      tone: 'text-verified bg-verified-soft',
+      title: t('home.trustVerified', { count: data.verifiedOrAudited, total: data.producers }),
+      body: t('home.trustVerifiedBody'),
+    },
+    {
+      icon: FileCheck2,
+      tone: 'text-expiring bg-expiring-soft',
+      title: t('home.trustDocuments', { count: data.documents }),
+      body: t('home.trustDocumentsBody'),
+    },
+    {
+      icon: MessageSquareQuote,
+      tone: 'text-primary bg-primary-soft',
+      title: t('home.trustReviews', { count: data.reviews }),
+      body: t('home.trustReviewsBody'),
+    },
   ]
   return (
     <ul className="grid gap-3 md:grid-cols-3">

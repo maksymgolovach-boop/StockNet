@@ -4,14 +4,29 @@ import { getCategoryConfig } from '@/config/categories'
 import { CategoryIcon } from '@/features/categories/CategoryIcon'
 import { cn } from '@/shared/lib/cn'
 
-const sized = (url: string, w: number) => (url.includes('images.unsplash.com') ? `${url}?auto=format&fit=crop&w=${w}&q=70` : `${url}?auto=compress&cs=tinysrgb&w=${w}`)
+const sized = (url: string, w: number) =>
+  url.includes('images.unsplash.com')
+    ? `${url}?auto=format&fit=crop&w=${w}&q=70`
+    : `${url}?auto=compress&cs=tinysrgb&w=${w}`
 
-export function ProductMedia({ media, categorySlug, className }: { media: MediaRef | undefined; categorySlug: string; className?: string }) {
+export function ProductMedia({
+  media,
+  categorySlug,
+  className,
+}: {
+  media: MediaRef | undefined
+  categorySlug: string
+  className?: string
+}) {
   const icon = getCategoryConfig(categorySlug)?.icon ?? 'Package'
   const [failed, setFailed] = useState<string | null>(null)
   const url = media?.url && failed !== media.url ? media.url : undefined
   return (
-    <div aria-hidden style={{ '--h': media?.tone ?? 0 } as CSSProperties} className={cn('product-media relative grid place-items-center overflow-hidden', className)}>
+    <div
+      aria-hidden
+      style={{ '--h': media?.tone ?? 0 } as CSSProperties}
+      className={cn('product-media relative grid place-items-center overflow-hidden', className)}
+    >
       <CategoryIcon name={icon} className="size-1/3 max-h-14 max-w-14 opacity-70" />
       {url && (
         <img

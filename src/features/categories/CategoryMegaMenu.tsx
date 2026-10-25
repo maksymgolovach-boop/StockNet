@@ -26,7 +26,7 @@ export function CategoryMegaMenu() {
 
   useLayoutEffect(() => {
     if (!open) return
-    const place = () => setTop((triggerRef.current?.closest('nav')?.getBoundingClientRect().bottom ?? 0))
+    const place = () => setTop(triggerRef.current?.closest('nav')?.getBoundingClientRect().bottom ?? 0)
     place()
     window.addEventListener('resize', place)
     window.addEventListener('scroll', place, { passive: true })
@@ -66,7 +66,10 @@ export function CategoryMegaMenu() {
         aria-expanded={open}
         aria-controls={panelId}
         onClick={() => setOpen((o) => !o)}
-        className={cn('flex h-8 items-center gap-1.5 rounded-full px-3 font-medium whitespace-nowrap', open ? 'bg-primary text-on-primary' : 'text-ink hover:bg-surface-2')}
+        className={cn(
+          'flex h-8 items-center gap-1.5 rounded-full px-3 font-medium whitespace-nowrap',
+          open ? 'bg-primary text-on-primary' : 'text-ink hover:bg-surface-2',
+        )}
       >
         <LayoutGrid className="size-3.5" aria-hidden />
         {t('nav.allCategories')}
@@ -91,7 +94,10 @@ export function CategoryMegaMenu() {
                       data-root
                       onMouseEnter={() => setRootSlug(c.slug)}
                       onFocus={() => setRootSlug(c.slug)}
-                      className={cn('flex h-10 items-center gap-3 rounded-md px-3 text-sm', rootSlug === c.slug ? 'bg-primary-soft font-medium text-primary' : 'hover:bg-surface-2')}
+                      className={cn(
+                        'flex h-10 items-center gap-3 rounded-md px-3 text-sm',
+                        rootSlug === c.slug ? 'bg-primary-soft font-medium text-primary' : 'hover:bg-surface-2',
+                      )}
                     >
                       <CategoryIcon name={c.icon} className="size-4" />
                       <span className="flex-1">{t(`categories.${c.slug}`)}</span>
@@ -108,17 +114,25 @@ export function CategoryMegaMenu() {
                 <div className="grid grid-cols-2 gap-x-8 gap-y-5 xl:grid-cols-3">
                   {children.map((child) => (
                     <div key={child.slug}>
-                      <Link to={`/category/${child.slug}`} className="flex items-baseline justify-between gap-2 border-b border-line pb-1.5 text-sm font-semibold hover:text-primary">
+                      <Link
+                        to={`/category/${child.slug}`}
+                        className="flex items-baseline justify-between gap-2 border-b border-line pb-1.5 text-sm font-semibold hover:text-primary"
+                      >
                         {t(`categories.${child.slug}`)}
-                        <span className="text-xs font-normal text-ink-subtle tabular">{counts.get(child.slug) ?? ''}</span>
+                        <span className="tabular text-xs font-normal text-ink-subtle">
+                          {counts.get(child.slug) ?? ''}
+                        </span>
                       </Link>
                       {child.childSlugs.length > 0 && (
                         <ul className="mt-1.5 flex flex-col gap-1">
                           {child.childSlugs.map((s) => (
                             <li key={s}>
-                              <Link to={`/category/${s}`} className="flex justify-between gap-2 text-[0.8125rem] text-ink-muted hover:text-primary">
+                              <Link
+                                to={`/category/${s}`}
+                                className="flex justify-between gap-2 text-[0.8125rem] text-ink-muted hover:text-primary"
+                              >
                                 {t(`categories.${s}`)}
-                                <span className="text-xs text-ink-subtle tabular">{counts.get(s) ?? ''}</span>
+                                <span className="tabular text-xs text-ink-subtle">{counts.get(s) ?? ''}</span>
                               </Link>
                             </li>
                           ))}

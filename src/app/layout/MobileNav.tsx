@@ -9,7 +9,10 @@ import { cn } from '@/shared/lib/cn'
 import { navItemsFor } from './navItems'
 
 const linkClass = ({ isActive }: { isActive: boolean }) =>
-  cn('flex h-11 items-center gap-3 rounded-[var(--radius-control)] px-3 text-sm font-medium', isActive ? 'bg-primary-soft text-primary' : 'hover:bg-surface-2')
+  cn(
+    'flex h-11 items-center gap-3 rounded-[var(--radius-control)] px-3 text-sm font-medium',
+    isActive ? 'bg-primary-soft text-primary' : 'hover:bg-surface-2',
+  )
 
 export function MobileNav({ open, onClose, unread }: { open: boolean; onClose: () => void; unread: number }) {
   const { t } = useTranslation()
@@ -21,7 +24,7 @@ export function MobileNav({ open, onClose, unread }: { open: boolean; onClose: (
             <item.icon className="size-[1.125rem]" aria-hidden />
             <span className="flex-1">{t(item.labelKey)}</span>
             {item.badge === 'unread' && unread > 0 && (
-              <span className="rounded-full bg-accent px-2 text-xs font-semibold text-on-accent tabular">
+              <span className="tabular rounded-full bg-accent px-2 text-xs font-semibold text-on-accent">
                 <span className="sr-only">{t('header.unreadMessages', { count: unread })}</span>
                 <span aria-hidden>{unread}</span>
               </span>

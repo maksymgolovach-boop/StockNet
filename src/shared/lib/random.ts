@@ -12,7 +12,7 @@ export function createRng(seed: number) {
     next,
     int: (min: number, max: number) => Math.floor(next() * (max - min + 1)) + min,
     float: (min: number, max: number, decimals = 2) => Number((next() * (max - min) + min).toFixed(decimals)),
-    pick: <T,>(items: readonly T[]): T => {
+    pick: <T>(items: readonly T[]): T => {
       const item = items[Math.floor(next() * items.length)]
       if (item === undefined) throw new Error('pick() on empty list')
       return item

@@ -38,7 +38,14 @@ export function NearbyProducers() {
           label={t('nearby.change')}
           width={300}
           trigger={({ open, toggle, id, ref }) => (
-            <button ref={ref} type="button" aria-expanded={open} aria-controls={id} onClick={toggle} className={buttonClass('secondary', 'sm')}>
+            <button
+              ref={ref}
+              type="button"
+              aria-expanded={open}
+              aria-controls={id}
+              onClick={toggle}
+              className={buttonClass('secondary', 'sm')}
+            >
               <Pencil className="size-4" aria-hidden />
               {t('nearby.change')}
             </button>
@@ -62,11 +69,17 @@ export function NearbyProducers() {
           {nearest.map(({ p, km }) => {
             const delivers = km <= p.deliveryRadiusKm
             return (
-              <li key={p.id} className="relative flex flex-col gap-2 rounded-[var(--radius-card)] border border-line bg-surface p-4 transition hover:border-ink">
+              <li
+                key={p.id}
+                className="relative flex flex-col gap-2 rounded-[var(--radius-card)] border border-line bg-surface p-4 transition hover:border-ink"
+              >
                 <div className="flex items-start gap-3">
                   <ProducerAvatar producer={p} size="sm" />
                   <div className="min-w-0 flex-1">
-                    <Link to={`/producer/${p.id}`} className="block truncate font-semibold after:absolute after:inset-0 hover:text-primary">
+                    <Link
+                      to={`/producer/${p.id}`}
+                      className="block truncate font-semibold after:absolute after:inset-0 hover:text-primary"
+                    >
                       {p.name}
                     </Link>
                     <p className="truncate text-xs text-ink-muted">{t(`producerTypes.${p.type}`)}</p>
@@ -78,13 +91,16 @@ export function NearbyProducers() {
                 </div>
                 <p className="flex items-center gap-1 text-xs text-ink-muted">
                   <MapPin className="size-3.5" aria-hidden />
-                  {p.address.city}, {fmt.region(p.address.country)} · <span className="font-medium text-ink">{fmt.distance(km)}</span>
+                  {p.address.city}, {fmt.region(p.address.country)} ·{' '}
+                  <span className="font-medium text-ink">{fmt.distance(km)}</span>
                 </p>
                 <p className={cn('flex items-center gap-1 text-xs', delivers ? 'text-verified' : 'text-ink-subtle')}>
                   <Truck className="size-3.5" aria-hidden />
                   {t(delivers ? 'product.deliversToYou' : 'product.outsideDelivery')}
                 </p>
-                <p className="truncate text-xs text-ink-subtle">{p.rootCategories.map((c) => t(`categories.${c}`)).join(' · ')}</p>
+                <p className="truncate text-xs text-ink-subtle">
+                  {p.rootCategories.map((c) => t(`categories.${c}`)).join(' · ')}
+                </p>
               </li>
             )
           })}

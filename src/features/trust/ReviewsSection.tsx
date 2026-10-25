@@ -22,14 +22,29 @@ export function Stars({ value, size = 'sm', label }: { value: number; size?: 'sm
         <Star
           key={i}
           aria-hidden
-          className={cn(size === 'md' ? 'size-5' : 'size-3.5', value >= i - 0.25 ? 'fill-accent text-accent' : value >= i - 0.75 ? 'fill-accent/40 text-accent' : 'text-line-strong')}
+          className={cn(
+            size === 'md' ? 'size-5' : 'size-3.5',
+            value >= i - 0.25
+              ? 'fill-accent text-accent'
+              : value >= i - 0.75
+                ? 'fill-accent/40 text-accent'
+                : 'text-line-strong',
+          )}
         />
       ))}
     </span>
   )
 }
 
-function Summary({ reviews, starFilter, onStar }: { reviews: Review[]; starFilter: number | null; onStar: (n: number | null) => void }) {
+function Summary({
+  reviews,
+  starFilter,
+  onStar,
+}: {
+  reviews: Review[]
+  starFilter: number | null
+  onStar: (n: number | null) => void
+}) {
   const { t } = useTranslation()
   const fmt = useFormat()
   const avg = reviews.reduce((s, r) => s + r.overall, 0) / reviews.length
@@ -38,8 +53,14 @@ function Summary({ reviews, starFilter, onStar }: { reviews: Review[]; starFilte
   return (
     <div className="grid gap-6 rounded-[var(--radius-card)] border border-line bg-surface p-4 md:grid-cols-[auto_1fr_1fr]">
       <div className="flex flex-col items-start gap-1">
-        <span className="font-display text-4xl font-semibold tabular">{fmt.number(avg, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
-        <Stars value={avg} size="md" label={t('reviews.average', { rating: fmt.number(avg, { maximumFractionDigits: 1 }) })} />
+        <span className="tabular font-display text-4xl font-semibold">
+          {fmt.number(avg, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
+        </span>
+        <Stars
+          value={avg}
+          size="md"
+          label={t('reviews.average', { rating: fmt.number(avg, { maximumFractionDigits: 1 }) })}
+        />
         <span className="text-sm text-ink-muted">{t('common.reviews', { count: reviews.length })}</span>
         <span className="mt-1 inline-flex items-center gap-1 text-xs text-verified">
           <BadgeCheck className="size-3.5" aria-hidden />
@@ -47,7 +68,9 @@ function Summary({ reviews, starFilter, onStar }: { reviews: Review[]; starFilte
         </span>
       </div>
       <div>
-        <p className="mb-2 text-xs font-semibold tracking-wide text-ink-subtle uppercase">{t('reviews.distribution')}</p>
+        <p className="mb-2 text-xs font-semibold tracking-wide text-ink-subtle uppercase">
+          {t('reviews.distribution')}
+        </p>
         <ul className="flex flex-col gap-1">
           {buckets.map((b) => (
             <li key={b.n}>
@@ -56,14 +79,20 @@ function Summary({ reviews, starFilter, onStar }: { reviews: Review[]; starFilte
                 onClick={() => onStar(starFilter === b.n ? null : b.n)}
                 aria-pressed={starFilter === b.n}
                 disabled={b.count === 0}
-                className={cn('flex w-full items-center gap-2 rounded px-1 py-0.5 text-sm hover:bg-surface-2 disabled:opacity-40', starFilter === b.n && 'bg-primary-soft')}
+                className={cn(
+                  'flex w-full items-center gap-2 rounded px-1 py-0.5 text-sm hover:bg-surface-2 disabled:opacity-40',
+                  starFilter === b.n && 'bg-primary-soft',
+                )}
                 aria-label={t('reviews.filterStars', { count: b.n, total: b.count })}
               >
-                <span className="w-6 text-end tabular">{b.n}★</span>
+                <span className="tabular w-6 text-end">{b.n}★</span>
                 <span className="h-2.5 flex-1 overflow-hidden rounded-full bg-surface-3">
-                  <span className="block h-full rounded-full bg-accent" style={{ width: `${(b.count / max) * 100}%` }} />
+                  <span
+                    className="block h-full rounded-full bg-accent"
+                    style={{ width: `${(b.count / max) * 100}%` }}
+                  />
                 </span>
-                <span className="w-6 text-xs text-ink-muted tabular">{b.count}</span>
+                <span className="tabular w-6 text-xs text-ink-muted">{b.count}</span>
               </button>
             </li>
           ))}
@@ -81,7 +110,9 @@ function Summary({ reviews, starFilter, onStar }: { reviews: Review[]; starFilte
                   <span className="h-2 flex-1 overflow-hidden rounded-full bg-surface-3">
                     <span className="block h-full rounded-full bg-ink" style={{ width: `${(v / 5) * 100}%` }} />
                   </span>
-                  <span className="w-7 text-end font-medium tabular">{fmt.number(v, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
+                  <span className="tabular w-7 text-end font-medium">
+                    {fmt.number(v, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
+                  </span>
                 </dd>
               </div>
             )
@@ -92,7 +123,17 @@ function Summary({ reviews, starFilter, onStar }: { reviews: Review[]; starFilte
   )
 }
 
-function ReviewCard({ review, buyerName, ownDeal, producerName }: { review: Review; buyerName: string; ownDeal: boolean; producerName: string }) {
+function ReviewCard({
+  review,
+  buyerName,
+  ownDeal,
+  producerName,
+}: {
+  review: Review
+  buyerName: string
+  ownDeal: boolean
+  producerName: string
+}) {
   const { t } = useTranslation()
   const fmt = useFormat()
   const [voted, setVoted] = useState(false)
@@ -100,7 +141,9 @@ function ReviewCard({ review, buyerName, ownDeal, producerName }: { review: Revi
     <article className="flex flex-col gap-2 rounded-[var(--radius-card)] border border-line bg-surface p-4">
       <header className="flex flex-wrap items-center gap-2">
         <Stars value={review.overall} label={t('reviews.rated', { rating: review.overall })} />
-        <span className="font-semibold tabular">{fmt.number(review.overall, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
+        <span className="tabular font-semibold">
+          {fmt.number(review.overall, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
+        </span>
         <span className="text-sm font-medium">{buyerName}</span>
         <span className="text-xs text-ink-subtle">· {fmt.date(review.createdAt)}</span>
         {ownDeal ? (
@@ -144,7 +187,8 @@ function ReviewCard({ review, buyerName, ownDeal, producerName }: { review: Revi
           <CornerDownRight className="mt-0.5 size-4 shrink-0 text-ink-subtle" aria-hidden />
           <div>
             <p className="text-xs font-semibold">
-              {t('reviews.replyFrom', { name: producerName })} <span className="font-normal text-ink-subtle">· {fmt.date(review.reply.createdAt)}</span>
+              {t('reviews.replyFrom', { name: producerName })}{' '}
+              <span className="font-normal text-ink-subtle">· {fmt.date(review.reply.createdAt)}</span>
             </p>
             <p className="mt-1">{review.reply.text}</p>
           </div>
@@ -155,7 +199,10 @@ function ReviewCard({ review, buyerName, ownDeal, producerName }: { review: Revi
           type="button"
           onClick={() => setVoted((v) => !v)}
           aria-pressed={voted}
-          className={cn('inline-flex items-center gap-1.5 text-xs font-medium', voted ? 'text-primary' : 'text-ink-muted hover:text-ink')}
+          className={cn(
+            'inline-flex items-center gap-1.5 text-xs font-medium',
+            voted ? 'text-primary' : 'text-ink-muted hover:text-ink',
+          )}
         >
           <ThumbsUp className={cn('size-3.5', voted && 'fill-primary')} aria-hidden />
           {t('reviews.helpful', { count: review.helpfulVotes + (voted ? 1 : 0) })}
@@ -167,7 +214,15 @@ function ReviewCard({ review, buyerName, ownDeal, producerName }: { review: Revi
 }
 
 /** Verified-deal reviews with distribution chart, criteria averages, filters and sorting. */
-export function ReviewsSection({ reviews, producerName, emptyBody }: { reviews: Review[]; producerName: string; emptyBody?: string }) {
+export function ReviewsSection({
+  reviews,
+  producerName,
+  emptyBody,
+}: {
+  reviews: Review[]
+  producerName: string
+  emptyBody?: string
+}) {
   const { t } = useTranslation()
   const { data: buyers } = useBuyers()
   const { buyerId, producerId } = useCompanyIds()
@@ -177,7 +232,12 @@ export function ReviewsSection({ reviews, producerName, emptyBody }: { reviews: 
   const [withReply, setWithReply] = useState(false)
 
   const shown = useMemo(() => {
-    const list = reviews.filter((r) => (star === null || Math.round(r.overall) === star) && (!withPhotos || r.photoCount > 0) && (!withReply || !!r.reply))
+    const list = reviews.filter(
+      (r) =>
+        (star === null || Math.round(r.overall) === star) &&
+        (!withPhotos || r.photoCount > 0) &&
+        (!withReply || !!r.reply),
+    )
     const cmp: Record<ReviewSort, (a: Review, b: Review) => number> = {
       newest: (a, b) => b.createdAt.localeCompare(a.createdAt),
       helpful: (a, b) => b.helpfulVotes - a.helpfulVotes,
@@ -187,7 +247,14 @@ export function ReviewsSection({ reviews, producerName, emptyBody }: { reviews: 
     return list.sort(cmp[sort])
   }, [reviews, star, sort, withPhotos, withReply])
 
-  if (!reviews.length) return <EmptyState icon={<MessageSquareOff className="size-5" aria-hidden />} title={t('reviews.none')} body={emptyBody ?? t('reviews.noneBody')} />
+  if (!reviews.length)
+    return (
+      <EmptyState
+        icon={<MessageSquareOff className="size-5" aria-hidden />}
+        title={t('reviews.none')}
+        body={emptyBody ?? t('reviews.noneBody')}
+      />
+    )
 
   const nameOf = (id: string) => buyers?.find((b) => b.id === id)?.name ?? t('reviews.verifiedBuyer')
   return (
@@ -198,11 +265,21 @@ export function ReviewsSection({ reviews, producerName, emptyBody }: { reviews: 
           {t('reviews.showing', { count: shown.length, total: reviews.length })}
         </p>
         <label className="flex items-center gap-1.5 text-sm">
-          <input type="checkbox" checked={withPhotos} onChange={(e) => setWithPhotos(e.target.checked)} className="accent-[var(--primary)]" />
+          <input
+            type="checkbox"
+            checked={withPhotos}
+            onChange={(e) => setWithPhotos(e.target.checked)}
+            className="accent-[var(--primary)]"
+          />
           {t('reviews.withPhotos')}
         </label>
         <label className="flex items-center gap-1.5 text-sm">
-          <input type="checkbox" checked={withReply} onChange={(e) => setWithReply(e.target.checked)} className="accent-[var(--primary)]" />
+          <input
+            type="checkbox"
+            checked={withReply}
+            onChange={(e) => setWithReply(e.target.checked)}
+            className="accent-[var(--primary)]"
+          />
           {t('reviews.withReply')}
         </label>
         <Select
@@ -211,10 +288,17 @@ export function ReviewsSection({ reviews, producerName, emptyBody }: { reviews: 
           compact
           value={sort}
           onChange={(e) => setSort(e.target.value as ReviewSort)}
-          options={(['newest', 'helpful', 'highest', 'lowest'] as const).map((s) => ({ value: s, label: t(`reviews.sort.${s}`) }))}
+          options={(['newest', 'helpful', 'highest', 'lowest'] as const).map((s) => ({
+            value: s,
+            label: t(`reviews.sort.${s}`),
+          }))}
         />
         {star !== null && (
-          <button type="button" onClick={() => setStar(null)} className="text-xs font-medium text-primary hover:underline">
+          <button
+            type="button"
+            onClick={() => setStar(null)}
+            className="text-xs font-medium text-primary hover:underline"
+          >
             {t('reviews.clearStars', { count: star })}
           </button>
         )}
@@ -225,7 +309,12 @@ export function ReviewsSection({ reviews, producerName, emptyBody }: { reviews: 
         <ul className="flex flex-col gap-3">
           {shown.map((r) => (
             <li key={r.id}>
-              <ReviewCard review={r} buyerName={nameOf(r.buyerId)} ownDeal={r.buyerId === buyerId || r.producerId === producerId} producerName={producerName} />
+              <ReviewCard
+                review={r}
+                buyerName={nameOf(r.buyerId)}
+                ownDeal={r.buyerId === buyerId || r.producerId === producerId}
+                producerName={producerName}
+              />
             </li>
           ))}
         </ul>

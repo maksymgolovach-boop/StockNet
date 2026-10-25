@@ -19,9 +19,26 @@ import type { LotInput } from '@/services/lotService'
 
 const MEASURABLE: UnitCode[] = ['kg', 't', 'm', 'm2', 'm3', 'l']
 const COUNT: UnitCode[] = ['piece', 'pallet', 'coil', 'bag', 'crate']
-const input = 'h-10 w-full rounded-[var(--radius-control)] border border-line-strong bg-surface px-3 text-sm aria-[invalid=true]:border-expired'
+const input =
+  'h-10 w-full rounded-[var(--radius-control)] border border-line-strong bg-surface px-3 text-sm aria-[invalid=true]:border-expired'
 
-function Field({ id, label, error, required, hint, children, className }: { id: string; label: string; error?: string; required?: boolean; hint?: ReactNode; children: ReactNode; className?: string }) {
+function Field({
+  id,
+  label,
+  error,
+  required,
+  hint,
+  children,
+  className,
+}: {
+  id: string
+  label: string
+  error?: string
+  required?: boolean
+  hint?: ReactNode
+  children: ReactNode
+  className?: string
+}) {
   const { t } = useTranslation()
   return (
     <div className={cn('flex min-w-0 flex-col gap-1', className)}>
@@ -60,7 +77,12 @@ interface Props {
 }
 
 /** Lot size in the listing unit and the price per unit, shown live while the producer fills the form. */
-function lotPreview(product: Product, v: Partial<Pick<LotFormValues, 'contentQty' | 'contentUnit' | 'itemQty' | 'itemUnit' | 'weightKg' | 'volumeM3' | 'pricePerLot'>>) {
+function lotPreview(
+  product: Product,
+  v: Partial<
+    Pick<LotFormValues, 'contentQty' | 'contentUnit' | 'itemQty' | 'itemUnit' | 'weightKg' | 'volumeM3' | 'pricePerLot'>
+  >,
+) {
   const num = (s?: string) => Number((s ?? '').replace(',', '.'))
   const q = num(v.contentQty)
   if (!(q > 0)) return null
@@ -68,7 +90,11 @@ function lotPreview(product: Product, v: Partial<Pick<LotFormValues, 'contentQty
   const iq = num(v.itemQty)
   const m = lotMeasure(
     {
-      content: { quantity: q, unit: (v.contentUnit || 'piece') as UnitCode, itemSize: iq > 0 && v.itemUnit ? { quantity: iq, unit: v.itemUnit as UnitCode } : undefined },
+      content: {
+        quantity: q,
+        unit: (v.contentUnit || 'piece') as UnitCode,
+        itemSize: iq > 0 && v.itemUnit ? { quantity: iq, unit: v.itemUnit as UnitCode } : undefined,
+      },
       totalWeightKg: Number(v.weightKg) || undefined,
       totalVolumeM3: Number(v.volumeM3) || undefined,
     },
@@ -81,7 +107,8 @@ export function LotForm({ products, initial, editing, submitting, onSubmit, form
   const { t } = useTranslation()
   const fmt = useFormat()
   const lf = useLotFormat()
-  const policyFor = (productId: string) => getCategoryConfig(products.find((p) => p.id === productId)?.categorySlug ?? '')?.lots
+  const policyFor = (productId: string) =>
+    getCategoryConfig(products.find((p) => p.id === productId)?.categorySlug ?? '')?.lots
   const resolver: Resolver<LotFormValues> = (values, ctx, opts) =>
     zodResolver(
       lotFormSchema(policyFor(values.productId), {
@@ -89,7 +116,11 @@ export function LotForm({ products, initial, editing, submitting, onSubmit, form
         hasCertificate: !!editing?.documents.some((d) => d.type === 'mill_test_certificate'),
       }),
     )(values, ctx, opts) as ReturnType<Resolver<LotFormValues>>
-  const { register, handleSubmit, control, formState, setValue } = useForm<LotFormValues>({ defaultValues: initial, resolver, mode: 'onBlur' })
+  const { register, handleSubmit, control, formState, setValue } = useForm<LotFormValues>({
+    defaultValues: initial,
+    resolver,
+    mode: 'onBlur',
+  })
   const tiers = useFieldArray({ control, name: 'tiers' })
   const v = useWatch({ control })
   const product = products.find((p) => p.id === v.productId)
@@ -101,15 +132,31 @@ export function LotForm({ products, initial, editing, submitting, onSubmit, form
     for (const part of parts) node = (node as Record<string, unknown> | undefined)?.[part]
     return (node as { message?: string } | undefined)?.message
   }
-  const a11y = (name: string) => ({ id: `${formId}-${name}`, 'aria-invalid': !!err(name), 'aria-describedby': err(name) ? `${formId}-${name}-err` : undefined })
+  const a11y = (name: string) => ({
+    id: `${formId}-${name}`,
+    'aria-invalid': !!err(name),
+    'aria-describedby': err(name) ? `${formId}-${name}-err` : undefined,
+  })
   const contentUnits = [...new Set([...COUNT, ...(config?.allowedUnits ?? [])])]
   const preview = product ? lotPreview(product, v) : null
 
   return (
-    <form id={formId} noValidate onSubmit={handleSubmit((values) => onSubmit(toLotInput(values)))} className="flex flex-col gap-5" aria-busy={submitting}>
+    <form
+      id={formId}
+      noValidate
+      onSubmit={handleSubmit((values) => onSubmit(toLotInput(values)))}
+      className="flex flex-col gap-5"
+      aria-busy={submitting}
+    >
       <Section title={t('lots.form.sections.listing')}>
         <div className="grid gap-3 sm:grid-cols-2">
-          <Field id={`${formId}-productId`} label={t('lots.form.product')} required error={err('productId')} className="sm:col-span-2">
+          <Field
+            id={`${formId}-productId`}
+            label={t('lots.form.product')}
+            required
+            error={err('productId')}
+            className="sm:col-span-2"
+          >
             <select {...register('productId')} {...a11y('productId')} disabled={!!editing} className={input}>
               <option value="">{t('lots.form.chooseProduct')}</option>
               {products.map((p) => (
@@ -129,8 +176,19 @@ export function LotForm({ products, initial, editing, submitting, onSubmit, form
               ))}
             </select>
           </Field>
-          <Field id={`${formId}-lotNumber`} label={t('lots.form.lotNumber')} required={policy?.requiresBatch} error={err('lotNumber')} hint={t('lots.form.lotNumberHint')}>
-            <input {...register('lotNumber')} {...a11y('lotNumber')} className={cn(input, 'font-mono')} autoComplete="off" />
+          <Field
+            id={`${formId}-lotNumber`}
+            label={t('lots.form.lotNumber')}
+            required={policy?.requiresBatch}
+            error={err('lotNumber')}
+            hint={t('lots.form.lotNumberHint')}
+          >
+            <input
+              {...register('lotNumber')}
+              {...a11y('lotNumber')}
+              className={cn(input, 'font-mono')}
+              autoComplete="off"
+            />
           </Field>
           <Field id={`${formId}-condition`} label={t('lots.form.condition')} required error={err('condition')}>
             <select {...register('condition')} {...a11y('condition')} className={input}>
@@ -180,20 +238,36 @@ export function LotForm({ products, initial, editing, submitting, onSubmit, form
               ))}
             </select>
           </Field>
-          <Field id={`${formId}-weightKg`} label={t('lots.form.weightKg')} error={err('weightKg')} className="sm:col-span-2">
+          <Field
+            id={`${formId}-weightKg`}
+            label={t('lots.form.weightKg')}
+            error={err('weightKg')}
+            className="sm:col-span-2"
+          >
             <input {...register('weightKg')} {...a11y('weightKg')} inputMode="decimal" className={input} />
           </Field>
-          <Field id={`${formId}-volumeM3`} label={t('lots.form.volumeM3')} error={err('volumeM3')} className="sm:col-span-2">
+          <Field
+            id={`${formId}-volumeM3`}
+            label={t('lots.form.volumeM3')}
+            error={err('volumeM3')}
+            className="sm:col-span-2"
+          >
             <input {...register('volumeM3')} {...a11y('volumeM3')} inputMode="decimal" className={input} />
           </Field>
         </div>
         {preview && product && (
           <p className="rounded-md bg-surface-2 px-3 py-2 text-sm" aria-live="polite">
-            {t('lots.form.preview', { size: preview.m.unit === product.unit ? fmt.quantity(preview.m.quantity, preview.m.unit, { withImperial: false }) : lf.amount(preview.m.quantity, preview.m.unit) })}
+            {t('lots.form.preview', {
+              size:
+                preview.m.unit === product.unit
+                  ? fmt.quantity(preview.m.quantity, preview.m.unit, { withImperial: false })
+                  : lf.amount(preview.m.quantity, preview.m.unit),
+            })}
             {preview.perUnit !== null && preview.m.unit === product.unit && (
               <>
                 {' · '}
-                {t('lots.approx')} <Price amount={preview.perUnit} currency={product.pricing.currency} unit={product.unit} />
+                {t('lots.approx')}{' '}
+                <Price amount={preview.perUnit} currency={product.pricing.currency} unit={product.unit} />
               </>
             )}
           </p>
@@ -202,7 +276,12 @@ export function LotForm({ products, initial, editing, submitting, onSubmit, form
 
       <Section title={t('lots.form.sections.price')}>
         <div className="grid gap-3 sm:grid-cols-2">
-          <Field id={`${formId}-pricePerLot`} label={t('lots.form.pricePerLot', { currency: product?.pricing.currency ?? '' })} required error={err('pricePerLot')}>
+          <Field
+            id={`${formId}-pricePerLot`}
+            label={t('lots.form.pricePerLot', { currency: product?.pricing.currency ?? '' })}
+            required
+            error={err('pricePerLot')}
+          >
             <input {...register('pricePerLot')} {...a11y('pricePerLot')} inputMode="decimal" className={input} />
           </Field>
           <Field
@@ -219,18 +298,44 @@ export function LotForm({ products, initial, editing, submitting, onSubmit, form
           <p className="text-xs font-medium text-ink-muted">{t('lots.form.tiers')}</p>
           {tiers.fields.map((field, i) => (
             <div key={field.id} className="grid grid-cols-[1fr_1fr_auto] items-end gap-2">
-              <Field id={`${formId}-tiers.${i}.minLots`} label={t('lots.form.tierFrom')} error={err(`tiers.${i}.minLots`)}>
-                <input {...register(`tiers.${i}.minLots`)} {...a11y(`tiers.${i}.minLots`)} inputMode="numeric" className={input} />
+              <Field
+                id={`${formId}-tiers.${i}.minLots`}
+                label={t('lots.form.tierFrom')}
+                error={err(`tiers.${i}.minLots`)}
+              >
+                <input
+                  {...register(`tiers.${i}.minLots`)}
+                  {...a11y(`tiers.${i}.minLots`)}
+                  inputMode="numeric"
+                  className={input}
+                />
               </Field>
               <Field id={`${formId}-tiers.${i}.price`} label={t('lots.form.tierPrice')} error={err(`tiers.${i}.price`)}>
-                <input {...register(`tiers.${i}.price`)} {...a11y(`tiers.${i}.price`)} inputMode="decimal" className={input} />
+                <input
+                  {...register(`tiers.${i}.price`)}
+                  {...a11y(`tiers.${i}.price`)}
+                  inputMode="decimal"
+                  className={input}
+                />
               </Field>
-              <button type="button" onClick={() => tiers.remove(i)} aria-label={t('lots.form.removeTier', { index: i + 1 })} className="mb-0.5 grid size-10 place-items-center rounded-[var(--radius-control)] text-ink-muted hover:bg-surface-2">
+              <button
+                type="button"
+                onClick={() => tiers.remove(i)}
+                aria-label={t('lots.form.removeTier', { index: i + 1 })}
+                className="mb-0.5 grid size-10 place-items-center rounded-[var(--radius-control)] text-ink-muted hover:bg-surface-2"
+              >
                 <Trash2 className="size-4" aria-hidden />
               </button>
             </div>
           ))}
-          <Button variant="ghost" size="sm" className="self-start" icon={<Plus className="size-4" aria-hidden />} onClick={() => tiers.append({ minLots: '', price: '' })} disabled={tiers.fields.length >= 4}>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="self-start"
+            icon={<Plus className="size-4" aria-hidden />}
+            onClick={() => tiers.append({ minLots: '', price: '' })}
+            disabled={tiers.fields.length >= 4}
+          >
             {t('lots.form.addTier')}
           </Button>
         </div>
@@ -238,17 +343,32 @@ export function LotForm({ products, initial, editing, submitting, onSubmit, form
           <legend className="mb-1 text-xs font-medium text-ink-muted">{t('lots.form.divisibility')}</legend>
           <div className="flex flex-wrap gap-4 text-sm">
             <label className="flex items-center gap-2">
-              <input type="radio" checked={!v.divisible} onChange={() => setValue('divisible', false, { shouldDirty: true })} className="accent-[var(--primary)]" />
+              <input
+                type="radio"
+                checked={!v.divisible}
+                onChange={() => setValue('divisible', false, { shouldDirty: true })}
+                className="accent-[var(--primary)]"
+              />
               {t('lots.form.indivisible')}
             </label>
             <label className="flex items-center gap-2">
-              <input type="radio" checked={!!v.divisible} onChange={() => setValue('divisible', true, { shouldDirty: true })} className="accent-[var(--primary)]" />
+              <input
+                type="radio"
+                checked={!!v.divisible}
+                onChange={() => setValue('divisible', true, { shouldDirty: true })}
+                className="accent-[var(--primary)]"
+              />
               {t('lots.form.divisible')}
             </label>
           </div>
           {v.divisible ? (
             <div className="grid gap-3 sm:grid-cols-2">
-              <Field id={`${formId}-step`} label={t('lots.form.step')} error={err('step')} hint={t('lots.form.stepHint')}>
+              <Field
+                id={`${formId}-step`}
+                label={t('lots.form.step')}
+                error={err('step')}
+                hint={t('lots.form.stepHint')}
+              >
                 <input {...register('step')} {...a11y('step')} inputMode="decimal" className={input} />
               </Field>
               <Field id={`${formId}-minSplit`} label={t('lots.form.minSplit')} error={err('minSplit')}>
@@ -256,7 +376,12 @@ export function LotForm({ products, initial, editing, submitting, onSubmit, form
               </Field>
             </div>
           ) : (
-            <Field id={`${formId}-moqLots`} label={t('lots.form.moqLots')} error={err('moqLots')} className="sm:max-w-[50%]">
+            <Field
+              id={`${formId}-moqLots`}
+              label={t('lots.form.moqLots')}
+              error={err('moqLots')}
+              className="sm:max-w-[50%]"
+            >
               <input {...register('moqLots')} {...a11y('moqLots')} inputMode="numeric" className={input} />
             </Field>
           )}
@@ -268,7 +393,13 @@ export function LotForm({ products, initial, editing, submitting, onSubmit, form
           <Field id={`${formId}-productionDate`} label={t('lots.form.productionDate')} error={err('productionDate')}>
             <input type="date" {...register('productionDate')} {...a11y('productionDate')} className={input} />
           </Field>
-          <Field id={`${formId}-expiryDate`} label={t('lots.form.expiryDate')} required={policy?.requiresExpiry} error={err('expiryDate')} hint={policy?.requiresExpiry ? t('lots.form.expiryHint') : undefined}>
+          <Field
+            id={`${formId}-expiryDate`}
+            label={t('lots.form.expiryDate')}
+            required={policy?.requiresExpiry}
+            error={err('expiryDate')}
+            hint={policy?.requiresExpiry ? t('lots.form.expiryHint') : undefined}
+          >
             <input type="date" {...register('expiryDate')} {...a11y('expiryDate')} className={input} />
           </Field>
           <Field
@@ -276,7 +407,11 @@ export function LotForm({ products, initial, editing, submitting, onSubmit, form
             label={t('lots.form.certificate')}
             required={policy?.requiresCertificate && !editing?.documents.length}
             error={err('certificateFile')}
-            hint={v.certificateFile ? v.certificateFile : editing?.documents[0]?.fileName ?? t('lots.form.certificateHint')}
+            hint={
+              v.certificateFile
+                ? v.certificateFile
+                : (editing?.documents[0]?.fileName ?? t('lots.form.certificateHint'))
+            }
             className="sm:col-span-2"
           >
             <input
@@ -284,7 +419,12 @@ export function LotForm({ products, initial, editing, submitting, onSubmit, form
               type="file"
               accept=".pdf,image/*"
               aria-invalid={!!err('certificateFile')}
-              onChange={(e) => setValue('certificateFile', e.target.files?.[0]?.name ?? '', { shouldValidate: true, shouldDirty: true })}
+              onChange={(e) =>
+                setValue('certificateFile', e.target.files?.[0]?.name ?? '', {
+                  shouldValidate: true,
+                  shouldDirty: true,
+                })
+              }
               className="text-sm file:me-3 file:h-9 file:rounded-[var(--radius-control)] file:border file:border-line-strong file:bg-surface file:px-3 file:text-sm"
             />
           </Field>
@@ -293,7 +433,12 @@ export function LotForm({ products, initial, editing, submitting, onSubmit, form
 
       <Section title={t('lots.form.sections.location')}>
         <div className="grid gap-3 sm:grid-cols-2">
-          <Field id={`${formId}-warehouseLabel`} label={t('lots.form.warehouse')} required error={err('warehouseLabel')}>
+          <Field
+            id={`${formId}-warehouseLabel`}
+            label={t('lots.form.warehouse')}
+            required
+            error={err('warehouseLabel')}
+          >
             <input {...register('warehouseLabel')} {...a11y('warehouseLabel')} className={input} />
           </Field>
           <Field id={`${formId}-cityId`} label={t('lots.form.city')} required error={err('cityId')}>

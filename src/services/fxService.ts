@@ -13,7 +13,10 @@ export const mockFxProvider: FxProvider = {
     mockRequest(
       () => ({
         base: BASE_CURRENCY,
-        rates: Object.fromEntries(CURRENCY_CODES.map((c) => [c, CURRENCIES[c].mockRateFromEUR])) as Record<CurrencyCode, number>,
+        rates: Object.fromEntries(CURRENCY_CODES.map((c) => [c, CURRENCIES[c].mockRateFromEUR])) as Record<
+          CurrencyCode,
+          number
+        >,
         updatedAt: addDays(now(), -0.125).toISOString(),
         indicative: true as const,
       }),

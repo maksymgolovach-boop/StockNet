@@ -23,6 +23,11 @@ export const useSearchHistory = create<SearchHistoryState>()(
       remove: (query) => set((s) => ({ recent: s.recent.filter((r) => r !== query) })),
       clear: () => set({ recent: [] }),
     }),
-    { name: 'sy-search-history', version: 2, storage: createJSONStorage(() => safeStorage), migrate: () => ({ recent: ['NPK 16-16-16', 'tractor', 'Golden Delicious'] }) as SearchHistoryState },
+    {
+      name: 'sy-search-history',
+      version: 2,
+      storage: createJSONStorage(() => safeStorage),
+      migrate: () => ({ recent: ['NPK 16-16-16', 'tractor', 'Golden Delicious'] }) as SearchHistoryState,
+    },
   ),
 )

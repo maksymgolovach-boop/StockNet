@@ -27,7 +27,7 @@ export function PriceTiers({ product }: { product: Product }) {
             <Price amount={first.unitPrice / (1 - discount / 100)} currency={pricing.currency} unit={unit} />
           </p>
         )}
-        <p className="text-3xl font-semibold leading-tight">
+        <p className="text-3xl leading-tight font-semibold">
           <Price amount={first.unitPrice} currency={pricing.currency} unit={unit} />
         </p>
         <p className="text-sm text-ink-muted">{t('product.moqLong', { qty: fmt.quantity(moq, unit) })}</p>
@@ -39,13 +39,16 @@ export function PriceTiers({ product }: { product: Product }) {
             <p className="font-semibold">{t('fx.priceMayChange', { index: pricing.index.name })}</p>
             <p className="text-ink-muted">
               {t('product.indexFormula', { index: pricing.index.name, date: fmt.date(pricing.index.asOf) })}{' '}
-              <Price amount={pricing.index.referenceValue} currency={pricing.currency} unit={unit} /> + <Price amount={pricing.index.premium} currency={pricing.currency} unit={unit} />
+              <Price amount={pricing.index.referenceValue} currency={pricing.currency} unit={unit} /> +{' '}
+              <Price amount={pricing.index.premium} currency={pricing.currency} unit={unit} />
             </p>
           </div>
         </div>
       )}
       <table className="w-full text-sm">
-        <caption className="mb-1 text-start text-xs font-semibold tracking-wide text-ink-subtle uppercase">{t('product.priceTiers')}</caption>
+        <caption className="mb-1 text-start text-xs font-semibold tracking-wide text-ink-subtle uppercase">
+          {t('product.priceTiers')}
+        </caption>
         <thead className="sr-only">
           <tr>
             <th scope="col">{t('product.quantity')}</th>
@@ -58,15 +61,21 @@ export function PriceTiers({ product }: { product: Product }) {
             const saving = 1 - tier.unitPrice / first.unitPrice
             return (
               <tr key={tier.minQty} className="border-t border-line">
-                <td className="py-1.5 tabular">
+                <td className="tabular py-1.5">
                   {tier.maxQty !== undefined
-                    ? t('product.tierRange', { from: fmt.number(tier.minQty), to: fmt.number(tier.maxQty), unit: fmt.unitLabel(unit) })
+                    ? t('product.tierRange', {
+                        from: fmt.number(tier.minQty),
+                        to: fmt.number(tier.maxQty),
+                        unit: fmt.unitLabel(unit),
+                      })
                     : t('product.tierFrom', { from: fmt.number(tier.minQty), unit: fmt.unitLabel(unit) })}
                 </td>
                 <td className="py-1.5 text-end font-medium">
                   <Price amount={tier.unitPrice} currency={pricing.currency} unit={unit} />
                 </td>
-                <td className="w-16 py-1.5 text-end text-xs text-verified tabular">{saving > 0.001 ? `−${fmt.percent(saving, 1)}` : ''}</td>
+                <td className="tabular w-16 py-1.5 text-end text-xs text-verified">
+                  {saving > 0.001 ? `−${fmt.percent(saving, 1)}` : ''}
+                </td>
               </tr>
             )
           })}

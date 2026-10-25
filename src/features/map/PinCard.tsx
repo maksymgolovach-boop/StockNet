@@ -31,7 +31,7 @@ export function PinCard({ pin, className, closeGap = false }: { pin: MapPin; cla
   return (
     <div className={cn('flex flex-col gap-1 bg-surface p-2.5 text-ink', className)}>
       <div className={cn('flex items-start gap-1.5', closeGap && 'pe-7')}>
-        <p className="line-clamp-2 flex-1 text-[13px] font-semibold leading-snug" lang={p.contentLang}>
+        <p className="line-clamp-2 flex-1 text-[13px] leading-snug font-semibold" lang={p.contentLang}>
           {p.name}
         </p>
         <button
@@ -48,7 +48,7 @@ export function PinCard({ pin, className, closeGap = false }: { pin: MapPin; cla
         <span className="truncate font-medium text-ink-muted">{producer.name}</span>
         <VerificationBadge level={producer.verification} compact />
         {producer.reviewCount > 0 && (
-          <span className="inline-flex items-center gap-0.5 text-ink-muted tabular">
+          <span className="tabular inline-flex items-center gap-0.5 text-ink-muted">
             <Star className="size-3 fill-current text-accent" aria-hidden />
             {fmt.number(producer.rating, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
           </span>
@@ -62,18 +62,34 @@ export function PinCard({ pin, className, closeGap = false }: { pin: MapPin; cla
       {lot && pin.best.lot && <LotSummaryLine product={p} lot={lot} lotsAvailable={pin.best.lot.lotsAvailable} />}
       <div className="flex items-end justify-between gap-2">
         <span className="text-sm font-semibold">
-            {!tier && lot ? (
-              <Price amount={lot.pricePerLot} currency={p.pricing.currency} unitLabel={lf.unit} compact={lot.pricePerLot >= 100} />
-            ) : p.pricing.mode === 'on_request' || !tier ? (
-              t('common.priceOnRequest')
-            ) : (
-              <Price amount={tier.unitPrice} currency={p.pricing.currency} unit={p.unit} compact={tier.unitPrice >= 100} />
-            )}
+          {!tier && lot ? (
+            <Price
+              amount={lot.pricePerLot}
+              currency={p.pricing.currency}
+              unitLabel={lf.unit}
+              compact={lot.pricePerLot >= 100}
+            />
+          ) : p.pricing.mode === 'on_request' || !tier ? (
+            t('common.priceOnRequest')
+          ) : (
+            <Price
+              amount={tier.unitPrice}
+              currency={p.pricing.currency}
+              unit={p.unit}
+              compact={tier.unitPrice >= 100}
+            />
+          )}
         </span>
-        {pin.count > 1 && <span className="text-xs text-ink-subtle">{t('map.moreProducts', { count: pin.count - 1 })}</span>}
+        {pin.count > 1 && (
+          <span className="text-xs text-ink-subtle">{t('map.moreProducts', { count: pin.count - 1 })}</span>
+        )}
       </div>
       <div className="mt-0.5 grid grid-cols-2 gap-1.5">
-        <Link to={`/product/${p.id}`} onClick={() => markVisited(producer.id)} className={cn(buttonClass('primary', 'sm'), 'h-8')}>
+        <Link
+          to={`/product/${p.id}`}
+          onClick={() => markVisited(producer.id)}
+          className={cn(buttonClass('primary', 'sm'), 'h-8')}
+        >
           {t('map.view')}
         </Link>
         {isOwn ? (
@@ -82,7 +98,10 @@ export function PinCard({ pin, className, closeGap = false }: { pin: MapPin; cla
             {t('nav.stock')}
           </Link>
         ) : (
-          <Link to={`/messages?producer=${producer.id}&product=${p.id}`} className={cn(buttonClass('secondary', 'sm'), 'h-8')}>
+          <Link
+            to={`/messages?producer=${producer.id}&product=${p.id}`}
+            className={cn(buttonClass('secondary', 'sm'), 'h-8')}
+          >
             <MessageSquare className="size-3.5" aria-hidden />
             {t('map.chat')}
           </Link>

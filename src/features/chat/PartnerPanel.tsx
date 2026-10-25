@@ -36,10 +36,13 @@ function TrustSummary({ partner }: { partner: Partner }) {
         <ul className="flex flex-col gap-1.5 text-sm">
           {p.reviewCount > 0 && (
             <Row icon={<Star className={`${icon} fill-accent text-accent`} aria-hidden />}>
-              {fmt.number(p.rating, { minimumFractionDigits: 1, maximumFractionDigits: 1 })} · {t('common.reviews', { count: p.reviewCount })}
+              {fmt.number(p.rating, { minimumFractionDigits: 1, maximumFractionDigits: 1 })} ·{' '}
+              {t('common.reviews', { count: p.reviewCount })}
             </Row>
           )}
-          <Row icon={<Clock className={icon} aria-hidden />}>{t('producer.responds', { hours: Math.round(p.trustInputs.avgResponseHours) })}</Row>
+          <Row icon={<Clock className={icon} aria-hidden />}>
+            {t('producer.responds', { hours: Math.round(p.trustInputs.avgResponseHours) })}
+          </Row>
           <Row icon={<MapPin className={icon} aria-hidden />}>
             {p.address.city}, {fmt.region(p.address.country)}
           </Row>
@@ -54,9 +57,15 @@ function TrustSummary({ partner }: { partner: Partner }) {
         <VerificationBadge level={b.verification.level} />
       </div>
       <ul className="flex flex-col gap-1.5 text-sm">
-        <Row icon={<Wallet className={icon} aria-hidden />}>{t('chat.buyer.payment', { pct: fmt.percent(b.paymentReliability), days: b.avgPaymentDays })}</Row>
-        <Row icon={<CalendarCheck className={icon} aria-hidden />}>{t('chat.buyer.deals', { count: b.completedDeals })}</Row>
-        <Row icon={<Clock className={icon} aria-hidden />}>{t('chat.buyer.memberSince', { date: fmt.date(b.memberSince, { month: 'long', year: 'numeric' }) })}</Row>
+        <Row icon={<Wallet className={icon} aria-hidden />}>
+          {t('chat.buyer.payment', { pct: fmt.percent(b.paymentReliability), days: b.avgPaymentDays })}
+        </Row>
+        <Row icon={<CalendarCheck className={icon} aria-hidden />}>
+          {t('chat.buyer.deals', { count: b.completedDeals })}
+        </Row>
+        <Row icon={<Clock className={icon} aria-hidden />}>
+          {t('chat.buyer.memberSince', { date: fmt.date(b.memberSince, { month: 'long', year: 'numeric' }) })}
+        </Row>
         <Row icon={<MapPin className={icon} aria-hidden />}>
           {b.address.city}, {fmt.region(b.address.country)}
         </Row>
@@ -76,7 +85,10 @@ function History({ partner }: { partner: Partner }) {
   const stats: [string, string][] = [
     [t('partner.stats.deals'), fmt.number(history.deals.length)],
     [t('partner.stats.completed'), fmt.number(history.completed)],
-    [t('chat.lastDeal'), history.lastAt ? fmt.date(history.lastAt, { day: 'numeric', month: 'short', year: 'numeric' }) : '—'],
+    [
+      t('chat.lastDeal'),
+      history.lastAt ? fmt.date(history.lastAt, { day: 'numeric', month: 'short', year: 'numeric' }) : '—',
+    ],
     [t('partner.stats.volume'), volume === null ? '—' : format(volume, display, { compact: true })],
     [t('partner.stats.onTime'), history.onTimeRate === null ? '—' : fmt.percent(history.onTimeRate)],
     [t('partner.stats.since'), history.firstAt ? fmt.date(history.firstAt, { month: 'short', year: 'numeric' }) : '—'],
@@ -87,7 +99,7 @@ function History({ partner }: { partner: Partner }) {
         {stats.map(([k, v]) => (
           <div key={k} className="rounded-lg bg-surface-2 px-2.5 py-2">
             <dt className="text-[0.6875rem] text-ink-muted">{k}</dt>
-            <dd className="text-sm font-semibold tabular">{v}</dd>
+            <dd className="tabular text-sm font-semibold">{v}</dd>
           </div>
         ))}
       </dl>
@@ -96,7 +108,7 @@ function History({ partner }: { partner: Partner }) {
           <li key={d.id} className="flex items-center gap-2 py-2">
             <Link to={`/deals/${d.id}`} className="min-w-0 flex-1 hover:text-primary">
               <span className="block truncate">{d.lineItems[0]?.productName}</span>
-              <span className="block text-xs text-ink-subtle tabular">
+              <span className="tabular block text-xs text-ink-subtle">
                 {fmt.date(d.createdAt)} · {format(d.total, d.currency, { compact: true })}
               </span>
             </Link>
@@ -105,7 +117,10 @@ function History({ partner }: { partner: Partner }) {
         ))}
       </ul>
       {partner.kind === 'producer' && (
-        <Link to={`/producer/${partner.id}?tab=history`} className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline">
+        <Link
+          to={`/producer/${partner.id}?tab=history`}
+          className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+        >
           {t('partner.viewHistory')}
           <ArrowRight className="size-3.5 rtl:rotate-180" aria-hidden />
         </Link>
@@ -129,7 +144,11 @@ export function PartnerPanel({ partner, thread }: { partner: Partner; thread: Th
           ) : (
             <p className="font-semibold">{partner.name}</p>
           )}
-          <p className="text-xs text-ink-muted">{partner.kind === 'producer' ? t(`producerTypes.${partner.producer.type}`) : t(`buyerTypes.${partner.buyer.type}`)}</p>
+          <p className="text-xs text-ink-muted">
+            {partner.kind === 'producer'
+              ? t(`producerTypes.${partner.producer.type}`)
+              : t(`buyerTypes.${partner.buyer.type}`)}
+          </p>
         </div>
       </div>
       <section className="flex flex-col gap-2.5" aria-labelledby="pp-trust">
@@ -145,7 +164,10 @@ export function PartnerPanel({ partner, thread }: { partner: Partner; thread: Th
         <History partner={partner} />
       </section>
       {partner.kind === 'producer' ? (
-        <ButtonLink to={`/deals/new?producer=${partner.id}${thread.productId ? `&product=${thread.productId}` : ''}&thread=${thread.id}`} icon={<FileSignature className="size-4" aria-hidden />}>
+        <ButtonLink
+          to={`/deals/new?producer=${partner.id}${thread.productId ? `&product=${thread.productId}` : ''}&thread=${thread.id}`}
+          icon={<FileSignature className="size-4" aria-hidden />}
+        >
           {t('chat.createQuote')}
         </ButtonLink>
       ) : (

@@ -11,7 +11,17 @@ import { LotConditionBadge } from './LotBadge'
 import { availableLots, normalizedLotPrice } from './lotMath'
 import { useLotFormat } from './useLotFormat'
 
-export function LotTable({ product, lots, selectedId, onSelect }: { product: Product; lots: Lot[]; selectedId?: string; onSelect: (id: string) => void }) {
+export function LotTable({
+  product,
+  lots,
+  selectedId,
+  onSelect,
+}: {
+  product: Product
+  lots: Lot[]
+  selectedId?: string
+  onSelect: (id: string) => void
+}) {
   const { t } = useTranslation()
   const fmt = useFormat()
   const lf = useLotFormat()
@@ -26,13 +36,27 @@ export function LotTable({ product, lots, selectedId, onSelect }: { product: Pro
             <th scope="col" className={`${th} text-start`}>
               <span className="sr-only">{t('lots.select')}</span>
             </th>
-            <th scope="col" className={`${th} text-start`}>{t('lots.cols.lot')}</th>
-            <th scope="col" className={`${th} text-start`}>{t('lots.cols.content')}</th>
-            <th scope="col" className={`${th} text-start`}>{t('lots.cols.dates')}</th>
-            <th scope="col" className={`${th} text-start`}>{t('lots.cols.location')}</th>
-            <th scope="col" className={`${th} text-start`}>{t('lots.cols.documents')}</th>
-            <th scope="col" className={cn(th, 'text-end')}>{t('lots.cols.price')}</th>
-            <th scope="col" className={cn(th, 'text-end')}>{t('lots.cols.available')}</th>
+            <th scope="col" className={`${th} text-start`}>
+              {t('lots.cols.lot')}
+            </th>
+            <th scope="col" className={`${th} text-start`}>
+              {t('lots.cols.content')}
+            </th>
+            <th scope="col" className={`${th} text-start`}>
+              {t('lots.cols.dates')}
+            </th>
+            <th scope="col" className={`${th} text-start`}>
+              {t('lots.cols.location')}
+            </th>
+            <th scope="col" className={`${th} text-start`}>
+              {t('lots.cols.documents')}
+            </th>
+            <th scope="col" className={cn(th, 'text-end')}>
+              {t('lots.cols.price')}
+            </th>
+            <th scope="col" className={cn(th, 'text-end')}>
+              {t('lots.cols.available')}
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -41,9 +65,24 @@ export function LotTable({ product, lots, selectedId, onSelect }: { product: Pro
             const selected = lot.id === selectedId
             const radioId = `lot-radio-${lot.id}`
             return (
-              <tr key={lot.id} onClick={() => onSelect(lot.id)} className={cn('cursor-pointer border-t border-line align-top', selected ? 'bg-surface-2 outline-2 -outline-offset-2 outline-ink' : 'hover:bg-surface-2')}>
+              <tr
+                key={lot.id}
+                onClick={() => onSelect(lot.id)}
+                className={cn(
+                  'cursor-pointer border-t border-line align-top',
+                  selected ? 'bg-surface-2 outline-2 -outline-offset-2 outline-ink' : 'hover:bg-surface-2',
+                )}
+              >
                 <td className="px-3 py-3">
-                  <input id={radioId} type="radio" name="lot" checked={selected} onChange={() => onSelect(lot.id)} className="size-4 accent-[var(--primary)]" aria-label={t('lots.selectLot', { number: lot.lotNumber })} />
+                  <input
+                    id={radioId}
+                    type="radio"
+                    name="lot"
+                    checked={selected}
+                    onChange={() => onSelect(lot.id)}
+                    className="size-4 accent-[var(--primary)]"
+                    aria-label={t('lots.selectLot', { number: lot.lotNumber })}
+                  />
                 </td>
                 <td className="px-3 py-3">
                   <label htmlFor={radioId} className="flex cursor-pointer flex-col gap-1">
@@ -55,14 +94,31 @@ export function LotTable({ product, lots, selectedId, onSelect }: { product: Pro
                 <td className="px-3 py-3">
                   <span className="block">{lf.content(lot.content)}</span>
                   <span className="block text-xs text-ink-subtle">
-                    {[lot.totalWeightKg ? fmt.quantity(lot.totalWeightKg >= 1000 ? lot.totalWeightKg / 1000 : lot.totalWeightKg, lot.totalWeightKg >= 1000 ? 't' : 'kg', { withImperial: false }) : null, lot.totalVolumeM3 ? fmt.quantity(lot.totalVolumeM3, 'm3', { withImperial: false }) : null]
+                    {[
+                      lot.totalWeightKg
+                        ? fmt.quantity(
+                            lot.totalWeightKg >= 1000 ? lot.totalWeightKg / 1000 : lot.totalWeightKg,
+                            lot.totalWeightKg >= 1000 ? 't' : 'kg',
+                            { withImperial: false },
+                          )
+                        : null,
+                      lot.totalVolumeM3 ? fmt.quantity(lot.totalVolumeM3, 'm3', { withImperial: false }) : null,
+                    ]
                       .filter(Boolean)
                       .join(' · ')}
                   </span>
-                  <span className="mt-1 block text-xs text-ink-muted">{lot.divisibility.kind === 'indivisible' ? t('lots.indivisibleShort') : t('lots.divisibleShort', { step: fmt.number(lot.divisibility.step) })}</span>
+                  <span className="mt-1 block text-xs text-ink-muted">
+                    {lot.divisibility.kind === 'indivisible'
+                      ? t('lots.indivisibleShort')
+                      : t('lots.divisibleShort', { step: fmt.number(lot.divisibility.step) })}
+                  </span>
                 </td>
                 <td className="px-3 py-3 text-xs">
-                  {lot.productionDate && <span className="block whitespace-nowrap">{t('lots.produced', { date: fmt.date(lot.productionDate) })}</span>}
+                  {lot.productionDate && (
+                    <span className="block whitespace-nowrap">
+                      {t('lots.produced', { date: fmt.date(lot.productionDate) })}
+                    </span>
+                  )}
                   {lot.expiryDate && (
                     <span className="mt-1 block">
                       <ExpiryBadge expiryDate={lot.expiryDate} />
@@ -75,7 +131,8 @@ export function LotTable({ product, lots, selectedId, onSelect }: { product: Pro
                     <span>
                       <span className="block">{lot.location.label}</span>
                       <span className="block text-ink-subtle">
-                        {lot.location.city}, {fmt.region(lot.location.country)} · {fmt.distance(Math.round(distanceKm(me, lot.location.point)))}
+                        {lot.location.city}, {fmt.region(lot.location.country)} ·{' '}
+                        {fmt.distance(Math.round(distanceKm(me, lot.location.point)))}
                       </span>
                     </span>
                   </span>
@@ -100,13 +157,18 @@ export function LotTable({ product, lots, selectedId, onSelect }: { product: Pro
                   </span>
                   {norm && (
                     <span className="block text-xs text-ink-muted">
-                      {t('lots.approx')} <Price amount={norm.amount} currency={product.pricing.currency} unit={norm.unit} />
+                      {t('lots.approx')}{' '}
+                      <Price amount={norm.amount} currency={product.pricing.currency} unit={norm.unit} />
                     </span>
                   )}
                 </td>
-                <td className="px-3 py-3 text-end whitespace-nowrap tabular">
+                <td className="tabular px-3 py-3 text-end whitespace-nowrap">
                   <span className="block font-semibold">{fmt.number(availableLots(lot))}</span>
-                  {lot.reservedCount > 0 && <span className="block text-xs text-ink-subtle">{t('lots.reservedCount', { count: lot.reservedCount })}</span>}
+                  {lot.reservedCount > 0 && (
+                    <span className="block text-xs text-ink-subtle">
+                      {t('lots.reservedCount', { count: lot.reservedCount })}
+                    </span>
+                  )}
                 </td>
               </tr>
             )

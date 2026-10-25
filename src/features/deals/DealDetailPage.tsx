@@ -71,7 +71,11 @@ export function DealDetailPage() {
 
   const partner = partners.resolve(d)
   const partnerName = partner?.name ?? ''
-  const messageLink = d.threadId ? `/messages/${d.threadId}` : side === 'buyer' ? `/messages?producer=${d.producerId}` : `/messages?buyer=${d.buyerId}`
+  const messageLink = d.threadId
+    ? `/messages/${d.threadId}`
+    : side === 'buyer'
+      ? `/messages?producer=${d.producerId}`
+      : `/messages?buyer=${d.buyerId}`
   const actions = transitionsFor(d, side)
   const review = reviews.data?.find((r) => r.id === d.reviewId)
 
@@ -89,7 +93,9 @@ export function DealDetailPage() {
 
   return (
     <div className="mx-auto flex max-w-[90rem] flex-col gap-6 px-4 py-6 lg:px-6">
-      <Breadcrumbs items={[{ label: t('nav.home'), to: '/' }, { label: t('pages.deals'), to: '/deals' }, { label: d.id }]} />
+      <Breadcrumbs
+        items={[{ label: t('nav.home'), to: '/' }, { label: t('pages.deals'), to: '/deals' }, { label: d.id }]}
+      />
       <header className="flex flex-col gap-4 rounded-[var(--radius-card)] border border-line bg-surface p-5 lg:flex-row lg:items-start lg:justify-between">
         <div className="flex min-w-0 flex-col gap-2">
           <div className="flex flex-wrap items-center gap-3">
@@ -107,13 +113,19 @@ export function DealDetailPage() {
             )}
             {partner?.kind === 'producer' && <TrustScoreButton trust={partner.producer.trust} size="sm" />}
             <span className="text-ink-muted">
-              · {t('dealDetail.created', { date: fmt.date(d.createdAt, { dateStyle: 'medium' }) })} · {t('dealDetail.updated', { when: fmt.relative(d.updatedAt) })}
+              · {t('dealDetail.created', { date: fmt.date(d.createdAt, { dateStyle: 'medium' }) })} ·{' '}
+              {t('dealDetail.updated', { when: fmt.relative(d.updatedAt) })}
             </span>
           </div>
         </div>
         <div className="flex flex-wrap gap-2 lg:justify-end">
           {actions.map((tr) => (
-            <Button key={tr.action} variant={tr.tone} disabled={m.transition.isPending} onClick={() => (tr.tone === 'danger' ? setConfirm(tr) : run(tr))}>
+            <Button
+              key={tr.action}
+              variant={tr.tone}
+              disabled={m.transition.isPending}
+              onClick={() => (tr.tone === 'danger' ? setConfirm(tr) : run(tr))}
+            >
               {t(`dealDetail.actions.${tr.action}`)}
             </Button>
           ))}
@@ -121,18 +133,32 @@ export function DealDetailPage() {
             {t('dealDetail.messagePartner')}
           </ButtonLink>
           {side === 'buyer' && (
-            <ButtonLink to={`/deals/new?reorder=${d.id}`} variant="secondary" icon={<Repeat2 className="size-4" aria-hidden />}>
+            <ButtonLink
+              to={`/deals/new?reorder=${d.id}`}
+              variant="secondary"
+              icon={<Repeat2 className="size-4" aria-hidden />}
+            >
               {t('dealDetail.reorder')}
             </ButtonLink>
           )}
           {canDispute(d, side) && (
-            <Button variant="danger" icon={<OctagonAlert className="size-4" aria-hidden />} onClick={() => setDisputeOpen(true)}>
+            <Button
+              variant="danger"
+              icon={<OctagonAlert className="size-4" aria-hidden />}
+              onClick={() => setDisputeOpen(true)}
+            >
               {t('dealDetail.openDispute')}
             </Button>
           )}
         </div>
       </header>
-      <p role="status" aria-live="polite" className={notice ? 'flex items-center gap-2 rounded-md bg-verified-soft px-3 py-2 text-sm text-verified' : 'sr-only'}>
+      <p
+        role="status"
+        aria-live="polite"
+        className={
+          notice ? 'flex items-center gap-2 rounded-md bg-verified-soft px-3 py-2 text-sm text-verified' : 'sr-only'
+        }
+      >
         {notice && <CheckCircle2 className="size-4" aria-hidden />}
         {notice}
       </p>
@@ -147,7 +173,12 @@ export function DealDetailPage() {
             deal={d}
             role={side}
             resolving={m.resolveDispute.isPending}
-            onResolve={(note) => m.resolveDispute.mutate({ dealId: d.id, note, side }, { onSuccess: () => setNotice(t('dispute.resolvedNotice')) })}
+            onResolve={(note) =>
+              m.resolveDispute.mutate(
+                { dealId: d.id, note, side },
+                { onSuccess: () => setNotice(t('dispute.resolvedNotice')) },
+              )
+            }
           />
           <section aria-labelledby="deal-items" className="flex flex-col gap-3">
             <h2 id="deal-items" className="text-lg font-semibold">
@@ -156,13 +187,18 @@ export function DealDetailPage() {
             <LineItemsTable deal={d} />
           </section>
           {d.status === 'completed' && side === 'buyer' && (
-            <section aria-labelledby="deal-review" className="flex flex-col gap-3 rounded-[var(--radius-card)] border-2 border-ink bg-surface p-4">
+            <section
+              aria-labelledby="deal-review"
+              className="flex flex-col gap-3 rounded-[var(--radius-card)] border-2 border-ink bg-surface p-4"
+            >
               <h2 id="deal-review" className="text-lg font-semibold">
                 {d.reviewId ? t('reviewForm.doneTitle') : t('reviewForm.title', { name: partnerName })}
               </h2>
               {d.reviewId ? (
                 <p className="text-sm text-ink-muted">
-                  {review ? t('reviewForm.doneBody', { rating: fmt.number(review.overall, { minimumFractionDigits: 1 }) }) : t('reviewForm.doneShort')}{' '}
+                  {review
+                    ? t('reviewForm.doneBody', { rating: fmt.number(review.overall, { minimumFractionDigits: 1 }) })
+                    : t('reviewForm.doneShort')}{' '}
                   <Link to={`/producer/${d.producerId}?tab=reviews`} className="text-primary hover:underline">
                     {t('reviewForm.seeReviews')}
                   </Link>
@@ -170,7 +206,16 @@ export function DealDetailPage() {
               ) : (
                 <>
                   <p className="text-sm text-ink-muted">{t('reviewForm.intro')}</p>
-                  <ReviewForm submitting={m.addReview.isPending} error={m.addReview.error?.message} onSubmit={(input) => m.addReview.mutate({ dealId: d.id, input }, { onSuccess: () => setNotice(t('reviewForm.thanks')) })} />
+                  <ReviewForm
+                    submitting={m.addReview.isPending}
+                    error={m.addReview.error?.message}
+                    onSubmit={(input) =>
+                      m.addReview.mutate(
+                        { dealId: d.id, input },
+                        { onSuccess: () => setNotice(t('reviewForm.thanks')) },
+                      )
+                    }
+                  />
                 </>
               )}
             </section>
@@ -178,7 +223,10 @@ export function DealDetailPage() {
           <DealDocuments deal={d} />
         </div>
         <aside className="flex flex-col gap-6">
-          <section aria-labelledby="deal-timeline" className="flex flex-col gap-3 rounded-[var(--radius-card)] border border-line bg-surface p-4">
+          <section
+            aria-labelledby="deal-timeline"
+            className="flex flex-col gap-3 rounded-[var(--radius-card)] border border-line bg-surface p-4"
+          >
             <h2 id="deal-timeline" className="text-lg font-semibold">
               {t('dealDetail.timeline')}
             </h2>

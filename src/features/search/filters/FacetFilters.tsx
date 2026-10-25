@@ -22,12 +22,21 @@ export function CountryFilter({ api, facets }: { api: FiltersApi; facets: FacetC
   const fmt = useFormat()
   const [all, setAll] = useState(false)
   const selected = api.filters.countries
-  const rows = [...facets, ...selected.filter((c) => !facets.some((f) => f.value === c)).map((value) => ({ value, count: 0 }))]
+  const rows = [
+    ...facets,
+    ...selected.filter((c) => !facets.some((f) => f.value === c)).map((value) => ({ value, count: 0 })),
+  ]
   const shown = all ? rows : rows.slice(0, 6)
   return (
     <div>
       {shown.map((f) => (
-        <Checkbox key={f.value} checked={selected.includes(f.value)} onChange={() => api.setFilters({ countries: toggle(selected, f.value) })} label={fmt.region(f.value)} meta={f.count} />
+        <Checkbox
+          key={f.value}
+          checked={selected.includes(f.value)}
+          onChange={() => api.setFilters({ countries: toggle(selected, f.value) })}
+          label={fmt.region(f.value)}
+          meta={f.count}
+        />
       ))}
       <ShowMore total={rows.length} shown={shown.length} onClick={() => setAll(true)} />
     </div>
@@ -48,7 +57,13 @@ export function CertificationFilter({ api, facets }: { api: FiltersApi; facets: 
     <div>
       <p className="mb-1 px-1 text-xs text-ink-subtle">{t('filters.allSelectedRequired')}</p>
       {shown.map((f) => (
-        <Checkbox key={f.value} checked={selected.includes(f.value)} onChange={() => api.setFilters({ certifications: toggle(selected, f.value) })} label={label(f.value)} meta={f.count} />
+        <Checkbox
+          key={f.value}
+          checked={selected.includes(f.value)}
+          onChange={() => api.setFilters({ certifications: toggle(selected, f.value) })}
+          label={label(f.value)}
+          meta={f.count}
+        />
       ))}
       <ShowMore total={rows.length} shown={shown.length} onClick={() => setAll(true)} />
     </div>

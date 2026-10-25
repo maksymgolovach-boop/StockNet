@@ -41,7 +41,10 @@ export function ThemeToggle() {
   const Icon = ICON[theme]
   const next = NEXT[theme]
   return (
-    <IconButton label={`${t('header.theme')}: ${t(`theme.${theme}`)} — ${t('theme.toggle', { mode: t(`theme.${next}`) })}`} onClick={() => setTheme(next)}>
+    <IconButton
+      label={`${t('header.theme')}: ${t(`theme.${theme}`)} — ${t('theme.toggle', { mode: t(`theme.${next}`) })}`}
+      onClick={() => setTheme(next)}
+    >
       <Icon className="size-[1.125rem]" aria-hidden />
     </IconButton>
   )

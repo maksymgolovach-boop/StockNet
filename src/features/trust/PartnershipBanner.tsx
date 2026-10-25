@@ -15,7 +15,9 @@ export function PartnershipBanner({ producerId, historyLink }: { producerId: str
       <Handshake className="size-5 shrink-0" aria-hidden />
       <p className="flex-1">
         {t('partner.banner', { count: h.completed, year: new Date(h.firstAt).getFullYear() })}{' '}
-        <span className="text-ink-muted">{t('partner.lastDeal', { date: fmt.date(h.lastAt, { day: 'numeric', month: 'short', year: 'numeric' }) })}</span>
+        <span className="text-ink-muted">
+          {t('partner.lastDeal', { date: fmt.date(h.lastAt, { day: 'numeric', month: 'short', year: 'numeric' }) })}
+        </span>
         {h.active > 0 && <span className="ms-1 font-medium">· {t('partner.active', { count: h.active })}</span>}
       </p>
       <Link to={historyLink} className="inline-flex items-center gap-1 font-medium text-primary hover:underline">

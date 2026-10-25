@@ -6,7 +6,14 @@ import { Price } from '@/features/currency/Price'
 import { useFormat } from '@/features/i18n/useFormat'
 import { useIsOwnProducer } from '@/features/dev/devStore'
 import { ButtonLink } from '@/shared/ui/Button'
-import { availableLots, clampLotQuantity, lotMeasure, lotQuantityRule, normalizedLotPrice, pricePerLotFor } from './lotMath'
+import {
+  availableLots,
+  clampLotQuantity,
+  lotMeasure,
+  lotQuantityRule,
+  normalizedLotPrice,
+  pricePerLotFor,
+} from './lotMath'
 import { useLotFormat } from './useLotFormat'
 
 export function LotOrderPanel({ product, lot }: { product: Product; lot: Lot }) {
@@ -28,7 +35,9 @@ export function LotOrderPanel({ product, lot }: { product: Product; lot: Lot }) 
   return (
     <div className="flex flex-col gap-3">
       <div>
-        <p className="text-xs font-semibold tracking-wide text-ink-subtle uppercase">{t('lots.selectedLot', { number: lot.lotNumber })}</p>
+        <p className="text-xs font-semibold tracking-wide text-ink-subtle uppercase">
+          {t('lots.selectedLot', { number: lot.lotNumber })}
+        </p>
         <p className="text-3xl leading-tight font-semibold">
           <Price amount={perLot} currency={cur} unitLabel={lf.unit} />
         </p>
@@ -39,16 +48,27 @@ export function LotOrderPanel({ product, lot }: { product: Product; lot: Lot }) 
         )}
         <p className="mt-1 text-sm">
           {lf.type(lot.type)}: {lf.content(lot.content)}
-          {measure.unit === product.unit && measure.unit !== lot.content.unit && <span className="text-ink-muted"> ≈ {fmt.quantity(measure.quantity, measure.unit, { withImperial: false })}</span>}
+          {measure.unit === product.unit && measure.unit !== lot.content.unit && (
+            <span className="text-ink-muted">
+              {' '}
+              ≈ {fmt.quantity(measure.quantity, measure.unit, { withImperial: false })}
+            </span>
+          )}
         </p>
       </div>
       {lot.tiers.length > 1 && (
         <table className="w-full text-sm">
-          <caption className="mb-1 text-start text-xs font-semibold tracking-wide text-ink-subtle uppercase">{t('lots.tiers')}</caption>
+          <caption className="mb-1 text-start text-xs font-semibold tracking-wide text-ink-subtle uppercase">
+            {t('lots.tiers')}
+          </caption>
           <tbody>
             {lot.tiers.map((tier) => (
               <tr key={tier.minLots} className={tier.pricePerLot === perLot ? 'font-semibold' : ''}>
-                <td className="border-t border-line py-1.5">{tier.maxLots ? t('lots.tierRange', { from: tier.minLots, to: tier.maxLots }) : t('lots.tierFrom', { from: tier.minLots })}</td>
+                <td className="border-t border-line py-1.5">
+                  {tier.maxLots
+                    ? t('lots.tierRange', { from: tier.minLots, to: tier.maxLots })
+                    : t('lots.tierFrom', { from: tier.minLots })}
+                </td>
                 <td className="border-t border-line py-1.5 text-end">
                   <Price amount={tier.pricePerLot} currency={cur} unitLabel={lf.unit} />
                 </td>
@@ -62,7 +82,13 @@ export function LotOrderPanel({ product, lot }: { product: Product; lot: Lot }) 
           {t('lots.quantityLabel')}
         </label>
         <div className="flex items-stretch gap-2">
-          <button type="button" onClick={() => step(-1)} disabled={quantity <= rule.min} aria-label={t('lots.decrease')} className="grid size-10 place-items-center rounded-[var(--radius-control)] border border-line-strong disabled:opacity-40">
+          <button
+            type="button"
+            onClick={() => step(-1)}
+            disabled={quantity <= rule.min}
+            aria-label={t('lots.decrease')}
+            className="grid size-10 place-items-center rounded-[var(--radius-control)] border border-line-strong disabled:opacity-40"
+          >
             <Minus className="size-4" aria-hidden />
           </button>
           <input
@@ -75,10 +101,16 @@ export function LotOrderPanel({ product, lot }: { product: Product; lot: Lot }) 
             value={quantity}
             readOnly={!rule.divisible && max <= 1}
             onChange={(e) => setQty(Number(e.target.value))}
-            className="h-10 w-24 rounded-[var(--radius-control)] border border-line-strong bg-surface text-center text-base tabular"
+            className="tabular h-10 w-24 rounded-[var(--radius-control)] border border-line-strong bg-surface text-center text-base"
             aria-describedby="lot-qty-help"
           />
-          <button type="button" onClick={() => step(1)} disabled={quantity >= max} aria-label={t('lots.increase')} className="grid size-10 place-items-center rounded-[var(--radius-control)] border border-line-strong disabled:opacity-40">
+          <button
+            type="button"
+            onClick={() => step(1)}
+            disabled={quantity >= max}
+            aria-label={t('lots.increase')}
+            className="grid size-10 place-items-center rounded-[var(--radius-control)] border border-line-strong disabled:opacity-40"
+          >
             <Plus className="size-4" aria-hidden />
           </button>
           <span className="self-center text-sm text-ink-muted">{lf.lots(quantity)}</span>
@@ -100,7 +132,11 @@ export function LotOrderPanel({ product, lot }: { product: Product; lot: Lot }) 
         </span>
       </div>
       {!isOwner && (
-        <ButtonLink to={`/deals/new?product=${product.id}&lot=${lot.id}&lots=${quantity}`} size="lg" icon={<FileSignature className="size-4" aria-hidden />}>
+        <ButtonLink
+          to={`/deals/new?product=${product.id}&lot=${lot.id}&lots=${quantity}`}
+          size="lg"
+          icon={<FileSignature className="size-4" aria-hidden />}
+        >
           {t('lots.requestLotQuote')}
         </ButtonLink>
       )}

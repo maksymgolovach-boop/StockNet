@@ -33,10 +33,17 @@ export function useSuggestionOptions(value: string) {
 
   const options = useMemo<SuggestionOption[]>(() => {
     const q = value.trim()
-    if (q.length < 2) return recent.map((r, i) => ({ id: `recent-${i}`, group: 'recent', label: r, to: searchUrl(r), query: r }))
+    if (q.length < 2)
+      return recent.map((r, i) => ({ id: `recent-${i}`, group: 'recent', label: r, to: searchUrl(r), query: r }))
     if (!data || !enabled) return [{ id: 'all', group: 'all', label: q, to: searchUrl(q), query: q }]
     return [
-      ...data.products.map((p) => ({ id: `p-${p.id}`, group: 'products' as const, label: p.name, meta: p.producerName, to: `/product/${p.id}` })),
+      ...data.products.map((p) => ({
+        id: `p-${p.id}`,
+        group: 'products' as const,
+        label: p.name,
+        meta: p.producerName,
+        to: `/product/${p.id}`,
+      })),
       ...data.categories.map((c) => ({
         id: `c-${c.slug}`,
         group: 'categories' as const,
@@ -44,7 +51,13 @@ export function useSuggestionOptions(value: string) {
         meta: t('common.products', { count: c.productCount }),
         to: `/category/${c.slug}`,
       })),
-      ...data.producers.map((p) => ({ id: `r-${p.id}`, group: 'producers' as const, label: p.name, meta: `${p.city}, ${p.country}`, to: `/producer/${p.id}` })),
+      ...data.producers.map((p) => ({
+        id: `r-${p.id}`,
+        group: 'producers' as const,
+        label: p.name,
+        meta: `${p.city}, ${p.country}`,
+        to: `/producer/${p.id}`,
+      })),
       { id: 'all', group: 'all' as const, label: q, to: searchUrl(q), query: q },
     ]
   }, [value, recent, data, enabled, t])

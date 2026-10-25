@@ -5,13 +5,18 @@ import { LocationPicker } from '@/features/settings/LocationPicker'
 import { RADIUS_STEPS } from '../radius'
 import type { FiltersApi } from '../useFilters'
 
-
 export function LocationFilter({ api }: { api: FiltersApi }) {
   const { t } = useTranslation()
   const fmt = useFormat()
   const id = useId()
   const radius = api.filters.radiusKm
-  const index = radius === undefined ? 0 : Math.max(0, RADIUS_STEPS.findIndex((r) => r >= radius))
+  const index =
+    radius === undefined
+      ? 0
+      : Math.max(
+          0,
+          RADIUS_STEPS.findIndex((r) => r >= radius),
+        )
 
   return (
     <div className="flex flex-col gap-3">
@@ -19,7 +24,7 @@ export function LocationFilter({ api }: { api: FiltersApi }) {
       <div className="flex flex-col gap-1">
         <label htmlFor={`${id}-radius`} className="flex justify-between text-xs text-ink-muted">
           {t('filters.radius')}
-          <output htmlFor={`${id}-radius`} className="font-medium text-ink tabular">
+          <output htmlFor={`${id}-radius`} className="tabular font-medium text-ink">
             {radius === undefined ? t('filters.anyDistance') : fmt.distance(radius)}
           </output>
         </label>

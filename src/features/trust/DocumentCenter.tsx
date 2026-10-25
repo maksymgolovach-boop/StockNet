@@ -25,7 +25,10 @@ export function DocumentCenter({ documents, title }: { documents: Document[]; ti
     <section className="flex flex-col gap-3" aria-label={title ?? t('docs.title')}>
       {title && <h2 className="text-xl font-semibold">{title}</h2>}
       {expired.length > 0 && (
-        <p role="alert" className="flex items-start gap-2 rounded-[var(--radius-control)] border border-expired/40 bg-expired-soft px-3 py-2 text-sm text-expired">
+        <p
+          role="alert"
+          className="flex items-start gap-2 rounded-[var(--radius-control)] border border-expired/40 bg-expired-soft px-3 py-2 text-sm text-expired"
+        >
           <TriangleAlert className="mt-0.5 size-4 shrink-0" aria-hidden />
           {t('docs.expiredWarning', { count: expired.length, list: fmt.list(expired.map((d) => d.doc.title)) })}
         </p>
@@ -69,7 +72,9 @@ export function DocumentCenter({ documents, title }: { documents: Document[]; ti
                   <div className="flex gap-1">
                     <dt>{t('docs.expires')}:</dt>
                     <dd className={status === 'valid' ? undefined : 'font-semibold'}>
-                      {doc.expiresAt ? `${fmt.date(doc.expiresAt)} (${fmt.relative(doc.expiresAt)})` : t('docs.noExpiry')}
+                      {doc.expiresAt
+                        ? `${fmt.date(doc.expiresAt)} (${fmt.relative(doc.expiresAt)})`
+                        : t('docs.noExpiry')}
                     </dd>
                   </div>
                 </dl>
@@ -87,9 +92,11 @@ export function DocumentCenter({ documents, title }: { documents: Document[]; ti
           ))}
         </ul>
       )}
-      {expired.length === 0 && expiring.length === 0 && documents.some((d) => d.expiresAt && daysFromNow(d.expiresAt) > 0) && (
-        <p className="text-xs text-ink-subtle">{t('docs.allValid')}</p>
-      )}
+      {expired.length === 0 &&
+        expiring.length === 0 &&
+        documents.some((d) => d.expiresAt && daysFromNow(d.expiresAt) > 0) && (
+          <p className="text-xs text-ink-subtle">{t('docs.allValid')}</p>
+        )}
     </section>
   )
 }

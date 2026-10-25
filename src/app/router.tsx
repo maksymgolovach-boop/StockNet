@@ -10,7 +10,8 @@ const page = (load: () => Promise<{ default: React.ComponentType }>): Pick<Route
   lazy: async () => ({ Component: (await load()).default }),
 })
 
-const named = <K extends string>(load: () => Promise<Record<K, React.ComponentType>>, key: K) => page(async () => ({ default: (await load())[key] }))
+const named = <K extends string>(load: () => Promise<Record<K, React.ComponentType>>, key: K) =>
+  page(async () => ({ default: (await load())[key] }))
 
 export const router = createBrowserRouter([
   {

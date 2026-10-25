@@ -17,7 +17,8 @@ interface ResultsListProps {
   onRetry: () => void
 }
 
-const gridClass = (view: 'list' | 'grid') => (view === 'grid' ? 'grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3' : 'flex flex-col gap-3')
+const gridClass = (view: 'list' | 'grid') =>
+  view === 'grid' ? 'grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3' : 'flex flex-col gap-3'
 
 export function ResultsList({ api, data, isPending, error, onRetry }: ResultsListProps) {
   const { t } = useTranslation()
@@ -55,7 +56,11 @@ export function ResultsList({ api, data, isPending, error, onRetry }: ResultsLis
       <ul className={cn(gridClass(view))}>
         {data.items.map((item, i) => (
           <li key={item.product.id} className="flex min-w-0">
-            <MapSyncItem producerId={item.producer.id} first={data.items.findIndex((x) => x.producer.id === item.producer.id) === i} className="min-w-0 flex-1">
+            <MapSyncItem
+              producerId={item.producer.id}
+              first={data.items.findIndex((x) => x.producer.id === item.producer.id) === i}
+              className="min-w-0 flex-1"
+            >
               <ProductCard item={item} view={view} query={api.filters.q} />
             </MapSyncItem>
           </li>
@@ -63,7 +68,9 @@ export function ResultsList({ api, data, isPending, error, onRetry }: ResultsLis
       </ul>
       {data.items.length < data.total && (
         <div className="flex flex-col items-center gap-2 py-2">
-          <p className="text-xs text-ink-subtle">{t('search.showing', { shown: data.items.length, total: data.total })}</p>
+          <p className="text-xs text-ink-subtle">
+            {t('search.showing', { shown: data.items.length, total: data.total })}
+          </p>
           <Button variant="secondary" onClick={api.showMore}>
             {t('search.showMore')}
           </Button>

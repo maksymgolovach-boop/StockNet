@@ -6,7 +6,17 @@ import { useFormat } from '@/features/i18n/useFormat'
 import { Badge } from '@/shared/ui/Badge'
 import { Button } from '@/shared/ui/Button'
 
-export function DisputePanel({ deal, role, onResolve, resolving }: { deal: Deal; role: PartyRole; onResolve: (note: string) => void; resolving: boolean }) {
+export function DisputePanel({
+  deal,
+  role,
+  onResolve,
+  resolving,
+}: {
+  deal: Deal
+  role: PartyRole
+  onResolve: (note: string) => void
+  resolving: boolean
+}) {
   const { t } = useTranslation()
   const fmt = useFormat()
   const [note, setNote] = useState('')
@@ -14,7 +24,10 @@ export function DisputePanel({ deal, role, onResolve, resolving }: { deal: Deal;
   if (!d) return null
   const open = d.status === 'open'
   return (
-    <section aria-labelledby="dispute-title" className={`flex flex-col gap-3 rounded-[var(--radius-card)] border-2 p-4 ${open ? 'border-expired bg-expired-soft' : 'border-line bg-surface'}`}>
+    <section
+      aria-labelledby="dispute-title"
+      className={`flex flex-col gap-3 rounded-[var(--radius-card)] border-2 p-4 ${open ? 'border-expired bg-expired-soft' : 'border-line bg-surface'}`}
+    >
       <div className="flex flex-wrap items-center gap-2">
         <OctagonAlert className="size-5 text-expired" aria-hidden />
         <h2 id="dispute-title" className="text-lg font-semibold">
@@ -52,7 +65,11 @@ export function DisputePanel({ deal, role, onResolve, resolving }: { deal: Deal;
             <dt className="text-xs text-ink-muted">{t('dispute.evidence')}</dt>
             <dd className="flex flex-wrap gap-2">
               {d.attachments.map((a) => (
-                <span key={a} className="inline-flex items-center gap-1 rounded bg-surface px-2 py-0.5 text-xs" title={t('docs.demoOnly')}>
+                <span
+                  key={a}
+                  className="inline-flex items-center gap-1 rounded bg-surface px-2 py-0.5 text-xs"
+                  title={t('docs.demoOnly')}
+                >
                   <Paperclip className="size-3" aria-hidden />
                   {a}
                 </span>
@@ -64,7 +81,8 @@ export function DisputePanel({ deal, role, onResolve, resolving }: { deal: Deal;
           <div className="sm:col-span-2">
             <dt className="text-xs text-ink-muted">{t('dispute.resolutionNote')}</dt>
             <dd>
-              {d.resolutionNote} {d.resolvedAt && <span className="text-ink-muted">· {fmt.dateTime(d.resolvedAt)}</span>}
+              {d.resolutionNote}{' '}
+              {d.resolvedAt && <span className="text-ink-muted">· {fmt.dateTime(d.resolvedAt)}</span>}
             </dd>
           </div>
         )}
@@ -79,7 +97,11 @@ export function DisputePanel({ deal, role, onResolve, resolving }: { deal: Deal;
         >
           <label className="flex min-w-0 flex-1 flex-col gap-1 text-xs font-medium text-ink-muted">
             {t('dispute.resolveNote')}
-            <input value={note} onChange={(e) => setNote(e.target.value)} className="h-10 rounded-[var(--radius-control)] border border-line-strong bg-surface px-3 text-sm text-ink" />
+            <input
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              className="h-10 rounded-[var(--radius-control)] border border-line-strong bg-surface px-3 text-sm text-ink"
+            />
           </label>
           <Button type="submit" disabled={resolving || note.trim().length < 3}>
             {t('dispute.markResolved')}

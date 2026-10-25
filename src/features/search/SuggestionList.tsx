@@ -5,7 +5,13 @@ import { Highlight } from './Highlight'
 import { useSearchHistory } from './searchHistoryStore'
 import type { SuggestionGroup, SuggestionOption } from './useSuggestionOptions'
 
-const ICON: Record<SuggestionGroup, typeof Package> = { recent: Clock, products: Package, categories: FolderTree, producers: Building2, all: ArrowRight }
+const ICON: Record<SuggestionGroup, typeof Package> = {
+  recent: Clock,
+  products: Package,
+  categories: FolderTree,
+  producers: Building2,
+  all: ArrowRight,
+}
 
 interface SuggestionListProps {
   id: string
@@ -30,16 +36,27 @@ export function SuggestionList({ id, options, active, query, onPick, onHover }: 
         {groups.map((group) => (
           <li key={group} role="presentation">
             {group !== 'all' && (
-              <div id={`${id}-${group}`} className="flex items-center justify-between px-3 pb-1 pt-2 text-[0.6875rem] font-semibold tracking-wide text-ink-subtle uppercase">
+              <div
+                id={`${id}-${group}`}
+                className="flex items-center justify-between px-3 pt-2 pb-1 text-[0.6875rem] font-semibold tracking-wide text-ink-subtle uppercase"
+              >
                 {t(`search.groups.${group}`)}
                 {group === 'recent' && (
-                  <button type="button" onClick={clearRecent} className="normal-case tracking-normal font-medium text-ink-muted hover:text-primary">
+                  <button
+                    type="button"
+                    onClick={clearRecent}
+                    className="font-medium tracking-normal text-ink-muted normal-case hover:text-primary"
+                  >
                     {t('common.clear')}
                   </button>
                 )}
               </div>
             )}
-            <ul role="group" aria-labelledby={group !== 'all' ? `${id}-${group}` : undefined} aria-label={group === 'all' ? t('search.groups.all') : undefined}>
+            <ul
+              role="group"
+              aria-labelledby={group !== 'all' ? `${id}-${group}` : undefined}
+              aria-label={group === 'all' ? t('search.groups.all') : undefined}
+            >
               {options.map((option, index) => {
                 if (option.group !== group) return null
                 const Icon = ICON[group]
@@ -60,7 +77,11 @@ export function SuggestionList({ id, options, active, query, onPick, onHover }: 
                     <Icon className="size-4 shrink-0 text-ink-subtle" aria-hidden />
                     <span className="min-w-0 flex-1">
                       <span className="block truncate">
-                        {group === 'all' ? t('search.searchFor', { query: option.label }) : <Highlight text={option.label} query={query} />}
+                        {group === 'all' ? (
+                          t('search.searchFor', { query: option.label })
+                        ) : (
+                          <Highlight text={option.label} query={query} />
+                        )}
                       </span>
                       {option.meta && <span className="block truncate text-xs text-ink-subtle">{option.meta}</span>}
                     </span>

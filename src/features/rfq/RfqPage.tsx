@@ -21,15 +21,28 @@ import { usePageTitle } from '@/shared/hooks/usePageTitle'
 import { RfqItemRow } from './RfqItemRow'
 import { rfqSchema, type RfqItemValues, type RfqValues } from './rfqSchema'
 
-const input = 'h-10 w-full rounded-[var(--radius-control)] border border-line-strong bg-surface px-3 text-sm aria-[invalid=true]:border-expired'
+const input =
+  'h-10 w-full rounded-[var(--radius-control)] border border-line-strong bg-surface px-3 text-sm aria-[invalid=true]:border-expired'
 const COUNTRIES = [...new Set(CITIES.map((c) => c.country))].sort()
 
 function itemFor(product: Product, lotId?: string | null, qty?: string | null): RfqItemValues {
   const lot = sellableLots(product).find((l) => l.id === lotId)
-  if (lot) return { productId: product.id, mode: 'lot', lotId: lot.id, quantity: qty ?? String(lotQuantityRule(lot).min) }
-  if (product.saleModes.includes('measure')) return { productId: product.id, mode: 'measure', lotId: sellableLots(product)[0]?.id ?? '', quantity: String(product.moq) }
+  if (lot)
+    return { productId: product.id, mode: 'lot', lotId: lot.id, quantity: qty ?? String(lotQuantityRule(lot).min) }
+  if (product.saleModes.includes('measure'))
+    return {
+      productId: product.id,
+      mode: 'measure',
+      lotId: sellableLots(product)[0]?.id ?? '',
+      quantity: String(product.moq),
+    }
   const first = sellableLots(product)[0]
-  return { productId: product.id, mode: 'lot', lotId: first?.id ?? '', quantity: String(first ? lotQuantityRule(first).min : 1) }
+  return {
+    productId: product.id,
+    mode: 'lot',
+    lotId: first?.id ?? '',
+    quantity: String(first ? lotQuantityRule(first).min : 1),
+  }
 }
 
 function fromDeal(deal: Deal, products: Product[]): RfqItemValues[] {
@@ -38,26 +51,65 @@ function fromDeal(deal: Deal, products: Product[]): RfqItemValues[] {
     if (!product) return []
     if (li.lot) {
       const lot = product.lots.find((l) => l.id === li.lot?.lotId && isSellable(l)) ?? sellableLots(product)[0]
-      if (lot) return [{ productId: product.id, mode: 'lot' as const, lotId: lot.id, quantity: String(Math.max(li.quantity, lotQuantityRule(lot).min)) }]
+      if (lot)
+        return [
+          {
+            productId: product.id,
+            mode: 'lot' as const,
+            lotId: lot.id,
+            quantity: String(Math.max(li.quantity, lotQuantityRule(lot).min)),
+          },
+        ]
     }
-    return product.saleModes.includes('measure') ? [{ productId: product.id, mode: 'measure' as const, lotId: '', quantity: String(Math.max(li.quantity, product.moq)) }] : []
+    return product.saleModes.includes('measure')
+      ? [
+          {
+            productId: product.id,
+            mode: 'measure' as const,
+            lotId: '',
+            quantity: String(Math.max(li.quantity, product.moq)),
+          },
+        ]
+      : []
   })
 }
 
-function RfqForm({ initial, products, producerFixed, reorderOf }: { initial: RfqValues; products: Product[]; producerFixed: boolean; reorderOf?: string }) {
+function RfqForm({
+  initial,
+  products,
+  producerFixed,
+  reorderOf,
+}: {
+  initial: RfqValues
+  products: Product[]
+  producerFixed: boolean
+  reorderOf?: string
+}) {
   const { t } = useTranslation()
   const fmt = useFormat()
   const navigate = useNavigate()
   const producers = useProducers()
   const { createQuote } = useDealMutations()
   const { producerId: ownProducerId } = useCompanyIds()
-  const resolver: Resolver<RfqValues> = (values, ctx, opts) => (zodResolver(rfqSchema(products, ownProducerId)) as unknown as Resolver<RfqValues>)(values, ctx, opts)
-  const { register, handleSubmit, control, setValue, formState } = useForm<RfqValues>({ defaultValues: initial, resolver })
+  const resolver: Resolver<RfqValues> = (values, ctx, opts) =>
+    (zodResolver(rfqSchema(products, ownProducerId)) as unknown as Resolver<RfqValues>)(values, ctx, opts)
+  const { register, handleSubmit, control, setValue, formState } = useForm<RfqValues>({
+    defaultValues: initial,
+    resolver,
+  })
   const items = useFieldArray({ control, name: 'items' })
   const values = useWatch({ control })
-  const producerProducts = useMemo(() => products.filter((p) => p.producerId === values.producerId && (p.saleModes.includes('measure') || sellableLots(p).length > 0)), [products, values.producerId])
+  const producerProducts = useMemo(
+    () =>
+      products.filter(
+        (p) => p.producerId === values.producerId && (p.saleModes.includes('measure') || sellableLots(p).length > 0),
+      ),
+    [products, values.producerId],
+  )
   const incoterms = useMemo(() => {
-    const chosen = (values.items ?? []).map((i) => products.find((p) => p.id === i.productId)).filter((p): p is Product => !!p)
+    const chosen = (values.items ?? [])
+      .map((i) => products.find((p) => p.id === i.productId))
+      .filter((p): p is Product => !!p)
     const sets = chosen.map((p) => p.logistics.incoterms)
     const all: Incoterm[] = ['EXW', 'FCA', 'DAP', 'DDP']
     return sets.length ? all.filter((i) => sets.every((s) => s.includes(i))) : all
@@ -84,8 +136,19 @@ function RfqForm({ initial, products, producerFixed, reorderOf }: { initial: Rfq
         createQuote.mutate(
           {
             producerId: v.producerId,
-            items: v.items.map((it) => ({ productId: it.productId, mode: it.mode, quantity: Number(it.quantity.replace(',', '.')), lotId: it.mode === 'lot' ? it.lotId : undefined })),
-            deliveryAddress: { street: v.street.trim(), postcode: v.postcode.trim(), city: v.city.trim(), region: '', country: v.country },
+            items: v.items.map((it) => ({
+              productId: it.productId,
+              mode: it.mode,
+              quantity: Number(it.quantity.replace(',', '.')),
+              lotId: it.mode === 'lot' ? it.lotId : undefined,
+            })),
+            deliveryAddress: {
+              street: v.street.trim(),
+              postcode: v.postcode.trim(),
+              city: v.city.trim(),
+              region: '',
+              country: v.country,
+            },
             incoterm: v.incoterm as Incoterm,
             requestedDeliveryDate: new Date(`${v.date}T12:00:00Z`).toISOString(),
             notes: v.notes.trim(),
@@ -93,7 +156,10 @@ function RfqForm({ initial, products, producerFixed, reorderOf }: { initial: Rfq
             reorderOf,
             lang: fmt.lang,
           },
-          { onSuccess: (deal) => navigate(`/deals/${deal.id}`, { state: { notice: t('rfq.created', { id: deal.id }) } }) },
+          {
+            onSuccess: (deal) =>
+              navigate(`/deals/${deal.id}`, { state: { notice: t('rfq.created', { id: deal.id }) } }),
+          },
         ),
       )}
       className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]"
@@ -115,11 +181,13 @@ function RfqForm({ initial, products, producerFixed, reorderOf }: { initial: Rfq
             className={input}
           >
             <option value="">{t('rfq.chooseProducer')}</option>
-            {(producers.data ?? []).filter((p) => p.id !== ownProducerId).map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.name} · {p.address.city}
-              </option>
-            ))}
+            {(producers.data ?? [])
+              .filter((p) => p.id !== ownProducerId)
+              .map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name} · {p.address.city}
+                </option>
+              ))}
           </select>
           {err('producerId') && <p className="text-xs text-expired">{t(err('producerId') as string)}</p>}
           <p className="text-xs text-ink-subtle">{t('rfq.oneProducer')}</p>
@@ -130,11 +198,29 @@ function RfqForm({ initial, products, producerFixed, reorderOf }: { initial: Rfq
           </h2>
           <ul className="flex flex-col gap-3">
             {items.fields.map((f, i) => (
-              <RfqItemRow key={f.id} index={i} products={producerProducts} control={control} register={register} setValue={setValue} errors={formState.errors} onRemove={items.fields.length > 1 ? () => items.remove(i) : undefined} />
+              <RfqItemRow
+                key={f.id}
+                index={i}
+                products={producerProducts}
+                control={control}
+                register={register}
+                setValue={setValue}
+                errors={formState.errors}
+                onRemove={items.fields.length > 1 ? () => items.remove(i) : undefined}
+              />
             ))}
           </ul>
-          {formState.errors.items?.message && <p className="text-xs text-expired">{t(formState.errors.items.message)}</p>}
-          <Button variant="secondary" size="sm" className="self-start" icon={<Plus className="size-4" aria-hidden />} disabled={!values.producerId || items.fields.length >= 10} onClick={() => items.append({ productId: '', mode: 'measure', lotId: '', quantity: '' })}>
+          {formState.errors.items?.message && (
+            <p className="text-xs text-expired">{t(formState.errors.items.message)}</p>
+          )}
+          <Button
+            variant="secondary"
+            size="sm"
+            className="self-start"
+            icon={<Plus className="size-4" aria-hidden />}
+            disabled={!values.producerId || items.fields.length >= 10}
+            onClick={() => items.append({ productId: '', mode: 'measure', lotId: '', quantity: '' })}
+          >
             {t('rfq.addItem')}
           </Button>
         </section>
@@ -144,9 +230,17 @@ function RfqForm({ initial, products, producerFixed, reorderOf }: { initial: Rfq
           </h2>
           <div className="grid gap-3 sm:grid-cols-2">
             {(['street', 'postcode', 'city'] as const).map((k) => (
-              <label key={k} className={`flex flex-col gap-1 text-xs font-medium text-ink-muted ${k === 'street' ? 'sm:col-span-2' : ''}`}>
+              <label
+                key={k}
+                className={`flex flex-col gap-1 text-xs font-medium text-ink-muted ${k === 'street' ? 'sm:col-span-2' : ''}`}
+              >
                 {t(`rfq.${k}`)}
-                <input {...register(k)} aria-invalid={!!err(k)} className={`${input} text-ink`} autoComplete={k === 'street' ? 'address-line1' : k === 'postcode' ? 'postal-code' : 'address-level2'} />
+                <input
+                  {...register(k)}
+                  aria-invalid={!!err(k)}
+                  className={`${input} text-ink`}
+                  autoComplete={k === 'street' ? 'address-line1' : k === 'postcode' ? 'postal-code' : 'address-level2'}
+                />
                 {err(k) && <span className="text-expired">{t(err(k) as string)}</span>}
               </label>
             ))}
@@ -173,7 +267,13 @@ function RfqForm({ initial, products, producerFixed, reorderOf }: { initial: Rfq
             </label>
             <label className="flex flex-col gap-1 text-xs font-medium text-ink-muted">
               {t('rfq.date')}
-              <input type="date" min={tomorrow} {...register('date')} aria-invalid={!!err('date')} className={`${input} text-ink`} />
+              <input
+                type="date"
+                min={tomorrow}
+                {...register('date')}
+                aria-invalid={!!err('date')}
+                className={`${input} text-ink`}
+              />
               {err('date') && <span className="text-expired">{t(err('date') as string)}</span>}
             </label>
           </div>
@@ -182,7 +282,13 @@ function RfqForm({ initial, products, producerFixed, reorderOf }: { initial: Rfq
           <h2 id="rfq-notes" className="text-lg font-semibold">
             {t('rfq.notesTitle')}
           </h2>
-          <textarea {...register('notes')} rows={4} placeholder={t('rfq.notesPlaceholder')} aria-label={t('rfq.notesTitle')} className="rounded-[var(--radius-control)] border border-line-strong bg-surface px-3 py-2 text-sm" />
+          <textarea
+            {...register('notes')}
+            rows={4}
+            placeholder={t('rfq.notesPlaceholder')}
+            aria-label={t('rfq.notesTitle')}
+            className="rounded-[var(--radius-control)] border border-line-strong bg-surface px-3 py-2 text-sm"
+          />
           {err('notes') && <p className="text-xs text-expired">{t(err('notes') as string)}</p>}
           <label className="flex flex-col gap-1 text-xs font-medium text-ink-muted">
             {t('rfq.attachments')}
@@ -190,17 +296,28 @@ function RfqForm({ initial, products, producerFixed, reorderOf }: { initial: Rfq
               type="file"
               multiple
               accept="image/*,.pdf,.dwg,.dxf,.step,.stp,.xlsx,.csv"
-              onChange={(e) => setValue('attachments', Array.from(e.target.files ?? []).map((f) => f.name).slice(0, 5))}
+              onChange={(e) =>
+                setValue(
+                  'attachments',
+                  Array.from(e.target.files ?? [])
+                    .map((f) => f.name)
+                    .slice(0, 5),
+                )
+              }
               className="text-sm text-ink file:me-3 file:h-9 file:rounded-[var(--radius-control)] file:border file:border-line-strong file:bg-surface file:px-3 file:text-sm"
             />
-            <span className="text-ink-subtle">{values.attachments?.length ? values.attachments.join(', ') : t('rfq.attachmentsHint')}</span>
+            <span className="text-ink-subtle">
+              {values.attachments?.length ? values.attachments.join(', ') : t('rfq.attachmentsHint')}
+            </span>
           </label>
         </section>
       </div>
       <aside className="flex flex-col gap-3 lg:sticky lg:top-[calc(var(--header-h,8rem)+1rem)] lg:self-start">
         <div className="flex flex-col gap-3 rounded-[var(--radius-card)] border-2 border-ink bg-surface p-4">
           <h2 className="text-lg font-semibold">{t('rfq.summary')}</h2>
-          <p className="text-sm text-ink-muted">{t('rfq.itemCount', { count: values.items?.filter((i) => i.productId).length ?? 0 })}</p>
+          <p className="text-sm text-ink-muted">
+            {t('rfq.itemCount', { count: values.items?.filter((i) => i.productId).length ?? 0 })}
+          </p>
           {totals.map(([currency, amount]) => (
             <p key={currency} className="flex items-baseline justify-between text-sm">
               <span className="text-ink-muted">{t('rfq.indicative')}</span>
@@ -215,7 +332,12 @@ function RfqForm({ initial, products, producerFixed, reorderOf }: { initial: Rfq
               {createQuote.error.message}
             </p>
           )}
-          <Button type="submit" size="lg" disabled={createQuote.isPending} icon={<FileSignature className="size-4" aria-hidden />}>
+          <Button
+            type="submit"
+            size="lg"
+            disabled={createQuote.isPending}
+            icon={<FileSignature className="size-4" aria-hidden />}
+          >
             {createQuote.isPending ? t('rfq.sending') : t('rfq.submit')}
           </Button>
           <p className="text-xs text-ink-muted">{t('rfq.afterSubmit')}</p>
@@ -226,11 +348,31 @@ function RfqForm({ initial, products, producerFixed, reorderOf }: { initial: Rfq
 }
 
 /** Form defaults from the URL: a reorder, a product (and lot), or a producer. Never pre-selects the company's own producer. */
-function initialValues({ params, products, buyer, deal, ownProducerId, reorderNote }: { params: URLSearchParams; products: Product[]; buyer?: Buyer; deal?: Deal; ownProducerId: string; reorderNote: (id: string) => string }) {
+function initialValues({
+  params,
+  products,
+  buyer,
+  deal,
+  ownProducerId,
+  reorderNote,
+}: {
+  params: URLSearchParams
+  products: Product[]
+  buyer?: Buyer
+  deal?: Deal
+  ownProducerId: string
+  reorderNote: (id: string) => string
+}) {
   const product = products.find((p) => p.id === params.get('product'))
   const requested = deal?.producerId ?? product?.producerId ?? params.get('producer') ?? ''
   const own = requested === ownProducerId
-  const items = own ? [] : deal ? fromDeal(deal, products) : product ? [itemFor(product, params.get('lot'), params.get('lots'))] : []
+  const items = own
+    ? []
+    : deal
+      ? fromDeal(deal, products)
+      : product
+        ? [itemFor(product, params.get('lot'), params.get('lots'))]
+        : []
   const address = deal?.deliveryAddress ?? buyer?.address
   const values: RfqValues = {
     producerId: own ? '' : requested,
@@ -239,7 +381,9 @@ function initialValues({ params, products, buyer, deal, ownProducerId, reorderNo
     postcode: address?.postcode ?? '',
     city: address?.city ?? '',
     country: address?.country ?? 'RO',
-    incoterm: deal?.incoterm ?? (product?.logistics.incoterms.includes('DAP') ? 'DAP' : (product?.logistics.incoterms[0] ?? 'DAP')),
+    incoterm:
+      deal?.incoterm ??
+      (product?.logistics.incoterms.includes('DAP') ? 'DAP' : (product?.logistics.incoterms[0] ?? 'DAP')),
     date: new Date(liveNow().getTime() + 14 * 86_400_000).toISOString().slice(0, 10),
     notes: deal ? reorderNote(deal.id) : '',
     attachments: [],
@@ -263,7 +407,17 @@ function RfqLoader() {
   const reorder = useDeal(reorderId)
   const ready = !!products.data && !!buyers.data && !(reorderId && reorder.isPending)
   const initial = useMemo(
-    () => (ready && products.data && buyers.data ? initialValues({ params, products: products.data, buyer: buyers.data.find((b) => b.id === buyerId), deal: reorder.data, ownProducerId, reorderNote: (id) => t('rfq.reorderNote', { id }) }) : null),
+    () =>
+      ready && products.data && buyers.data
+        ? initialValues({
+            params,
+            products: products.data,
+            buyer: buyers.data.find((b) => b.id === buyerId),
+            deal: reorder.data,
+            ownProducerId,
+            reorderNote: (id) => t('rfq.reorderNote', { id }),
+          })
+        : null,
     [ready, products.data, buyers.data, reorder.data, params, buyerId, ownProducerId, t],
   )
 
@@ -271,9 +425,17 @@ function RfqLoader() {
 
   return (
     <div className="mx-auto flex max-w-[90rem] flex-col gap-5 px-4 py-6 lg:px-6">
-      <Breadcrumbs items={[{ label: t('nav.home'), to: '/' }, { label: t('pages.deals'), to: '/deals' }, { label: t('pages.rfq') }]} />
+      <Breadcrumbs
+        items={[
+          { label: t('nav.home'), to: '/' },
+          { label: t('pages.deals'), to: '/deals' },
+          { label: t('pages.rfq') },
+        ]}
+      />
       <div>
-        <h1 className="text-3xl font-semibold">{reorderId ? t('rfq.reorderTitle', { id: reorderId }) : t('pages.rfq')}</h1>
+        <h1 className="text-3xl font-semibold">
+          {reorderId ? t('rfq.reorderTitle', { id: reorderId }) : t('pages.rfq')}
+        </h1>
         <p className="text-sm text-ink-muted">{t('rfq.subtitle')}</p>
       </div>
       {!initial || !products.data ? (
@@ -281,7 +443,12 @@ function RfqLoader() {
           <Skeleton className="h-96" />
         </LoadingRegion>
       ) : (
-        <RfqForm initial={initial.values} products={products.data} producerFixed={initial.fixed} reorderOf={reorderId || undefined} />
+        <RfqForm
+          initial={initial.values}
+          products={products.data}
+          producerFixed={initial.fixed}
+          reorderOf={reorderId || undefined}
+        />
       )}
     </div>
   )

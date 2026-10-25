@@ -16,11 +16,19 @@ export function VolumeChart({ data, label }: { data: { quarter: string; volumeEU
     <figure className="flex flex-col gap-1">
       <figcaption className="flex items-baseline justify-between gap-2 text-xs text-ink-muted">
         <span className="min-w-0 truncate">{label}</span>
-        <span className="shrink-0 font-medium text-ink tabular" aria-live="polite">
-          {shown ? `${quarter(shown.quarter)}: ${format(values[active as number] ?? 0, display, { compact: true })}` : <span className="font-normal text-ink-muted">{t('partners.chartHint')}</span>}
+        <span className="tabular shrink-0 font-medium text-ink" aria-live="polite">
+          {shown ? (
+            `${quarter(shown.quarter)}: ${format(values[active as number] ?? 0, display, { compact: true })}`
+          ) : (
+            <span className="font-normal text-ink-muted">{t('partners.chartHint')}</span>
+          )}
         </span>
       </figcaption>
-      <div className="flex h-16 items-end gap-0.5 border-b border-line-strong" aria-hidden onMouseLeave={() => setActive(null)}>
+      <div
+        className="flex h-16 items-end gap-0.5 border-b border-line-strong"
+        aria-hidden
+        onMouseLeave={() => setActive(null)}
+      >
         {data.map((d, i) => {
           const v = values[i] ?? 0
           return (

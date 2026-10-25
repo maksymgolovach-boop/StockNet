@@ -7,7 +7,10 @@ import { persistLot, persistSaleModes } from '@/mocks/lotStorage'
 import { liveNow } from '@/shared/lib/dates'
 import { ApiError, NotFoundError, mockRequest } from './client'
 
-export interface LotInput extends Omit<Lot, 'id' | 'producerId' | 'reservedCount' | 'createdAt' | 'updatedAt' | 'documents' | 'location'> {
+export interface LotInput extends Omit<
+  Lot,
+  'id' | 'producerId' | 'reservedCount' | 'createdAt' | 'updatedAt' | 'documents' | 'location'
+> {
   cityId: string
   warehouseLabel: string
   certificateFile?: string
@@ -43,7 +46,12 @@ function commit(product: Product, lot: Lot) {
   syncLotOnlyFields(db.products)
 }
 
-function documentsFor(lot: Pick<Lot, 'id' | 'lotNumber' | 'productionDate'>, file: string | undefined, issuer: string, previous: Document[]): Document[] {
+function documentsFor(
+  lot: Pick<Lot, 'id' | 'lotNumber' | 'productionDate'>,
+  file: string | undefined,
+  issuer: string,
+  previous: Document[],
+): Document[] {
   if (!file) return previous.filter((d) => d.type !== 'mill_test_certificate')
   const kept = previous.filter((d) => d.type !== 'mill_test_certificate')
   return [
@@ -77,7 +85,12 @@ function build(producerId: string, product: Product, input: LotInput, id: string
     id,
     producerId,
     reservedCount: previous?.reservedCount ?? 0,
-    documents: documentsFor({ id, lotNumber: input.lotNumber, productionDate: input.productionDate }, certificateFile, producer?.name ?? '', previous?.documents ?? []),
+    documents: documentsFor(
+      { id, lotNumber: input.lotNumber, productionDate: input.productionDate },
+      certificateFile,
+      producer?.name ?? '',
+      previous?.documents ?? [],
+    ),
     location: { label: warehouseLabel, city: city.name, country: city.country, point: city.point },
     createdAt: previous?.createdAt ?? at,
     updatedAt: at,
@@ -92,7 +105,20 @@ export const lotService = {
     mockRequest((): ProducerLotRow[] =>
       db.products
         .filter((p) => p.producerId === producerId)
-        .flatMap((p) => p.lots.map((lot) => ({ product: { id: p.id, name: p.name, categorySlug: p.categorySlug, unit: p.unit, saleModes: p.saleModes, pricing: p.pricing, contentLang: p.contentLang }, lot })))
+        .flatMap((p) =>
+          p.lots.map((lot) => ({
+            product: {
+              id: p.id,
+              name: p.name,
+              categorySlug: p.categorySlug,
+              unit: p.unit,
+              saleModes: p.saleModes,
+              pricing: p.pricing,
+              contentLang: p.contentLang,
+            },
+            lot,
+          })),
+        )
         .sort((a, b) => b.lot.updatedAt.localeCompare(a.lot.updatedAt)),
     ),
   producerProducts: (producerId: string) => mockRequest(() => db.products.filter((p) => p.producerId === producerId)),
@@ -117,26 +143,41 @@ export const lotService = {
     mockRequest(() => {
       const { product, lot: source } = findLot(producerId, lotId)
       const at = liveNow().toISOString()
-      const lot: Lot = { ...structuredClone(source), id: newId(product.id), lotNumber: `${source.lotNumber}-C`, reservedCount: 0, status: 'paused', documents: [], createdAt: at, updatedAt: at }
+      const lot: Lot = {
+        ...structuredClone(source),
+        id: newId(product.id),
+        lotNumber: `${source.lotNumber}-C`,
+        reservedCount: 0,
+        status: 'paused',
+        documents: [],
+        createdAt: at,
+        updatedAt: at,
+      }
       product.lots.push(lot)
       commit(product, lot)
       return lot
     }),
   setStock: (producerId: string, lotId: string, stockCount: number) =>
-    mockRequest(() => {
-      const { product, lot } = findLot(producerId, lotId)
-      if (stockCount < lot.reservedCount) throw new ApiError('Stock cannot go below reserved lots', 422)
-      lot.stockCount = Math.max(0, Math.round(stockCount))
-      lot.updatedAt = liveNow().toISOString()
-      commit(product, lot)
-      return lot
-    }, { latencyFactor: 0.4 }),
+    mockRequest(
+      () => {
+        const { product, lot } = findLot(producerId, lotId)
+        if (stockCount < lot.reservedCount) throw new ApiError('Stock cannot go below reserved lots', 422)
+        lot.stockCount = Math.max(0, Math.round(stockCount))
+        lot.updatedAt = liveNow().toISOString()
+        commit(product, lot)
+        return lot
+      },
+      { latencyFactor: 0.4 },
+    ),
   setStatus: (producerId: string, lotId: string, status: LotRecordStatus) =>
-    mockRequest(() => {
-      const { product, lot } = findLot(producerId, lotId)
-      lot.status = status
-      lot.updatedAt = liveNow().toISOString()
-      commit(product, lot)
-      return lot
-    }, { latencyFactor: 0.4 }),
+    mockRequest(
+      () => {
+        const { product, lot } = findLot(producerId, lotId)
+        lot.status = status
+        lot.updatedAt = liveNow().toISOString()
+        commit(product, lot)
+        return lot
+      },
+      { latencyFactor: 0.4 },
+    ),
 }
