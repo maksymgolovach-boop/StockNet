@@ -3,6 +3,7 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Loader2, Search } from 'lucide-react'
 import { cn } from '@/shared/lib/cn'
+import { useValueChange } from '@/shared/hooks/useValueChange'
 import { useSearchHistory } from './searchHistoryStore'
 import { useSuggestionOptions, type SuggestionOption } from './useSuggestionOptions'
 import { SuggestionList } from './SuggestionList'
@@ -28,8 +29,8 @@ export function SearchBox({ size = 'md', className, shortcut = false }: SearchBo
   const addRecent = useSearchHistory((s) => s.add)
   const { options, loading } = useSuggestionOptions(value)
 
-  useEffect(() => setValue(urlQuery), [urlQuery, pathname])
-  useEffect(() => setActive(-1), [options])
+  useValueChange(`${pathname}?${urlQuery}`, () => setValue(urlQuery))
+  useValueChange(options, () => setActive(-1))
 
   useEffect(() => {
     if (!shortcut) return

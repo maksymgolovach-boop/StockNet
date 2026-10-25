@@ -2,10 +2,9 @@ import { useId } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useFormat } from '@/features/i18n/useFormat'
 import { LocationPicker } from '@/features/settings/LocationPicker'
+import { RADIUS_STEPS } from '../radius'
 import type { FiltersApi } from '../useFilters'
 
-/** Radius steps for the slider; index 0 = any distance. */
-export const RADIUS_STEPS = [0, 5, 10, 25, 50, 100, 150, 250, 350, 500, 750, 1000]
 
 export function LocationFilter({ api }: { api: FiltersApi }) {
   const { t } = useTranslation()

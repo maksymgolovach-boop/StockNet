@@ -2,7 +2,8 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import type { Deal } from '@/types/models'
 import { useCurrency } from '@/features/currency/useCurrency'
-import { LotRef, useLineItemText } from './LineItemQuantity'
+import { LotRef } from './LineItemQuantity'
+import { useLineItemText } from './useLineItemText'
 
 export function LineItemsTable({ deal }: { deal: Deal }) {
   const { t } = useTranslation()

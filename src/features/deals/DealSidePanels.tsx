@@ -4,14 +4,14 @@ import { FileText, MessageSquare, Paperclip } from 'lucide-react'
 import type { Deal } from '@/types/models'
 import { useFormat } from '@/features/i18n/useFormat'
 import { Badge } from '@/shared/ui/Badge'
-import { buttonClass } from '@/shared/ui/Button'
+import { buttonClass } from '@/shared/ui/buttonClass'
 
 export function DealDetails({ deal }: { deal: Deal }) {
   const { t } = useTranslation()
   const fmt = useFormat()
   const a = deal.deliveryAddress
   const rows: [string, React.ReactNode][] = [
-    [t('dealDetail.incoterm'), <span className="font-mono">{deal.incoterm}</span>],
+    [t('dealDetail.incoterm'), <span key="incoterm" className="font-mono">{deal.incoterm}</span>],
     [t('dealDetail.currency'), deal.currency],
     [t('dealDetail.address'), `${a.street}, ${a.postcode} ${a.city}, ${fmt.region(a.country)}`],
     [t('dealDetail.requested'), fmt.date(deal.requestedDeliveryDate, { dateStyle: 'long' })],
@@ -19,7 +19,7 @@ export function DealDetails({ deal }: { deal: Deal }) {
   if (deal.deliveredAt)
     rows.push([
       t('dealDetail.delivered'),
-      <span className="flex flex-wrap items-center gap-2">
+      <span key="delivered" className="flex flex-wrap items-center gap-2">
         {fmt.date(deal.deliveredAt, { dateStyle: 'long' })}
         {deal.onTime !== undefined && <Badge tone={deal.onTime ? 'verified' : 'expiring'}>{t(deal.onTime ? 'dealDetail.onTime' : 'dealDetail.late')}</Badge>}
       </span>,
@@ -27,7 +27,7 @@ export function DealDetails({ deal }: { deal: Deal }) {
   if (deal.reorderOf)
     rows.push([
       t('dealDetail.reorderOf'),
-      <Link to={`/deals/${deal.reorderOf}`} className="font-mono text-primary hover:underline">
+      <Link key="reorder" to={`/deals/${deal.reorderOf}`} className="font-mono text-primary hover:underline">
         {deal.reorderOf}
       </Link>,
     ])

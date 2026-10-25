@@ -11,7 +11,7 @@ import { useLotFormat } from '@/features/lots/useLotFormat'
 import { useIsOwnProducer } from '@/features/dev/devStore'
 import { useSaved } from '@/features/saved/savedStore'
 import { VerificationBadge } from '@/features/trust/VerificationBadge'
-import { buttonClass } from '@/shared/ui/Button'
+import { buttonClass } from '@/shared/ui/buttonClass'
 import { cn } from '@/shared/lib/cn'
 import { useMapUi } from './mapUiStore'
 

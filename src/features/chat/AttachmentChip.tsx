@@ -6,7 +6,7 @@ import { cn } from '@/shared/lib/cn'
 
 const ICON = { image: FileImage, pdf: FileText, drawing: PencilRuler, spreadsheet: FileSpreadsheet }
 
-export function formatSize(kb: number, fmt: ReturnType<typeof useFormat>) {
+function formatSize(kb: number, fmt: ReturnType<typeof useFormat>) {
   return kb >= 1024 ? `${fmt.number(kb / 1024, { maximumFractionDigits: 1 })} MB` : `${fmt.number(Math.max(1, Math.round(kb)))} KB`
 }
 

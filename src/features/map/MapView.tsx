@@ -57,6 +57,7 @@ const markerIds = new WeakMap<L.Marker, string>()
 const toBounds = (b: L.LatLngBounds): GeoBounds => ({ north: b.getNorth(), south: b.getSouth(), east: b.getEast(), west: b.getWest() })
 
 export default function MapView(props: MapViewProps) {
+  const { pins, fitKey, dataReady, pinText, labels, popups, renderPopup, initialView, ref, userLocation, radiusKm } = props
   const elRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<L.Map | null>(null)
   const clusterRef = useRef<L.MarkerClusterGroup | null>(null)
@@ -68,7 +69,7 @@ export default function MapView(props: MapViewProps) {
   const userMoved = useRef(false)
   /** once the user pans or zooms, new searches no longer move the map */
   const userControlled = useRef(false)
-  const fitted = useRef<string | null>(props.initialView ? props.fitKey : null)
+  const fitted = useRef<string | null>(initialView ? fitKey : null)
   const popupId = useRef<string | null>(null)
   const [tilesFailed, setTilesFailed] = useState(false)
   const popupEl = useMemo(() => document.createElement('div'), [])
@@ -152,7 +153,7 @@ export default function MapView(props: MapViewProps) {
       } else programmatic.current = false
     })
 
-  useImperativeHandle(props.ref, () => ({
+  useImperativeHandle(ref, () => ({
     flyTo: (p, zoom = 10) => move((map) => map.flyTo([p.lat, p.lng], zoom, { duration: 0.6 })),
     zoomOut: () => mapRef.current?.zoomOut(2),
     fitAll: () => {
@@ -234,7 +235,7 @@ export default function MapView(props: MapViewProps) {
       map.remove()
       mapRef.current = null
     }
-  }, [])
+  }, [popup])
 
   useEffect(() => {
     const cluster = clusterRef.current
@@ -242,8 +243,8 @@ export default function MapView(props: MapViewProps) {
     cluster.clearLayers()
     markers.current.clear()
     iconKeys.current.clear()
-    pinById.current = new Map(props.pins.map((p) => [p.producerId, p]))
-    const list = props.pins.map((pin) => {
+    pinById.current = new Map(pins.map((p) => [p.producerId, p]))
+    const list = pins.map((pin) => {
       const id = pin.producerId
       const c = content(id) as PinContent
       iconKeys.current.set(id, pinKey(c))
@@ -270,16 +271,16 @@ export default function MapView(props: MapViewProps) {
       return m
     })
     cluster.addLayers(list)
-  }, [props.pins])
+  }, [pins])
 
   useEffect(() => {
-    if (props.dataReady && fitted.current !== props.fitKey) {
-      fitted.current = props.fitKey
+    if (dataReady && fitted.current !== fitKey) {
+      fitted.current = fitKey
       if (!userControlled.current) fitAll()
     }
-  }, [props.fitKey, props.dataReady, props.pins])
+  }, [fitKey, dataReady, pins])
 
-  useEffect(refreshAll, [props.pinText])
+  useEffect(refreshAll, [pinText])
 
   useEffect(() => {
     const map = mapRef.current
@@ -302,10 +303,9 @@ export default function MapView(props: MapViewProps) {
       }),
     )
     return () => document.removeEventListener('keydown', onKey)
-  }, [selectedId, props.pins])
+  }, [selectedId, pins, popup])
 
 
-  const { userLocation, radiusKm } = props
   useEffect(() => {
     const map = mapRef.current
     if (!map) return
@@ -371,16 +371,16 @@ export default function MapView(props: MapViewProps) {
     [],
   )
 
-  const selectedPin = selectedId ? props.pins.find((p) => p.producerId === selectedId) : undefined
+  const selectedPin = selectedId ? pins.find((p) => p.producerId === selectedId) : undefined
   return (
     <div className={cn('relative h-full w-full', tilesFailed && 'tiles-failed')}>
       <div ref={elRef} className="sy-map h-full w-full" />
       {tilesFailed && (
         <p role="status" className="absolute bottom-8 start-3 z-[450] max-w-xs rounded-md border border-line bg-surface/95 px-3 py-2 text-xs text-ink-muted shadow-pop">
-          {props.labels.tilesFailed}
+          {labels.tilesFailed}
         </p>
       )}
-      {props.popups && selectedPin && createPortal(props.renderPopup(selectedPin), popupEl)}
+      {popups && selectedPin && createPortal(renderPopup(selectedPin), popupEl)}
     </div>
   )
 }

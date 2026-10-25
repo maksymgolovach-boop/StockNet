@@ -1,6 +1,7 @@
-import { useEffect, useId, useState, type ReactNode } from 'react'
+import { useId, useState, type ReactNode } from 'react'
 import { ChevronDown } from 'lucide-react'
 import { cn } from '@/shared/lib/cn'
+import { useValueChange } from '@/shared/hooks/useValueChange'
 
 export function Checkbox({ checked, onChange, label, meta, disabled }: { checked: boolean; onChange: (v: boolean) => void; label: ReactNode; meta?: ReactNode; disabled?: boolean }) {
   return (
@@ -61,8 +62,8 @@ export function RangeInputs({ min, max, onCommit, minLabel, maxLabel, suffix, st
   const id = useId()
   const [lo, setLo] = useState(min?.toString() ?? '')
   const [hi, setHi] = useState(max?.toString() ?? '')
-  useEffect(() => setLo(min?.toString() ?? ''), [min])
-  useEffect(() => setHi(max?.toString() ?? ''), [max])
+  useValueChange(min, (v) => setLo(v?.toString() ?? ''))
+  useValueChange(max, (v) => setHi(v?.toString() ?? ''))
   const parse = (s: string) => (s.trim() === '' || !Number.isFinite(Number(s.replace(',', '.'))) ? undefined : Number(s.replace(',', '.')))
   const commit = () => {
     const a = parse(lo)
@@ -122,7 +123,7 @@ export function FilterSection({ title, children, defaultOpen = true, count }: { 
 export function NumberField({ value, onCommit, label, suffix }: { value?: number; onCommit: (v: number | undefined) => void; label: string; suffix?: string }) {
   const id = useId()
   const [text, setText] = useState(value?.toString() ?? '')
-  useEffect(() => setText(value?.toString() ?? ''), [value])
+  useValueChange(value, (v) => setText(v?.toString() ?? ''))
   const commit = () => {
     const n = text.trim() === '' ? undefined : Number(text.replace(',', '.'))
     const next = n !== undefined && Number.isFinite(n) ? n : undefined

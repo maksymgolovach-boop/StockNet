@@ -12,7 +12,7 @@ import { LotConditionBadge } from '../LotBadge'
 import { availableLots, lotStatus } from '../lotMath'
 import { useLotFormat } from '../useLotFormat'
 
-export const STATUS_TONE: Record<LotStatus, BadgeTone> = { available: 'verified', reserved: 'expiring', sold: 'neutral', expired: 'expired', paused: 'unverified', archived: 'neutral' }
+const STATUS_TONE: Record<LotStatus, BadgeTone> = { available: 'verified', reserved: 'expiring', sold: 'neutral', expired: 'expired', paused: 'unverified', archived: 'neutral' }
 
 interface Props {
   rows: ProducerLotRow[]

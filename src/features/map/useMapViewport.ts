@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState, type RefObject } from 'react'
+import { useCallback, useLayoutEffect, useRef, useState, type RefObject } from 'react'
 import type { FiltersApi } from '@/features/search/useFilters'
 import type { MapHandle, ViewportEvent } from './MapView'
 
@@ -13,7 +13,9 @@ export function useMapViewport(api: FiltersApi, handle: RefObject<MapHandle | nu
   const [moved, setMoved] = useState(false)
   const [visiblePins, setVisiblePins] = useState<number | null>(null)
   const latest = useRef(api)
-  latest.current = api
+  useLayoutEffect(() => {
+    latest.current = api
+  })
 
   const onViewport = useCallback((e: ViewportEvent) => {
     const { map, setMap } = latest.current

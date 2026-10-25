@@ -17,6 +17,7 @@ import { EmptyState, ErrorState, LoadingRegion, Skeleton } from '@/shared/ui/sta
 import { cn } from '@/shared/lib/cn'
 import { now } from '@/shared/lib/dates'
 import { usePageTitle } from '@/shared/hooks/usePageTitle'
+import { useValueChange } from '@/shared/hooks/useValueChange'
 import { availableLots, lotStatus } from '../lotMath'
 import { LotForm } from './LotForm'
 import { StockTable } from './StockTable'
@@ -43,16 +44,16 @@ export function StockPage() {
   const [status, setStatus] = useState<LotStatus | 'all'>('all')
   const [productFilter, setProductFilter] = useState('')
   const [editing, setEditing] = useState<ProducerLotRow | null>(null)
-  const [creatingFor, setCreatingFor] = useState<string | null>(null)
+  const [creatingFor, setCreatingFor] = useState<string | null>(() => params.get('new'))
   const [notice, setNotice] = useState('')
   const busyId = (m.setStock.isPending && m.setStock.variables?.lotId) || (m.setStatus.isPending && m.setStatus.variables?.lotId) || (m.duplicate.isPending && m.duplicate.variables) || undefined
 
   usePageTitle(t('lots.stock.title'))
 
   const requestedNew = params.get('new')
+  useValueChange(requestedNew, (id) => id !== null && setCreatingFor(id))
   useEffect(() => {
     if (requestedNew === null) return
-    setCreatingFor(requestedNew)
     setParams((prev) => {
       const next = new URLSearchParams(prev)
       next.delete('new')
@@ -60,7 +61,7 @@ export function StockPage() {
     }, { replace: true })
   }, [requestedNew, setParams])
 
-  const rows = lots.data ?? []
+  const rows = useMemo(() => lots.data ?? [], [lots.data])
   const counts = useMemo(() => {
     const c: Record<string, number> = { all: rows.length }
     for (const r of rows) c[lotStatus(r.lot)] = (c[lotStatus(r.lot)] ?? 0) + 1

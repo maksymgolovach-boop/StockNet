@@ -15,14 +15,14 @@ export function Popover({ trigger, children, label, width = 360, className }: Po
   const id = useId()
   const [open, setOpen] = useState(false)
   const [pos, setPos] = useState<{ left: number; top: number } | null>(null)
-  const anchor = useRef<HTMLButtonElement | null>(null)
+  const [anchor, setAnchor] = useState<HTMLButtonElement | null>(null)
   const panel = useRef<HTMLDivElement>(null)
 
   useLayoutEffect(() => {
-    if (!open || !anchor.current || !panel.current) return
+    if (!open || !anchor || !panel.current) return
     const place = () => {
-      if (!anchor.current || !panel.current) return
-      const a = anchor.current.getBoundingClientRect()
+      if (!panel.current) return
+      const a = anchor.getBoundingClientRect()
       const h = panel.current.offsetHeight
       const w = Math.min(width, innerWidth - 16)
       const below = a.bottom + 8 + h <= innerHeight || a.top - 8 - h < 0
@@ -35,7 +35,7 @@ export function Popover({ trigger, children, label, width = 360, className }: Po
       removeEventListener('resize', place)
       removeEventListener('scroll', place, true)
     }
-  }, [open, width])
+  }, [open, width, anchor])
 
   useEffect(() => {
     if (!open) return
@@ -43,11 +43,11 @@ export function Popover({ trigger, children, label, width = 360, className }: Po
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== 'Escape') return
       setOpen(false)
-      anchor.current?.focus()
+      anchor?.focus()
     }
     const onDown = (e: MouseEvent) => {
       const t = e.target as Node
-      if (!panel.current?.contains(t) && !anchor.current?.contains(t)) setOpen(false)
+      if (!panel.current?.contains(t) && !anchor?.contains(t)) setOpen(false)
     }
     document.addEventListener('keydown', onKey)
     document.addEventListener('mousedown', onDown)
@@ -55,11 +55,11 @@ export function Popover({ trigger, children, label, width = 360, className }: Po
       document.removeEventListener('keydown', onKey)
       document.removeEventListener('mousedown', onDown)
     }
-  }, [open])
+  }, [open, anchor])
 
   return (
     <>
-      {trigger({ open, toggle: () => setOpen((o) => !o), id, ref: (el) => (anchor.current = el) })}
+      {trigger({ open, toggle: () => setOpen((o) => !o), id, ref: setAnchor })}
       {open &&
         createPortal(
           <div

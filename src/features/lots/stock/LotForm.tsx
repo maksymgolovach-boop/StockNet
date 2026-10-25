@@ -1,4 +1,4 @@
-import { useMemo, type ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { useFieldArray, useForm, useWatch, type Resolver } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslation } from 'react-i18next'
@@ -59,6 +59,24 @@ interface Props {
   formId: string
 }
 
+/** Lot size in the listing unit and the price per unit, shown live while the producer fills the form. */
+function lotPreview(product: Product, v: Partial<Pick<LotFormValues, 'contentQty' | 'contentUnit' | 'itemQty' | 'itemUnit' | 'weightKg' | 'volumeM3' | 'pricePerLot'>>) {
+  const num = (s?: string) => Number((s ?? '').replace(',', '.'))
+  const q = num(v.contentQty)
+  if (!(q > 0)) return null
+  const price = num(v.pricePerLot)
+  const iq = num(v.itemQty)
+  const m = lotMeasure(
+    {
+      content: { quantity: q, unit: (v.contentUnit || 'piece') as UnitCode, itemSize: iq > 0 && v.itemUnit ? { quantity: iq, unit: v.itemUnit as UnitCode } : undefined },
+      totalWeightKg: Number(v.weightKg) || undefined,
+      totalVolumeM3: Number(v.volumeM3) || undefined,
+    },
+    product.unit,
+  )
+  return { m, perUnit: price > 0 && m.quantity > 0 ? price / m.quantity : null }
+}
+
 export function LotForm({ products, initial, editing, submitting, onSubmit, formId }: Props) {
   const { t } = useTranslation()
   const fmt = useFormat()
@@ -84,23 +102,8 @@ export function LotForm({ products, initial, editing, submitting, onSubmit, form
     return (node as { message?: string } | undefined)?.message
   }
   const a11y = (name: string) => ({ id: `${formId}-${name}`, 'aria-invalid': !!err(name), 'aria-describedby': err(name) ? `${formId}-${name}-err` : undefined })
-  const contentUnits = useMemo(() => [...new Set([...COUNT, ...(config?.allowedUnits ?? [])])], [config])
-  const preview = useMemo(() => {
-    if (!product) return null
-    const q = Number((v.contentQty ?? '').replace(',', '.'))
-    const price = Number((v.pricePerLot ?? '').replace(',', '.'))
-    if (!(q > 0)) return null
-    const iq = Number((v.itemQty ?? '').replace(',', '.'))
-    const m = lotMeasure(
-      {
-        content: { quantity: q, unit: (v.contentUnit || 'piece') as UnitCode, itemSize: iq > 0 && v.itemUnit ? { quantity: iq, unit: v.itemUnit as UnitCode } : undefined },
-        totalWeightKg: Number(v.weightKg) || undefined,
-        totalVolumeM3: Number(v.volumeM3) || undefined,
-      },
-      product.unit,
-    )
-    return { m, perUnit: price > 0 && m.quantity > 0 ? price / m.quantity : null }
-  }, [product, v.contentQty, v.contentUnit, v.itemQty, v.itemUnit, v.weightKg, v.volumeM3, v.pricePerLot])
+  const contentUnits = [...new Set([...COUNT, ...(config?.allowedUnits ?? [])])]
+  const preview = product ? lotPreview(product, v) : null
 
   return (
     <form id={formId} noValidate onSubmit={handleSubmit((values) => onSubmit(toLotInput(values)))} className="flex flex-col gap-5" aria-busy={submitting}>

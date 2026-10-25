@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useFieldArray, useForm, useWatch, type Resolver } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslation } from 'react-i18next'
 import { FileSignature, Plus } from 'lucide-react'
-import type { Deal, Incoterm, Product } from '@/types/models'
+import type { Buyer, Deal, Incoterm, Product } from '@/types/models'
 import { Price } from '@/features/currency/Price'
 import { useCompanyIds } from '@/features/dev/devStore'
 import { useDeal, useDealMutations } from '@/features/deals/useDeals'
@@ -225,6 +225,28 @@ function RfqForm({ initial, products, producerFixed, reorderOf }: { initial: Rfq
   )
 }
 
+/** Form defaults from the URL: a reorder, a product (and lot), or a producer. Never pre-selects the company's own producer. */
+function initialValues({ params, products, buyer, deal, ownProducerId, reorderNote }: { params: URLSearchParams; products: Product[]; buyer?: Buyer; deal?: Deal; ownProducerId: string; reorderNote: (id: string) => string }) {
+  const product = products.find((p) => p.id === params.get('product'))
+  const requested = deal?.producerId ?? product?.producerId ?? params.get('producer') ?? ''
+  const own = requested === ownProducerId
+  const items = own ? [] : deal ? fromDeal(deal, products) : product ? [itemFor(product, params.get('lot'), params.get('lots'))] : []
+  const address = deal?.deliveryAddress ?? buyer?.address
+  const values: RfqValues = {
+    producerId: own ? '' : requested,
+    items: items.length ? items : [{ productId: '', mode: 'measure', lotId: '', quantity: '' }],
+    street: address?.street ?? '',
+    postcode: address?.postcode ?? '',
+    city: address?.city ?? '',
+    country: address?.country ?? 'RO',
+    incoterm: deal?.incoterm ?? (product?.logistics.incoterms.includes('DAP') ? 'DAP' : (product?.logistics.incoterms[0] ?? 'DAP')),
+    date: new Date(liveNow().getTime() + 14 * 86_400_000).toISOString().slice(0, 10),
+    notes: deal ? reorderNote(deal.id) : '',
+    attachments: [],
+  }
+  return { values, fixed: !own && !!(deal || product) }
+}
+
 /** Remounts the form when the URL changes (e.g. another product's "Request quote"), so it never keeps stale values. */
 export function RfqPage() {
   const [params] = useSearchParams()
@@ -239,38 +261,13 @@ function RfqLoader() {
   const buyers = useBuyers()
   const reorderId = params.get('reorder') ?? ''
   const reorder = useDeal(reorderId)
-  const [initial, setInitial] = useState<{ values: RfqValues; fixed: boolean } | null>(null)
+  const ready = !!products.data && !!buyers.data && !(reorderId && reorder.isPending)
+  const initial = useMemo(
+    () => (ready && products.data && buyers.data ? initialValues({ params, products: products.data, buyer: buyers.data.find((b) => b.id === buyerId), deal: reorder.data, ownProducerId, reorderNote: (id) => t('rfq.reorderNote', { id }) }) : null),
+    [ready, products.data, buyers.data, reorder.data, params, buyerId, ownProducerId, t],
+  )
 
   usePageTitle(t('pages.rfq'))
-
-  useEffect(() => {
-    if (initial || !products.data || !buyers.data || (reorderId && reorder.isPending)) return
-    const buyer = buyers.data.find((b) => b.id === buyerId)
-    const productId = params.get('product')
-    const product = products.data.find((p) => p.id === productId)
-    const deal = reorder.data
-    const requested = deal?.producerId ?? product?.producerId ?? params.get('producer') ?? ''
-    const own = requested === ownProducerId
-    const producerId = own ? '' : requested
-    const items = own ? [] : deal ? fromDeal(deal, products.data) : product ? [itemFor(product, params.get('lot'), params.get('lots'))] : []
-    const address = deal?.deliveryAddress ?? buyer?.address
-    const date = new Date(liveNow().getTime() + 14 * 86_400_000).toISOString().slice(0, 10)
-    setInitial({
-      fixed: !own && !!(deal || product),
-      values: {
-        producerId,
-        items: items.length ? items : [{ productId: '', mode: 'measure', lotId: '', quantity: '' }],
-        street: address?.street ?? '',
-        postcode: address?.postcode ?? '',
-        city: address?.city ?? '',
-        country: address?.country ?? 'RO',
-        incoterm: deal?.incoterm ?? (product?.logistics.incoterms.includes('DAP') ? 'DAP' : (product?.logistics.incoterms[0] ?? 'DAP')),
-        date,
-        notes: deal ? t('rfq.reorderNote', { id: deal.id }) : '',
-        attachments: [],
-      },
-    })
-  }, [initial, products.data, buyers.data, reorder.isPending, reorder.data, reorderId, params, buyerId, ownProducerId, t])
 
   return (
     <div className="mx-auto flex max-w-[90rem] flex-col gap-5 px-4 py-6 lg:px-6">

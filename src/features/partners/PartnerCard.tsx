@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { FileSignature, MessageSquare, Star } from 'lucide-react'
@@ -9,11 +9,12 @@ import { useFormat } from '@/features/i18n/useFormat'
 import { ProducerAvatar } from '@/features/producer/ProducerAvatar'
 import { TrustScoreButton } from '@/features/trust/TrustScoreDisplay'
 import { Badge } from '@/shared/ui/Badge'
-import { buttonClass } from '@/shared/ui/Button'
+import { buttonClass } from '@/shared/ui/buttonClass'
 import { cn } from '@/shared/lib/cn'
+import { useValueChange } from '@/shared/hooks/useValueChange'
 import { VolumeChart } from './VolumeChart'
 
-export const PARTNER_TAGS = ['primary_supplier', 'local_supplier', 'preferred', 'backup', 'under_review', 'key_account'] as const
+const PARTNER_TAGS = ['primary_supplier', 'local_supplier', 'preferred', 'backup', 'under_review', 'key_account'] as const
 
 interface Props {
   p: Partnership
@@ -28,7 +29,7 @@ export function PartnerCard({ p, partner, role, onMeta, saving }: Props) {
   const fmt = useFormat()
   const { convert, format, display } = useCurrency()
   const [notes, setNotes] = useState(p.privateNotes)
-  useEffect(() => setNotes(p.privateNotes), [p.privateNotes])
+  useValueChange(p.privateNotes, setNotes)
   const name = partner?.name ?? p.counterpartyId
   const volume = convert(p.totalVolumeEUR, 'EUR')
   const stats: [string, string][] = [

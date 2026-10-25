@@ -6,6 +6,7 @@ import { ChevronDown, ChevronRight, LayoutGrid } from 'lucide-react'
 import { CATEGORY_CONFIGS, getCategoryChildren } from '@/config/categories'
 import { useCategoryStats } from '@/services/queries'
 import { cn } from '@/shared/lib/cn'
+import { useValueChange } from '@/shared/hooks/useValueChange'
 import { CategoryIcon } from './CategoryIcon'
 
 /** Desktop mega-menu: roots on the left, levels 2 and 3 of the focused root on the right. */
@@ -21,7 +22,7 @@ export function CategoryMegaMenu() {
   const { data: stats } = useCategoryStats()
   const counts = new Map(stats?.map((s) => [s.slug, s.productCount]))
 
-  useEffect(() => setOpen(false), [pathname, search])
+  useValueChange(pathname + search, () => setOpen(false))
 
   useLayoutEffect(() => {
     if (!open) return
