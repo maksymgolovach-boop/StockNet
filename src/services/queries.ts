@@ -1,7 +1,9 @@
-import { QueryClient, useQuery } from '@tanstack/react-query'
-import { useActorId, useDevStore } from '@/features/dev/devStore'
+import { QueryClient, useQueries, useQuery } from '@tanstack/react-query'
+import type { PartyRole } from '@/types/models'
+import { useCompanyIds } from '@/features/dev/devStore'
+import { unionById } from '@/features/company/company'
 import { catalogService } from './catalogService'
-import { dealService } from './dealService'
+import { dealService, type ThreadSummary } from './dealService'
 import { mockFxProvider } from './fxService'
 import { ApiError } from './client'
 
@@ -42,23 +44,45 @@ export const useProducerReviews = (producerId: string | undefined) =>
 export const useBuyers = () => useQuery({ queryKey: ['buyers'], queryFn: () => catalogService.buyers() })
 
 export function useMyDeals() {
-  const role = useDevStore((s) => s.role)
-  const actorId = useActorId()
-  return useQuery({ queryKey: queryKeys.deals(role, actorId), queryFn: () => dealService.deals(role, actorId) })
+  const { buyerId, producerId } = useCompanyIds()
+  const results = useQueries({
+    queries: [
+      { queryKey: queryKeys.deals('buyer', buyerId), queryFn: () => dealService.deals('buyer', buyerId) },
+      { queryKey: queryKeys.deals('producer', producerId), queryFn: () => dealService.deals('producer', producerId) },
+    ],
+  })
+  const data = results.some((r) => r.data) ? unionById(...results.map((r) => r.data)) : undefined
+  const isPending = results.some((r) => r.isPending)
+  const error = results.find((r) => r.error)?.error ?? null
+  const refetch = () => Promise.all(results.map((r) => r.refetch()))
+  return { data, isPending, error, refetch }
 }
+
+export type CompanyThread = ThreadSummary & { mySide: PartyRole }
 
 export function useMyThreads() {
-  const role = useDevStore((s) => s.role)
-  const actorId = useActorId()
-  return useQuery({ queryKey: queryKeys.threads(role, actorId), queryFn: () => dealService.threads(role, actorId) })
+  const { buyerId, producerId } = useCompanyIds()
+  const results = useQueries({
+    queries: [
+      { queryKey: queryKeys.threads('buyer', buyerId), queryFn: () => dealService.threads('buyer', buyerId) },
+      { queryKey: queryKeys.threads('producer', producerId), queryFn: () => dealService.threads('producer', producerId) },
+    ],
+  })
+  const tag = (list: ThreadSummary[] | undefined, mySide: PartyRole) => list?.map((t) => ({ ...t, mySide }))
+  const data = results.some((r) => r.data)
+    ? unionById<CompanyThread>(tag(results[0]?.data, 'buyer'), tag(results[1]?.data, 'producer'))
+    : undefined
+  const isPending = results.some((r) => r.isPending)
+  const isFetching = results.some((r) => r.isFetching)
+  const error = results.find((r) => r.error)?.error ?? null
+  const refetch = () => Promise.all(results.map((r) => r.refetch()))
+  return { data, isPending, isFetching, error, refetch }
 }
 
-export function useThreadMessages(threadId: string | undefined) {
-  const role = useDevStore((s) => s.role)
-  const actorId = useActorId()
+export function useThreadMessages(threadId: string | undefined, side: PartyRole, actorId: string) {
   return useQuery({
-    queryKey: queryKeys.messages(role, actorId, threadId ?? ''),
-    queryFn: () => dealService.messages(role, actorId, threadId ?? ''),
+    queryKey: queryKeys.messages(side, actorId, threadId ?? ''),
+    queryFn: () => dealService.messages(side, actorId, threadId ?? ''),
     enabled: !!threadId,
     staleTime: Infinity,
   })

@@ -50,7 +50,7 @@ export const RELATIONSHIPS: Relationship[] = [
   { buyerId: 'b07', producerId: 'p28', count: 7, currency: 'RON', since: '2023-02-20', recent: ['in_delivery'] },
   { buyerId: 'b07', producerId: 'p26', count: 4, currency: 'RON', since: '2023-06-12', recent: ['order_confirmed'], cancelled: 1 },
   { buyerId: 'b07', producerId: 'p29', count: 5, currency: 'EUR', since: '2023-09-04', recent: ['negotiation'] },
-  { buyerId: 'b07', producerId: 'p01', count: 5, currency: 'RON', since: '2024-03-11', recent: ['delivered'] },
+  { buyerId: 'b06', producerId: 'p01', count: 5, currency: 'RON', since: '2024-03-11', recent: ['delivered'] },
   { buyerId: 'b07', producerId: 'p27', count: 2, currency: 'EUR', since: '2025-03-17', recent: ['quote_received'] },
   { buyerId: 'b07', producerId: 'p03', count: 2, currency: 'EUR', since: '2025-06-02', recent: ['disputed'] },
   { buyerId: 'b07', producerId: 'p02', count: 3, currency: 'RON', since: '2024-07-22' },

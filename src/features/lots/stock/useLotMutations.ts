@@ -1,21 +1,21 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { LotRecordStatus } from '@/types/models'
-import { useActorId } from '@/features/dev/devStore'
+import { useCompanyIds } from '@/features/dev/devStore'
 import { lotService, type LotInput } from '@/services/lotService'
 
 export function useProducerLots() {
-  const producerId = useActorId()
+  const { producerId } = useCompanyIds()
   return useQuery({ queryKey: ['producerLots', producerId], queryFn: () => lotService.producerLots(producerId) })
 }
 
 export function useProducerProducts() {
-  const producerId = useActorId()
+  const { producerId } = useCompanyIds()
   return useQuery({ queryKey: ['producerProducts', producerId], queryFn: () => lotService.producerProducts(producerId) })
 }
 
 /** Every lot change refreshes the producer's table and every buyer-facing view of the catalogue. */
 export function useLotMutations() {
-  const producerId = useActorId()
+  const { producerId } = useCompanyIds()
   const qc = useQueryClient()
   const onSuccess = () => {
     for (const key of ['producerLots', 'producerProducts', 'products', 'search', 'producers']) void qc.invalidateQueries({ queryKey: [key] })

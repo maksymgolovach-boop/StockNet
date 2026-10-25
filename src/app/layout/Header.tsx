@@ -13,7 +13,6 @@ import { SearchBox } from '@/features/search/SearchBox'
 import { CategoryMegaMenu } from '@/features/categories/CategoryMegaMenu'
 import { Logo } from './Logo'
 import { MobileNav } from './MobileNav'
-import { useDevStore } from '@/features/dev/devStore'
 import { navItemsFor } from './navItems'
 import { useUnreadCount } from './useUnreadCount'
 import { AccountChip } from './AccountChip'
@@ -29,7 +28,6 @@ function UnreadDot({ count }: { count: number }) {
 
 export function Header() {
   const { t } = useTranslation()
-  const role = useDevStore((s) => s.role)
   const [menuOpen, setMenuOpen] = useState(false)
   const unread = useUnreadCount()
   const headerRef = useRef<HTMLElement>(null)
@@ -58,7 +56,7 @@ export function Header() {
         <Logo />
         <SearchBox className="hidden max-w-xl flex-1 md:block" shortcut />
         <nav aria-label={t('nav.primary')} className="ms-auto hidden items-center gap-1 lg:flex">
-          {navItemsFor(role).map((item) => {
+          {navItemsFor().map((item) => {
             const label = t(item.labelKey)
             const showBadge = item.badge === 'unread' && unread > 0
             return (

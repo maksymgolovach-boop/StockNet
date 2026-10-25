@@ -596,9 +596,9 @@
   },
   "dev": {
     "menu": "Dev-Menü",
-    "role": "Demo-Rolle",
-    "roleBuyer": "Käufer · {{name}}",
-    "roleProducer": "Hersteller · {{name}}",
+    "company": "Unternehmen",
+    "buyerIdentity": "Käufer-Identität",
+    "producerIdentity": "Hersteller-Identität",
     "simulateErrors": "API-Fehler simulieren",
     "latency": "API-Latenz",
     "latencyValue": "{{ms}} ms",
@@ -1259,9 +1259,6 @@
       "empty": "Keine Lose",
       "emptyBody": "Legen Sie Ihr erstes Los an, um Paletten, Bunde oder Lkw-Ladungen zu verkaufen.",
       "emptyFiltered": "Kein Los entspricht diesen Filtern.",
-      "producerOnly": "Bestand & Lose ist für Hersteller",
-      "producerOnlyBody": "Wechseln Sie die Demo in die Herstelleransicht (Oțelăria Dunării), um Lose zu verwalten.",
-      "switchRole": "Zur Herstelleransicht wechseln",
       "created": "Los {{number}} angelegt.",
       "saved": "Los {{number}} gespeichert.",
       "duplicated": "Kopie {{number}} pausiert angelegt.",
@@ -1282,6 +1279,7 @@
   "dealsPage": {
     "subtitleBuyer": "Alle Anfragen, Bestellungen und Lieferungen mit Ihren Lieferanten. Nur Sie und der Hersteller sehen diese Details.",
     "subtitleProducer": "Alle Anfragen und Bestellungen Ihrer Kunden. Nur Sie und der Käufer sehen diese Details.",
+    "subtitleCompany": "Alle Anfragen, Bestellungen und Lieferungen — Ein- und Verkauf. Nur Sie und Ihr Geschäftspartner sehen diese Details.",
     "search": "Geschäfts-ID, Partner, Produkt oder Losnummer suchen",
     "filters": "Filter",
     "statusFilter": "Nach Status filtern",
@@ -1528,9 +1526,6 @@
     "sending": "Wird gesendet…",
     "afterSubmit": "Ein Geschäft im Status „Angebotsanfrage“ und ein Chat werden angelegt. Sie werden benachrichtigt, sobald das Angebot eintrifft.",
     "created": "Angebotsanfrage {{id}} gesendet. Der Hersteller antwortet meist innerhalb weniger Stunden.",
-    "buyerOnly": "Angebotsanfragen senden Käufer",
-    "buyerOnlyBody": "Wechseln Sie die Demo zurück in die Käuferansicht.",
-    "switchRole": "Zur Käuferansicht wechseln",
     "errors": {
       "producer": "Hersteller wählen",
       "items": "Mindestens eine Position hinzufügen",
@@ -1556,6 +1551,7 @@
   "partners": {
     "subtitleBuyer": "Alle, mit denen Sie gehandelt haben, mit Ihren privaten Notizen. Hersteller sehen diese Seite nie.",
     "subtitleProducer": "Ihre Kunden, ihre Zuverlässigkeit und Ihre privaten Notizen.",
+    "subtitleCompany": "Alle Lieferanten und Kunden, mit Ihren privaten Notizen. Geschäftspartner sehen diese Seite nie.",
     "viewLabel": "Partner anzeigen",
     "views": {
       "all": "Alle",

@@ -4,7 +4,8 @@ import { useTranslation } from 'react-i18next'
 import { CheckCircle2, MessageSquare, OctagonAlert, Repeat2 } from 'lucide-react'
 import { NotFoundPage } from '@/app/NotFoundPage'
 import { usePartners } from '@/features/chat/usePartner'
-import { useDevStore } from '@/features/dev/devStore'
+import { sideForDeal } from '@/features/company/company'
+import { useCompanyIds } from '@/features/dev/devStore'
 import { useFormat } from '@/features/i18n/useFormat'
 import { ProducerAvatar } from '@/features/producer/ProducerAvatar'
 import { TrustScoreButton } from '@/features/trust/TrustScoreDisplay'
@@ -29,9 +30,9 @@ export function DealDetailPage() {
   const { t } = useTranslation()
   const fmt = useFormat()
   const navigate = useNavigate()
-  const role = useDevStore((s) => s.role)
+  const { buyerId, producerId } = useCompanyIds()
   const deal = useDeal(dealId)
-  const partners = usePartners(role)
+  const partners = usePartners()
   const m = useDealMutations()
   const reviews = useProducerReviews(deal.data?.producerId)
   const [confirm, setConfirm] = useState<DealTransition | null>(null)
@@ -61,15 +62,23 @@ export function DealDetailPage() {
       </div>
     )
 
+  const side = deal.side ?? (d ? sideForDeal(d, { buyerId, producerId }) : undefined)
+  if (!side)
+    return (
+      <div className="mx-auto max-w-3xl px-4 py-10">
+        <ErrorState error={deal.error} onRetry={() => void deal.refetch()} />
+      </div>
+    )
+
   const partner = partners.resolve(d)
   const partnerName = partner?.name ?? ''
-  const messageLink = d.threadId ? `/messages/${d.threadId}` : role === 'buyer' ? `/messages?producer=${d.producerId}` : `/messages?buyer=${d.buyerId}`
-  const actions = transitionsFor(d, role)
+  const messageLink = d.threadId ? `/messages/${d.threadId}` : side === 'buyer' ? `/messages?producer=${d.producerId}` : `/messages?buyer=${d.buyerId}`
+  const actions = transitionsFor(d, side)
   const review = reviews.data?.find((r) => r.id === d.reviewId)
 
   const run = (tr: DealTransition) =>
     m.transition.mutate(
-      { dealId: d.id, action: tr.action },
+      { dealId: d.id, action: tr.action, side },
       {
         onSuccess: () => {
           setConfirm(null)
@@ -112,12 +121,12 @@ export function DealDetailPage() {
           <ButtonLink to={messageLink} variant="secondary" icon={<MessageSquare className="size-4" aria-hidden />}>
             {t('dealDetail.messagePartner')}
           </ButtonLink>
-          {role === 'buyer' && (
+          {side === 'buyer' && (
             <ButtonLink to={`/deals/new?reorder=${d.id}`} variant="secondary" icon={<Repeat2 className="size-4" aria-hidden />}>
               {t('dealDetail.reorder')}
             </ButtonLink>
           )}
-          {canDispute(d, role) && (
+          {canDispute(d, side) && (
             <Button variant="danger" icon={<OctagonAlert className="size-4" aria-hidden />} onClick={() => setDisputeOpen(true)}>
               {t('dealDetail.openDispute')}
             </Button>
@@ -135,14 +144,19 @@ export function DealDetailPage() {
       )}
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
         <div className="flex min-w-0 flex-col gap-6">
-          <DisputePanel deal={d} role={role} resolving={m.resolveDispute.isPending} onResolve={(note) => m.resolveDispute.mutate({ dealId: d.id, note }, { onSuccess: () => setNotice(t('dispute.resolvedNotice')) })} />
+          <DisputePanel
+            deal={d}
+            role={side}
+            resolving={m.resolveDispute.isPending}
+            onResolve={(note) => m.resolveDispute.mutate({ dealId: d.id, note, side }, { onSuccess: () => setNotice(t('dispute.resolvedNotice')) })}
+          />
           <section aria-labelledby="deal-items" className="flex flex-col gap-3">
             <h2 id="deal-items" className="text-lg font-semibold">
               {t('dealDetail.lineItems')}
             </h2>
             <LineItemsTable deal={d} />
           </section>
-          {d.status === 'completed' && role === 'buyer' && (
+          {d.status === 'completed' && side === 'buyer' && (
             <section aria-labelledby="deal-review" className="flex flex-col gap-3 rounded-[var(--radius-card)] border-2 border-ink bg-surface p-4">
               <h2 id="deal-review" className="text-lg font-semibold">
                 {d.reviewId ? t('reviewForm.doneTitle') : t('reviewForm.title', { name: partnerName })}
@@ -202,7 +216,7 @@ export function DealDetailPage() {
           error={m.openDispute.error?.message}
           onSubmit={(input) =>
             m.openDispute.mutate(
-              { dealId: d.id, input },
+              { dealId: d.id, input, side },
               {
                 onSuccess: () => {
                   setDisputeOpen(false)

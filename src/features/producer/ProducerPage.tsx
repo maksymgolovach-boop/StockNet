@@ -59,7 +59,7 @@ export function ProducerPage() {
   const [params, setParams] = useSearchParams()
   const producer = useProducer(id)
   const reviews = useProducerReviews(id)
-  const history = usePartnerHistory(id)
+  const history = usePartnerHistory(id, 'buyer')
   const saved = useSaved((s) => s.producerIds.includes(id))
   const toggleSaved = useSaved((s) => s.toggleProducer)
 

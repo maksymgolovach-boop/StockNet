@@ -69,7 +69,8 @@ function History({ partner }: { partner: Partner }) {
   const { t } = useTranslation()
   const fmt = useFormat()
   const { format, convert, display } = useCurrency()
-  const history = usePartnerHistory(partner.id)
+  const side = partner.kind === 'producer' ? 'buyer' : 'producer'
+  const history = usePartnerHistory(partner.id, side)
   if (!history) return <p className="text-sm text-ink-muted">{t('chat.noHistory')}</p>
   const volume = convert(history.totalEUR, 'EUR')
   const stats: [string, string][] = [

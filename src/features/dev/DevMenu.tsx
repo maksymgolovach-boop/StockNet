@@ -12,7 +12,7 @@ import { cn } from '@/shared/lib/cn'
 import { Button } from '@/shared/ui/Button'
 import { Drawer } from '@/shared/ui/Drawer'
 import { Select } from '@/shared/ui/Select'
-import { useDevStore } from './devStore'
+import { useCompany, useCompanyIds, useDevStore } from './devStore'
 
 const LATENCIES = [0, 150, 350, 800, 1500]
 
@@ -21,7 +21,9 @@ export function DevMenu() {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const qc = useQueryClient()
-  const { role, buyerId, producerId, simulateErrors, latencyMs, setRole, setSimulateErrors, setLatency } = useDevStore()
+  const { simulateErrors, latencyMs, setSimulateErrors, setLatency } = useDevStore()
+  const company = useCompany()
+  const { buyerId, producerId } = useCompanyIds()
   const resetPrefs = usePreferences((s) => s.reset)
   const buyerName = db.buyers.find((b) => b.id === buyerId)?.name ?? buyerId
   const producerName = db.producers.find((p) => p.id === producerId)?.name ?? producerId
@@ -48,28 +50,28 @@ export function DevMenu() {
       >
         <Wrench className="size-3.5" aria-hidden />
         
-        {(simulateErrors || role === 'producer') && <span className="size-2 rounded-full bg-accent" aria-hidden />}
+        {simulateErrors && <span className="size-2 rounded-full bg-accent" aria-hidden />}
       </button>
       <Drawer open={open} onClose={() => setOpen(false)} title={t('dev.menu')} closeLabel={t('common.close')} side="end">
         <div className="flex flex-col gap-6 p-4 text-sm">
-          <fieldset className="flex flex-col gap-2">
-            <legend className="mb-1 text-xs font-semibold tracking-wide text-ink-subtle uppercase">{t('dev.role')}</legend>
-            {(['buyer', 'producer'] as const).map((r) => (
-              <label key={r} className="flex cursor-pointer items-center gap-2 rounded-md border border-line p-2.5 has-[:checked]:border-primary has-[:checked]:bg-primary-soft">
-                <input
-                  type="radio"
-                  name="dev-role"
-                  checked={role === r}
-                  onChange={() => {
-                    setRole(r)
-                    refresh()
-                  }}
-                  className="accent-[var(--primary)]"
-                />
-                {r === 'buyer' ? t('dev.roleBuyer', { name: buyerName }) : t('dev.roleProducer', { name: producerName })}
-              </label>
-            ))}
-          </fieldset>
+          <div>
+            <p className="mb-1 text-xs font-semibold tracking-wide text-ink-subtle uppercase">{t('dev.company')}</p>
+            <p className="font-medium">{company.name}</p>
+            <dl className="mt-2 grid gap-1 rounded-md border border-line p-2.5">
+              <div className="flex justify-between gap-3">
+                <dt className="text-ink-muted">{t('dev.buyerIdentity')}</dt>
+                <dd className="text-end">
+                  {buyerName} <span className="text-ink-subtle">({buyerId})</span>
+                </dd>
+              </div>
+              <div className="flex justify-between gap-3">
+                <dt className="text-ink-muted">{t('dev.producerIdentity')}</dt>
+                <dd className="text-end">
+                  {producerName} <span className="text-ink-subtle">({producerId})</span>
+                </dd>
+              </div>
+            </dl>
+          </div>
           <label className="flex items-center justify-between gap-3">
             <span>{t('dev.simulateErrors')}</span>
             <input

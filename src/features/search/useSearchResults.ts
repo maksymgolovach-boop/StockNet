@@ -1,5 +1,5 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
-import { useActorId, useDevStore } from '@/features/dev/devStore'
+import { useCompanyIds } from '@/features/dev/devStore'
 import { useDisplayCurrency, usePreferences } from '@/features/settings/preferencesStore'
 import { searchService } from '@/services/searchService'
 import type { SearchParams } from './types'
@@ -7,11 +7,10 @@ import type { SearchParams } from './types'
 export function useSearchResults(params: SearchParams) {
   const location = usePreferences((s) => s.location.point)
   const displayCurrency = useDisplayCurrency()
-  const role = useDevStore((s) => s.role)
-  const partyId = useActorId()
+  const { buyerId } = useCompanyIds()
   return useQuery({
-    queryKey: ['search', params, location, displayCurrency, role, partyId],
-    queryFn: () => searchService.search(params, { location, displayCurrency, role, partyId }),
+    queryKey: ['search', params, location, displayCurrency, 'buyer', buyerId],
+    queryFn: () => searchService.search(params, { location, displayCurrency, role: 'buyer', partyId: buyerId }),
     placeholderData: keepPreviousData,
   })
 }

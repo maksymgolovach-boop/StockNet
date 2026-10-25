@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { BadgeCheck, Camera, CornerDownRight, MessageSquareOff, Star, ThumbsUp } from 'lucide-react'
 import type { Review, ReviewCriterion } from '@/types/models'
-import { useActorId, useDevStore } from '@/features/dev/devStore'
+import { useCompanyIds } from '@/features/dev/devStore'
 import { useFormat } from '@/features/i18n/useFormat'
 import { useBuyers } from '@/services/queries'
 import { Badge } from '@/shared/ui/Badge'
@@ -170,8 +170,7 @@ function ReviewCard({ review, buyerName, ownDeal, producerName }: { review: Revi
 export function ReviewsSection({ reviews, producerName, emptyBody }: { reviews: Review[]; producerName: string; emptyBody?: string }) {
   const { t } = useTranslation()
   const { data: buyers } = useBuyers()
-  const role = useDevStore((s) => s.role)
-  const actor = useActorId()
+  const { buyerId, producerId } = useCompanyIds()
   const [star, setStar] = useState<number | null>(null)
   const [sort, setSort] = useState<ReviewSort>('newest')
   const [withPhotos, setWithPhotos] = useState(false)
@@ -226,7 +225,7 @@ export function ReviewsSection({ reviews, producerName, emptyBody }: { reviews: 
         <ul className="flex flex-col gap-3">
           {shown.map((r) => (
             <li key={r.id}>
-              <ReviewCard review={r} buyerName={nameOf(r.buyerId)} ownDeal={role === 'buyer' ? r.buyerId === actor : r.producerId === actor} producerName={producerName} />
+              <ReviewCard review={r} buyerName={nameOf(r.buyerId)} ownDeal={r.buyerId === buyerId || r.producerId === producerId} producerName={producerName} />
             </li>
           ))}
         </ul>

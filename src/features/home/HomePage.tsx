@@ -2,14 +2,12 @@ import { useTranslation } from 'react-i18next'
 import { SearchBox } from '@/features/search/SearchBox'
 import { CategoryGrid } from '@/features/categories/CategoryGrid'
 import { RecommendedSection } from '@/features/recommendations/RecommendedSection'
-import { useDevStore } from '@/features/dev/devStore'
 import { HomeDeals } from './HomeDeals'
 import { NearbyProducers } from './NearbyProducers'
 import { TrustHighlights } from './TrustHighlights'
 
 export function HomePage() {
   const { t } = useTranslation()
-  const role = useDevStore((s) => s.role)
   return (
     <div className="flex flex-col gap-14">
       <section className="relative border-b border-line bg-surface">
@@ -24,7 +22,7 @@ export function HomePage() {
         </div>
       </section>
 
-      {role === 'buyer' && <RecommendedSection />}
+      <RecommendedSection />
 
       <section aria-labelledby="home-categories" className="mx-auto w-full max-w-[90rem] px-4 lg:px-6">
         <div className="mb-4 flex flex-col gap-1">

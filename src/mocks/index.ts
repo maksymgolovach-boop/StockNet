@@ -18,8 +18,10 @@ import { buildDeals } from './deals'
 import { buildReviews } from './reviews'
 import { buildThreads } from './threads'
 import { producerDocuments } from './documents'
+import { currentCompany } from './companies'
 
 export { CURRENT_BUYER_ID } from './buyers'
+export { COMPANY_SEEDS, CURRENT_COMPANY_ID, currentCompany } from './companies'
 export { CITIES, DEFAULT_CITY_ID, cityById } from './cities'
 export type { City } from './cities'
 
@@ -160,7 +162,6 @@ function buildDatabase(): MockDatabase {
     { ownerId: 'b07', counterpartyId: 'p28', favorite: true, tag: 'primary_supplier', privateNotes: 'Seasonal price for CAN and urea fixed every February. Contact: dna Pop, sales.' },
     { ownerId: 'b07', counterpartyId: 'p26', favorite: true, tag: 'local_supplier', privateNotes: 'Mobile service within 24 h; ask for spare-parts kit with every new machine.' },
     { ownerId: 'b07', counterpartyId: 'p29', favorite: false, tag: 'preferred', privateNotes: 'Seed orders must be confirmed before 15 January for spring delivery.' },
-    { ownerId: 'b07', counterpartyId: 'p01', favorite: false, privateNotes: '' },
     { ownerId: 'b07', counterpartyId: 'p03', favorite: false, tag: 'under_review', privateNotes: 'Cold-chain issue on last pepper delivery — dispute open.' },
   ]
 
@@ -239,6 +240,13 @@ export function validateMockData(data: MockDatabase = db): string[] {
     [lotListings.some((p) => p.saleModes.includes('measure')), 'no listing offering both modes'],
     [data.deals.filter((d) => d.lineItems.some((li) => li.lot)).length >= 3, 'fewer than 3 deals with lot line items'],
   ]
+  const company = currentCompany
+  const selfPairs = [
+    data.deals.some((d) => d.buyerId === company.buyerId && d.producerId === company.producerId),
+    data.threads.some((t) => t.buyerId === company.buyerId && t.producerId === company.producerId),
+    data.partnershipMeta.some((m) => m.ownerId === company.buyerId && m.counterpartyId === company.producerId),
+  ]
+  checks.push([!selfPairs.some(Boolean), 'company trades with itself (buyer and producer identity overlap)'])
   for (const [ok, msg] of checks) if (!ok) issues.push(msg)
   return issues
 }

@@ -596,9 +596,9 @@
   },
   "dev": {
     "menu": "Dev menu",
-    "role": "Demo role",
-    "roleBuyer": "Buyer · {{name}}",
-    "roleProducer": "Producer · {{name}}",
+    "company": "Company",
+    "buyerIdentity": "Buyer identity",
+    "producerIdentity": "Producer identity",
     "simulateErrors": "Simulate API errors",
     "latency": "API latency",
     "latencyValue": "{{ms}} ms",
@@ -1259,9 +1259,6 @@
       "empty": "No lots here",
       "emptyBody": "Create your first lot to sell pallets, bundles or truckloads.",
       "emptyFiltered": "No lot matches these filters.",
-      "producerOnly": "Stock & lots is for producers",
-      "producerOnlyBody": "Switch the demo to the producer view (Oțelăria Dunării) to manage lots.",
-      "switchRole": "Switch to producer view",
       "created": "Lot {{number}} created.",
       "saved": "Lot {{number}} saved.",
       "duplicated": "Copy {{number}} created as paused.",
@@ -1282,6 +1279,7 @@
   "dealsPage": {
     "subtitleBuyer": "Every quote request, order and delivery with your suppliers. Only you and the producer see these details.",
     "subtitleProducer": "Every request and order from your customers. Only you and the buyer see these details.",
+    "subtitleCompany": "Every quote request, order and delivery — buying and selling. Only you and your counterparty see these details.",
     "search": "Search deal ID, partner, product or lot number",
     "filters": "Filters",
     "statusFilter": "Filter by status",
@@ -1528,9 +1526,6 @@
     "sending": "Sending…",
     "afterSubmit": "A deal in \"Quote request\" status and a chat thread are created. You will be notified when the quote arrives.",
     "created": "Quote request {{id}} sent. The producer usually replies within hours.",
-    "buyerOnly": "Quote requests are sent by buyers",
-    "buyerOnlyBody": "Switch the demo back to the buyer view to request a quote.",
-    "switchRole": "Switch to buyer view",
     "errors": {
       "producer": "Choose a producer",
       "items": "Add at least one item",
@@ -1556,6 +1551,7 @@
   "partners": {
     "subtitleBuyer": "Everyone you have traded with, with your private notes. Producers never see this page.",
     "subtitleProducer": "Your customers, their reliability and your private notes.",
+    "subtitleCompany": "Everyone you buy from and sell to, with your private notes. Counterparties never see this page.",
     "viewLabel": "Show partners",
     "views": {
       "all": "All",

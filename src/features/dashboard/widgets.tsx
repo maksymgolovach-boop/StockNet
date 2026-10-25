@@ -6,7 +6,6 @@ import type { Deal } from '@/types/models'
 import { usePartners } from '@/features/chat/usePartner'
 import { useCurrency } from '@/features/currency/useCurrency'
 import { DealStatusBadge } from '@/features/deals/DealStatusBadge'
-import { useDevStore } from '@/features/dev/devStore'
 import { useFormat } from '@/features/i18n/useFormat'
 import { ProducerAvatar } from '@/features/producer/ProducerAvatar'
 import { ProductPrice } from '@/features/product/ProductPrice'
@@ -56,8 +55,7 @@ export function StatTiles({ stats }: { stats: { label: string; value: string; to
 
 export function DealRows({ deals, empty }: { deals: Deal[]; empty: string }) {
   const fmt = useFormat()
-  const role = useDevStore((s) => s.role)
-  const partners = usePartners(role)
+  const partners = usePartners()
   const { format } = useCurrency()
   if (!deals.length) return <Empty>{empty}</Empty>
   return (
@@ -92,10 +90,9 @@ export function DealRows({ deals, empty }: { deals: Deal[]; empty: string }) {
 export function ConversationsWidget() {
   const { t } = useTranslation()
   const fmt = useFormat()
-  const role = useDevStore((s) => s.role)
   const threads = useMyThreads()
-  const partners = usePartners(role)
-  const unreadOf = (x: { unreadForBuyer: number; unreadForProducer: number }) => (role === 'buyer' ? x.unreadForBuyer : x.unreadForProducer)
+  const partners = usePartners()
+  const unreadOf = (x: { mySide: 'buyer' | 'producer'; unreadForBuyer: number; unreadForProducer: number }) => (x.mySide === 'buyer' ? x.unreadForBuyer : x.unreadForProducer)
   const list = [...(threads.data ?? [])].sort((a, b) => unreadOf(b) - unreadOf(a) || b.lastMessageAt.localeCompare(a.lastMessageAt)).slice(0, 5)
   return (
     <Widget title={t('dashboard.conversations')} action={{ to: '/messages', label: t('common.viewAll') }}>

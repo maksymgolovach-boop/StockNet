@@ -3,7 +3,6 @@ import { useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Download, FilePlus2, SearchX } from 'lucide-react'
 import { useCurrency } from '@/features/currency/useCurrency'
-import { useDevStore } from '@/features/dev/devStore'
 import { useFormat } from '@/features/i18n/useFormat'
 import { Button, ButtonLink } from '@/shared/ui/Button'
 import { EmptyState, ErrorState, LoadingRegion, Skeleton } from '@/shared/ui/states'
@@ -19,7 +18,6 @@ export function DealsPage() {
   const { t } = useTranslation()
   const fmt = useFormat()
   const { display } = useCurrency()
-  const role = useDevStore((s) => s.role)
   const [params, setParams] = useSearchParams()
   const filters = useMemo(() => parseDealFilters(params), [params])
   const { all, rows, isPending, error, refetch } = useDealRows(filters)
@@ -71,17 +69,15 @@ export function DealsPage() {
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-3xl font-semibold">{t('pages.deals')}</h1>
-          <p className="text-sm text-ink-muted">{t(role === 'buyer' ? 'dealsPage.subtitleBuyer' : 'dealsPage.subtitleProducer')}</p>
+          <p className="text-sm text-ink-muted">{t('dealsPage.subtitleCompany')}</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Button variant="secondary" icon={<Download className="size-4" aria-hidden />} onClick={() => exportCsv(rows)} disabled={!rows.length}>
             {t('dealsPage.export', { count: rows.length })}
           </Button>
-          {role === 'buyer' && (
-            <ButtonLink to="/deals/new" icon={<FilePlus2 className="size-4" aria-hidden />}>
-              {t('rfq.new')}
-            </ButtonLink>
-          )}
+          <ButtonLink to="/deals/new" icon={<FilePlus2 className="size-4" aria-hidden />}>
+            {t('rfq.new')}
+          </ButtonLink>
         </div>
       </div>
       {isPending ? (

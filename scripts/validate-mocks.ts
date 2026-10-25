@@ -1,7 +1,9 @@
 import { db, validateMockData } from '../src/mocks'
 import { CURRENT_BUYER_ID } from '../src/mocks/buyers'
+import { currentCompany } from '../src/mocks/companies'
 
 const issues = validateMockData()
+console.log('company', currentCompany.id, currentCompany.name, `${currentCompany.buyerId}/${currentCompany.producerId}`)
 const by = <T,>(xs: T[], key: (x: T) => string) =>
   Object.fromEntries([...xs.reduce((m, x) => m.set(key(x), (m.get(key(x)) ?? 0) + 1), new Map<string, number>())].sort())
 

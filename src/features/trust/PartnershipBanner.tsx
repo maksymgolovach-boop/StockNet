@@ -8,7 +8,7 @@ import { usePartnerHistory } from './usePartnerHistory'
 export function PartnershipBanner({ producerId, historyLink }: { producerId: string; historyLink: string }) {
   const { t } = useTranslation()
   const fmt = useFormat()
-  const h = usePartnerHistory(producerId)
+  const h = usePartnerHistory(producerId, 'buyer')
   if (!h || !h.lastAt || !h.firstAt) return null
   return (
     <div className="flex flex-wrap items-center gap-3 rounded-[var(--radius-card)] border-s-4 border-ink bg-surface-2 px-4 py-3 text-sm">

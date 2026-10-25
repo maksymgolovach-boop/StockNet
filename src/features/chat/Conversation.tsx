@@ -2,12 +2,11 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ArrowLeft, MessageSquareDashed, PanelRightClose, PanelRightOpen } from 'lucide-react'
-import type { Thread } from '@/types/models'
 import { ProducerAvatar } from '@/features/producer/ProducerAvatar'
 import { TrustScoreButton } from '@/features/trust/TrustScoreDisplay'
 import { VerificationBadge } from '@/features/trust/VerificationBadge'
 import { NotFoundError } from '@/services/client'
-import { useProduct } from '@/services/queries'
+import { type CompanyThread, useProduct } from '@/services/queries'
 import { useMediaQuery } from '@/shared/hooks/useMediaQuery'
 import { Drawer } from '@/shared/ui/Drawer'
 import { IconButton } from '@/shared/ui/Button'
@@ -20,9 +19,9 @@ import { PinnedContext } from './PinnedContext'
 import { useChat } from './useChat'
 import type { Partner } from './usePartner'
 
-export function Conversation({ thread, partner }: { thread: Thread; partner: Partner | undefined }) {
+export function Conversation({ thread, partner }: { thread: CompanyThread; partner: Partner | undefined }) {
   const { t } = useTranslation()
-  const chat = useChat(thread.id)
+  const chat = useChat(thread.id, thread.mySide)
   const product = useProduct(thread.productId ?? '')
   const wide = useMediaQuery('(min-width: 1280px)')
   const panelOpen = useChatUi((s) => s.panelOpen)

@@ -2,12 +2,11 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Paperclip, Search } from 'lucide-react'
-import type { PartyRole } from '@/types/models'
 import { useFormat } from '@/features/i18n/useFormat'
 import { ProducerAvatar } from '@/features/producer/ProducerAvatar'
 import { VerificationBadge } from '@/features/trust/VerificationBadge'
 import type { ThreadSummary } from '@/services/dealService'
-import { useProducts } from '@/services/queries'
+import { type CompanyThread, useProducts } from '@/services/queries'
 import { normalize } from '@/features/search/normalize'
 import { cn } from '@/shared/lib/cn'
 import { liveNow } from '@/shared/lib/dates'
@@ -27,20 +26,19 @@ function useShortTime() {
 }
 
 interface Props {
-  threads: ThreadSummary[]
-  role: PartyRole
+  threads: CompanyThread[]
   activeId?: string
   resolve: (t: ThreadSummary) => Partner | undefined
 }
 
-export function ThreadList({ threads, role, activeId, resolve }: Props) {
+export function ThreadList({ threads, activeId, resolve }: Props) {
   const { t } = useTranslation()
   const shortTime = useShortTime()
   const typing = useChatUi((s) => s.typing)
   const { data: products } = useProducts()
   const [query, setQuery] = useState('')
   const [unreadOnly, setUnreadOnly] = useState(false)
-  const unreadOf = (x: ThreadSummary) => (role === 'buyer' ? x.unreadForBuyer : x.unreadForProducer)
+  const unreadOf = (x: CompanyThread) => (x.mySide === 'buyer' ? x.unreadForBuyer : x.unreadForProducer)
   const productName = (id?: string) => products?.find((p) => p.id === id)?.name
 
   const q = normalize(query)
@@ -88,7 +86,7 @@ export function ThreadList({ threads, role, activeId, resolve }: Props) {
             const partner = resolve(x)
             const unread = unreadOf(x)
             const last = x.lastMessage
-            const mine = last?.senderRole === role
+            const mine = last?.senderRole === x.mySide
             return (
               <li key={x.id}>
                 <Link

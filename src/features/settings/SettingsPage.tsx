@@ -5,7 +5,6 @@ import type { ThemePreference, UserPreferences } from '@/types/models'
 import { CURRENCY_CODES, isCurrencyCode } from '@/config/currencies'
 import { LANGUAGES } from '@/config/languages'
 import { CurrencySwitcher } from '@/features/currency/CurrencySwitcher'
-import { useDevStore } from '@/features/dev/devStore'
 import { useFormat } from '@/features/i18n/useFormat'
 import { LanguageSwitcher } from '@/features/i18n/LanguageSwitcher'
 import { TuningPanel } from '@/features/recommendations/TuningPanel'
@@ -40,7 +39,6 @@ export function SettingsPage() {
   const { t } = useTranslation()
   const fmt = useFormat()
   const id = useId()
-  const role = useDevStore((s) => s.role)
   const prefs = usePreferences()
   const set = prefs.update
   const notif = (patch: Partial<UserPreferences['notifications']>) => set({ notifications: { ...prefs.notifications, ...patch } })
@@ -56,7 +54,7 @@ export function SettingsPage() {
       <nav aria-label={t('settings.nav')} className="min-w-0 lg:sticky lg:top-[calc(var(--chrome-h,8rem)+1rem)] lg:self-start">
         <h1 className="mb-3 text-3xl font-semibold">{t('pages.settings')}</h1>
         <ul className="-mx-1 flex gap-1 overflow-x-auto px-1 pb-1 lg:flex-col">
-          {SECTIONS.filter((s) => s !== 'recommendations' || role === 'buyer').map((s) => (
+          {SECTIONS.map((s) => (
             <li key={s}>
               <a href={`#${s}`} className="block shrink-0 rounded-[var(--radius-control)] px-3 py-2 text-sm whitespace-nowrap hover:bg-surface-2">
                 {t(`settings.sections.${s}`)}
@@ -154,21 +152,16 @@ export function SettingsPage() {
 
         <Section id="privacy" icon={<ShieldCheck className="size-5" aria-hidden />} title={t('settings.sections.privacy')} description={t('settings.privacyBody')}>
           <div className="flex flex-col gap-1">
-            {role === 'producer' ? (
-              <Switch checked={prefs.privacy.showReferenceCustomers} onChange={(v) => privacy({ showReferenceCustomers: v })} label={t('settings.privacy.showReferences')} hint={t('settings.privacy.showReferencesHint')} />
-            ) : (
-              <Switch checked={prefs.privacy.allowListedAsReference ?? true} onChange={(v) => privacy({ allowListedAsReference: v })} label={t('settings.privacy.allowReference')} hint={t('settings.privacy.allowReferenceHint')} />
-            )}
+            <Switch checked={prefs.privacy.showReferenceCustomers} onChange={(v) => privacy({ showReferenceCustomers: v })} label={t('settings.privacy.showReferences')} hint={t('settings.privacy.showReferencesHint')} />
+            <Switch checked={prefs.privacy.allowListedAsReference ?? true} onChange={(v) => privacy({ allowListedAsReference: v })} label={t('settings.privacy.allowReference')} hint={t('settings.privacy.allowReferenceHint')} />
             <Switch checked={prefs.privacy.showDealCountPublicly} onChange={(v) => privacy({ showDealCountPublicly: v })} label={t('settings.privacy.dealCount')} hint={t('settings.privacy.dealCountHint')} />
           </div>
           <p className="mt-3 text-xs text-ink-subtle">{t('settings.privacy.always')}</p>
         </Section>
 
-        {role === 'buyer' && (
-          <Section id="recommendations" icon={<Sparkles className="size-5" aria-hidden />} title={t('settings.sections.recommendations')} description={t('reco.tune.intro')}>
-            <TuningPanel />
-          </Section>
-        )}
+        <Section id="recommendations" icon={<Sparkles className="size-5" aria-hidden />} title={t('settings.sections.recommendations')} description={t('reco.tune.intro')}>
+          <TuningPanel />
+        </Section>
 
         <Section id="data" icon={<RotateCcw className="size-5" aria-hidden />} title={t('settings.sections.data')} description={t('settings.dataBody')}>
           <div className="flex flex-wrap gap-2">

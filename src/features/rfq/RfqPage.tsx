@@ -3,10 +3,10 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useFieldArray, useForm, useWatch, type Resolver } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslation } from 'react-i18next'
-import { FileSignature, Plus, Store } from 'lucide-react'
+import { FileSignature, Plus } from 'lucide-react'
 import type { Deal, Incoterm, Product } from '@/types/models'
 import { Price } from '@/features/currency/Price'
-import { useActorId, useDevStore } from '@/features/dev/devStore'
+import { useCompanyIds } from '@/features/dev/devStore'
 import { useDeal, useDealMutations } from '@/features/deals/useDeals'
 import { useFormat } from '@/features/i18n/useFormat'
 import { isSellable, lotQuantityRule, pricePerLotFor, sellableLots } from '@/features/lots/lotMath'
@@ -14,7 +14,7 @@ import { CITIES } from '@/mocks/cities'
 import { useBuyers, useProducers, useProducts } from '@/services/queries'
 import { Breadcrumbs } from '@/shared/ui/Breadcrumbs'
 import { Button } from '@/shared/ui/Button'
-import { EmptyState, LoadingRegion, Skeleton } from '@/shared/ui/states'
+import { LoadingRegion, Skeleton } from '@/shared/ui/states'
 import { liveNow } from '@/shared/lib/dates'
 import { RfqItemRow } from './RfqItemRow'
 import { rfqSchema, type RfqItemValues, type RfqValues } from './rfqSchema'
@@ -225,13 +225,11 @@ function RfqForm({ initial, products, producerFixed, reorderOf }: { initial: Rfq
 export function RfqPage() {
   const { t } = useTranslation()
   const [params] = useSearchParams()
-  const role = useDevStore((s) => s.role)
-  const setRole = useDevStore((s) => s.setRole)
-  const actorId = useActorId()
+  const { buyerId } = useCompanyIds()
   const products = useProducts()
   const buyers = useBuyers()
   const reorderId = params.get('reorder') ?? ''
-  const reorder = useDeal(role === 'buyer' ? reorderId : '')
+  const reorder = useDeal(reorderId)
   const [initial, setInitial] = useState<{ values: RfqValues; fixed: boolean } | null>(null)
 
   useEffect(() => {
@@ -240,7 +238,7 @@ export function RfqPage() {
 
   useEffect(() => {
     if (initial || !products.data || !buyers.data || (reorderId && reorder.isPending)) return
-    const buyer = buyers.data.find((b) => b.id === actorId)
+    const buyer = buyers.data.find((b) => b.id === buyerId)
     const productId = params.get('product')
     const product = products.data.find((p) => p.id === productId)
     const deal = reorder.data
@@ -263,14 +261,7 @@ export function RfqPage() {
         attachments: [],
       },
     })
-  }, [initial, products.data, buyers.data, reorder.isPending, reorder.data, reorderId, params, actorId, t])
-
-  if (role !== 'buyer')
-    return (
-      <div className="mx-auto max-w-2xl px-4 py-12">
-        <EmptyState icon={<Store className="size-5" aria-hidden />} title={t('rfq.buyerOnly')} body={t('rfq.buyerOnlyBody')} action={<Button onClick={() => setRole('buyer')}>{t('rfq.switchRole')}</Button>} />
-      </div>
-    )
+  }, [initial, products.data, buyers.data, reorder.isPending, reorder.data, reorderId, params, buyerId, t])
 
   return (
     <div className="mx-auto flex max-w-[90rem] flex-col gap-5 px-4 py-6 lg:px-6">

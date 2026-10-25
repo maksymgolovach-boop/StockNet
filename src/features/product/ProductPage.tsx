@@ -5,7 +5,7 @@ import { Boxes, CalendarClock, Package, Plus } from 'lucide-react'
 import { NotFoundPage } from '@/app/NotFoundPage'
 import { CERTIFICATIONS } from '@/config/certifications'
 import { useCategoryConfig } from '@/features/categories/useCategoryConfig'
-import { useActorId, useDevStore } from '@/features/dev/devStore'
+import { useCompanyIds } from '@/features/dev/devStore'
 import { useFormat } from '@/features/i18n/useFormat'
 import { LotBadge } from '@/features/lots/LotBadge'
 import { LotOrderPanel } from '@/features/lots/LotOrderPanel'
@@ -55,8 +55,7 @@ export function ProductPage() {
   const reviews = useProducerReviews(p?.producerId)
   const cat = useCategoryConfig(p?.categorySlug)
   const [params, setParams] = useSearchParams()
-  const role = useDevStore((s) => s.role)
-  const actorId = useActorId()
+  const { producerId } = useCompanyIds()
   const [modeChoice, setModeChoice] = useState<'measure' | 'lot' | null>(null)
 
   if (product.error instanceof NotFoundError) return <NotFoundPage />
@@ -69,7 +68,7 @@ export function ProductPage() {
     )
 
   const perishable = cat.config?.perishable ?? false
-  const isOwner = role === 'producer' && actorId === p.producerId
+  const isOwner = producerId === p.producerId
   const lots = p.saleModes.includes('lot') ? sellableLots(p) : []
   const selectedLot = lots.find((l) => l.id === params.get('lot')) ?? bestLot(p)
   const hasMeasure = p.saleModes.includes('measure')

@@ -6,7 +6,6 @@ import { LanguageSwitcher } from '@/features/i18n/LanguageSwitcher'
 import { CategoryTree } from '@/features/categories/CategoryTree'
 import { Drawer } from '@/shared/ui/Drawer'
 import { cn } from '@/shared/lib/cn'
-import { useDevStore } from '@/features/dev/devStore'
 import { navItemsFor } from './navItems'
 
 const linkClass = ({ isActive }: { isActive: boolean }) =>
@@ -14,11 +13,10 @@ const linkClass = ({ isActive }: { isActive: boolean }) =>
 
 export function MobileNav({ open, onClose, unread }: { open: boolean; onClose: () => void; unread: number }) {
   const { t } = useTranslation()
-  const role = useDevStore((s) => s.role)
   return (
     <Drawer open={open} onClose={onClose} title={t('nav.menu')} closeLabel={t('nav.closeMenu')}>
       <nav aria-label={t('nav.primary')} className="flex flex-col gap-0.5 p-3">
-        {navItemsFor(role).map((item) => (
+        {navItemsFor().map((item) => (
           <NavLink key={item.to} to={item.to} className={linkClass} onClick={onClose}>
             <item.icon className="size-[1.125rem]" aria-hidden />
             <span className="flex-1">{t(item.labelKey)}</span>

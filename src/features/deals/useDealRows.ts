@@ -1,9 +1,10 @@
 import { useMemo } from 'react'
 import type { Deal } from '@/types/models'
 import { getCategory } from '@/config/categories'
+import { sideForDeal } from '@/features/company/company'
 import { useCurrency } from '@/features/currency/useCurrency'
 import { usePartners, type Partner } from '@/features/chat/usePartner'
-import { useDevStore } from '@/features/dev/devStore'
+import { useCompanyIds } from '@/features/dev/devStore'
 import { normalize } from '@/features/search/normalize'
 import { useMyDeals } from '@/services/queries'
 import type { DealFilters } from './dealFilters'
@@ -18,21 +19,24 @@ export interface DealRow {
 }
 
 export function useDealRows(filters: DealFilters) {
-  const role = useDevStore((s) => s.role)
+  const { buyerId, producerId } = useCompanyIds()
   const deals = useMyDeals()
-  const partners = usePartners(role)
+  const partners = usePartners()
   const { convert } = useCurrency()
 
   const all: DealRow[] = useMemo(
     () =>
-      (deals.data ?? []).map((deal) => ({
-        deal,
-        partner: partners.resolve(deal),
-        counterpartyId: role === 'buyer' ? deal.producerId : deal.buyerId,
-        displayTotal: convert(deal.total, deal.currency),
-        rootCategories: [...new Set(deal.lineItems.map((li) => getCategory(li.categorySlug)?.rootSlug ?? li.categorySlug))],
-      })),
-    [deals.data, partners.isPending, role, convert],
+      (deals.data ?? []).map((deal) => {
+        const side = sideForDeal(deal, { buyerId, producerId })!
+        return {
+          deal,
+          partner: partners.resolve(deal),
+          counterpartyId: side === 'buyer' ? deal.producerId : deal.buyerId,
+          displayTotal: convert(deal.total, deal.currency),
+          rootCategories: [...new Set(deal.lineItems.map((li) => getCategory(li.categorySlug)?.rootSlug ?? li.categorySlug))],
+        }
+      }),
+    [deals.data, partners.isPending, buyerId, producerId, convert],
   )
 
   const rows = useMemo(() => {

@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Boxes, Plus, Search, Store } from 'lucide-react'
+import { Boxes, Plus, Search } from 'lucide-react'
 import type { LotStatus, Product } from '@/types/models'
 import { useCurrency } from '@/features/currency/useCurrency'
-import { useActorId, useDevStore } from '@/features/dev/devStore'
+import { useCompanyIds } from '@/features/dev/devStore'
 import { useFormat } from '@/features/i18n/useFormat'
 import { CITIES } from '@/mocks/cities'
 import { normalize } from '@/features/search/normalize'
@@ -31,13 +31,11 @@ function cityIdFor(name: string, country: string, fallback: string) {
 export function StockPage() {
   const { t } = useTranslation()
   const fmt = useFormat()
-  const role = useDevStore((s) => s.role)
-  const setRole = useDevStore((s) => s.setRole)
-  const producerId = useActorId()
+  const { producerId } = useCompanyIds()
   const [params, setParams] = useSearchParams()
   const lots = useProducerLots()
   const products = useProducerProducts()
-  const producer = useProducer(role === 'producer' ? producerId : undefined)
+  const producer = useProducer(producerId)
   const m = useLotMutations()
   const { convert, format, display } = useCurrency()
   const [query, setQuery] = useState('')
@@ -54,14 +52,14 @@ export function StockPage() {
 
   const requestedNew = params.get('new')
   useEffect(() => {
-    if (requestedNew === null || role !== 'producer') return
+    if (requestedNew === null) return
     setCreatingFor(requestedNew)
     setParams((prev) => {
       const next = new URLSearchParams(prev)
       next.delete('new')
       return next
     }, { replace: true })
-  }, [requestedNew, role, setParams])
+  }, [requestedNew, setParams])
 
   const rows = lots.data ?? []
   const counts = useMemo(() => {
@@ -83,18 +81,6 @@ export function StockPage() {
       value,
     }
   }, [rows, convert])
-
-  if (role !== 'producer')
-    return (
-      <div className="mx-auto max-w-2xl px-4 py-12">
-        <EmptyState
-          icon={<Store className="size-5" aria-hidden />}
-          title={t('lots.stock.producerOnly')}
-          body={t('lots.stock.producerOnlyBody')}
-          action={<Button onClick={() => setRole('producer')}>{t('lots.stock.switchRole')}</Button>}
-        />
-      </div>
-    )
 
   const productList: Product[] = products.data ?? []
   const createProduct = productList.find((p) => p.id === creatingFor)

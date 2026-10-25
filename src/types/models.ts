@@ -308,6 +308,15 @@ export interface Buyer {
   brandHue: number
 }
 
+export interface Company {
+  id: string
+  name: string
+  legalName: string
+  buyerId: string
+  producerId: string
+  brandHue?: number
+}
+
 /* ───────────── Products ───────────── */
 
 export type PricingMode = 'fixed' | 'on_request' | 'indexed'

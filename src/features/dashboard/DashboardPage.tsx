@@ -3,15 +3,16 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { CalendarClock, FilePlus2, PackageX, PauseCircle } from 'lucide-react'
 import { useUnreadCount } from '@/app/layout/useUnreadCount'
+import { sideForDeal } from '@/features/company/company'
 import { ACTIVE_STATUSES, OPEN_QUOTE_STATUSES, transitionsFor } from '@/features/deals/dealRules'
-import { useActorId, useDevStore } from '@/features/dev/devStore'
+import { useCompany, useCompanyIds } from '@/features/dev/devStore'
 import { useFormat } from '@/features/i18n/useFormat'
 import { availableLots, lotStatus } from '@/features/lots/lotMath'
 import { useProducerLots } from '@/features/lots/stock/useLotMutations'
 import { ReasonChip } from '@/features/recommendations/ReasonChip'
 import { useRecommendations } from '@/features/recommendations/useRecommendations'
 import { useSaved } from '@/features/saved/savedStore'
-import { useBuyers, useMyDeals, useProducer } from '@/services/queries'
+import { useMyDeals } from '@/services/queries'
 import { daysFromNow } from '@/shared/lib/dates'
 import { ButtonLink } from '@/shared/ui/Button'
 import { ErrorState, LoadingRegion, Skeleton } from '@/shared/ui/states'
@@ -81,60 +82,55 @@ function StockAlerts() {
 
 export function DashboardPage() {
   const { t } = useTranslation()
-  const role = useDevStore((s) => s.role)
-  const actorId = useActorId()
+  const { buyerId, producerId } = useCompanyIds()
+  const company = useCompany()
   const deals = useMyDeals()
   const unread = useUnreadCount()
   const saved = useSaved()
-  const buyers = useBuyers()
-  const producer = useProducer(role === 'producer' ? actorId : undefined)
-  const name = role === 'buyer' ? buyers.data?.find((b) => b.id === actorId)?.name : producer.data?.name
+  const name = company.name
 
   useEffect(() => {
     document.title = `${t('pages.dashboard')} · Stocknet`
   }, [t])
 
   const list = [...(deals.data ?? [])].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
-  const quotes = list.filter((d) => OPEN_QUOTE_STATUSES.has(d.status))
+  const buyQuotes = list.filter((d) => d.buyerId === buyerId && OPEN_QUOTE_STATUSES.has(d.status))
+  const sellQuotes = list.filter((d) => d.producerId === producerId && OPEN_QUOTE_STATUSES.has(d.status))
   const active = list.filter((d) => ACTIVE_STATUSES.has(d.status) && !OPEN_QUOTE_STATUSES.has(d.status))
-  const needsMe = list.filter((d) => transitionsFor(d, role).some((tr) => tr.tone === 'primary'))
+  const needsMe = list.filter((d) => {
+    const side = sideForDeal(d, { buyerId, producerId })
+    return side && transitionsFor(d, side).some((tr) => tr.tone === 'primary')
+  })
 
-  const stats =
-    role === 'buyer'
-      ? [
-          { label: t('dashboard.stats.quotes'), value: String(quotes.length), to: '/deals?status=quote_request,quote_received,negotiation' },
-          { label: t('dashboard.stats.active'), value: String(active.length), to: '/deals?status=order_confirmed,in_delivery,delivered,disputed' },
-          { label: t('dashboard.stats.unread'), value: String(unread), to: '/messages' },
-          { label: t('dashboard.stats.saved'), value: String(saved.productIds.length + saved.producerIds.length), to: '#saved' },
-        ]
-      : [
-          { label: t('dashboard.stats.requests'), value: String(quotes.length), to: '/deals?status=quote_request,quote_received,negotiation' },
-          { label: t('dashboard.stats.toShip'), value: String(list.filter((d) => d.status === 'order_confirmed').length), to: '/deals?status=order_confirmed' },
-          { label: t('dashboard.stats.inDelivery'), value: String(list.filter((d) => d.status === 'in_delivery').length), to: '/deals?status=in_delivery' },
-          { label: t('dashboard.stats.unread'), value: String(unread), to: '/messages' },
-        ]
+  const stats = [
+    { label: t('dashboard.stats.quotes'), value: String(buyQuotes.length), to: '/deals?status=quote_request,quote_received,negotiation' },
+    { label: t('dashboard.stats.requests'), value: String(sellQuotes.length), to: '/deals?status=quote_request,quote_received,negotiation' },
+    { label: t('dashboard.stats.active'), value: String(active.length), to: '/deals?status=order_confirmed,in_delivery,delivered,disputed' },
+    { label: t('dashboard.stats.toShip'), value: String(list.filter((d) => d.producerId === producerId && d.status === 'order_confirmed').length), to: '/deals?status=order_confirmed' },
+    { label: t('dashboard.stats.unread'), value: String(unread), to: '/messages' },
+    { label: t('dashboard.stats.saved'), value: String(saved.productIds.length + saved.producerIds.length), to: '#saved' },
+  ]
 
   return (
     <div className="mx-auto flex max-w-[90rem] flex-col gap-5 px-4 py-6 lg:px-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-3xl font-semibold">{t('pages.dashboard')}</h1>
-          <p className="text-sm text-ink-muted">{name ? t('dashboard.subtitle', { name }) : ' '}</p>
+          <p className="text-sm text-ink-muted">{name ? t('dashboard.subtitle', { name }) : ' '}</p>
         </div>
-        {role === 'buyer' ? (
+        <div className="flex flex-wrap gap-2">
           <ButtonLink to="/deals/new" icon={<FilePlus2 className="size-4" aria-hidden />}>
             {t('rfq.new')}
           </ButtonLink>
-        ) : (
           <ButtonLink to="/stock?new=" variant="secondary">
             {t('lots.stock.newLot')}
           </ButtonLink>
-        )}
+        </div>
       </div>
       {deals.isPending ? (
         <LoadingRegion>
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-            {[0, 1, 2, 3].map((i) => (
+            {[0, 1, 2, 3, 4, 5].map((i) => (
               <Skeleton key={i} className="h-24" />
             ))}
           </div>
@@ -151,24 +147,24 @@ export function DashboardPage() {
               <DealRows deals={needsMe.slice(0, 5)} empty="" />
             </Widget>
           )}
-          <Widget title={role === 'buyer' ? t('dashboard.openQuotes') : t('dashboard.incomingRequests')} action={{ to: '/deals?status=quote_request,quote_received,negotiation', label: t('common.viewAll') }}>
-            {deals.isPending ? <Skeleton className="h-32" /> : <DealRows deals={quotes.slice(0, 5)} empty={t('dashboard.noQuotes')} />}
+          <Widget title={t('dashboard.openQuotes')} action={{ to: '/deals?status=quote_request,quote_received,negotiation', label: t('common.viewAll') }}>
+            {deals.isPending ? <Skeleton className="h-32" /> : <DealRows deals={buyQuotes.slice(0, 5)} empty={t('dashboard.noQuotes')} />}
+          </Widget>
+          <Widget title={t('dashboard.incomingRequests')} action={{ to: '/deals?status=quote_request,quote_received,negotiation', label: t('common.viewAll') }}>
+            {deals.isPending ? <Skeleton className="h-32" /> : <DealRows deals={sellQuotes.slice(0, 5)} empty={t('dashboard.noQuotes')} />}
           </Widget>
           <Widget title={t('dashboard.activeDeals')} action={{ to: '/deals?status=order_confirmed,in_delivery,delivered,disputed', label: t('common.viewAll') }}>
             {deals.isPending ? <Skeleton className="h-32" /> : <DealRows deals={active.slice(0, 5)} empty={t('dashboard.noActive')} />}
           </Widget>
-          {role === 'buyer' ? (
-            <div id="saved" className="scroll-mt-[calc(var(--chrome-h,8rem)+1rem)]">
-              <SavedWidget />
-            </div>
-          ) : (
-            <StockAlerts />
-          )}
+          <div id="saved" className="scroll-mt-[calc(var(--chrome-h,8rem)+1rem)]">
+            <SavedWidget />
+          </div>
+          <StockAlerts />
         </div>
         <div className="flex min-w-0 flex-col gap-5">
           <ConversationsWidget />
-          {role === 'buyer' && <RecoWidget />}
-          {role === 'buyer' && <RecentSearchesWidget />}
+          <RecoWidget />
+          <RecentSearchesWidget />
         </div>
       </div>
     </div>

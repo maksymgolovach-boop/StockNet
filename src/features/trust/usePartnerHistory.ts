@@ -1,7 +1,6 @@
 import { useMemo } from 'react'
-import type { Deal } from '@/types/models'
+import type { Deal, PartyRole } from '@/types/models'
 import { CURRENCIES } from '@/config/currencies'
-import { useDevStore } from '@/features/dev/devStore'
 import { useMyDeals } from '@/services/queries'
 
 export interface PartnerHistory {
@@ -16,14 +15,13 @@ export interface PartnerHistory {
 
 const ACTIVE = new Set(['quote_request', 'quote_received', 'negotiation', 'order_confirmed', 'in_delivery', 'delivered', 'disputed'])
 
-/** The current party's private history with one counterparty (only ever computed from the user's own deals). */
-export function usePartnerHistory(counterpartyId: string | undefined): PartnerHistory | null {
-  const role = useDevStore((s) => s.role)
+/** The company's private history with one counterparty (only ever computed from the user's own deals). */
+export function usePartnerHistory(counterpartyId: string | undefined, side: PartyRole): PartnerHistory | null {
   const { data } = useMyDeals()
   return useMemo(() => {
     if (!data || !counterpartyId) return null
     const deals = data
-      .filter((d) => (role === 'buyer' ? d.producerId : d.buyerId) === counterpartyId)
+      .filter((d) => (side === 'buyer' ? d.producerId : d.buyerId) === counterpartyId)
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
     if (!deals.length) return null
     const delivered = deals.filter((d) => d.onTime !== undefined)
@@ -37,5 +35,5 @@ export function usePartnerHistory(counterpartyId: string | undefined): PartnerHi
       totalEUR: deals.filter((d) => d.status !== 'cancelled').reduce((s, d) => s + toEUR(d), 0),
       onTimeRate: delivered.length ? delivered.filter((d) => d.onTime).length / delivered.length : null,
     }
-  }, [data, counterpartyId, role])
+  }, [data, counterpartyId, side])
 }

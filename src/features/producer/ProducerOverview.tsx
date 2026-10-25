@@ -7,7 +7,7 @@ import { CategoryIcon } from '@/features/categories/CategoryIcon'
 import { getCategoryConfig } from '@/config/categories'
 import { useFormat } from '@/features/i18n/useFormat'
 import { useBuyers } from '@/services/queries'
-import { useDevStore } from '@/features/dev/devStore'
+import { useCompanyIds } from '@/features/dev/devStore'
 import { usePreferences } from '@/features/settings/preferencesStore'
 
 export function ProducerOverview({ producer }: { producer: Producer }) {
@@ -15,14 +15,14 @@ export function ProducerOverview({ producer }: { producer: Producer }) {
   const fmt = useFormat()
   const { data: buyers } = useBuyers()
   const privacy = usePreferences((s) => s.privacy)
-  const dev = useDevStore()
-  const ownCompany = producer.id === dev.producerId
+  const { buyerId, producerId } = useCompanyIds()
+  const ownCompany = producer.id === producerId
   const refsHidden = ownCompany && !privacy.showReferenceCustomers
   const countHidden = ownCompany && !privacy.showDealCountPublicly
   const refs = refsHidden
     ? []
     : producer.referenceCustomers
-        .filter((r) => (r.buyerId === dev.buyerId ? (privacy.allowListedAsReference ?? true) : r.visible))
+        .filter((r) => (r.buyerId === buyerId ? (privacy.allowListedAsReference ?? true) : r.visible))
         .map((r) => buyers?.find((b) => b.id === r.buyerId))
         .filter((b) => b !== undefined)
   const facts: [string, string][] = [
@@ -77,7 +77,7 @@ export function ProducerOverview({ producer }: { producer: Producer }) {
             {t('producer.privacyNote')}
           </p>
         </section>
-        {refsHidden && dev.role === 'producer' && (
+        {refsHidden && ownCompany && (
           <p className="rounded-md bg-surface-2 px-3 py-2 text-xs text-ink-muted">
             {t('settings.privacy.refsHiddenNote')}{' '}
             <Link to="/settings#privacy" className="text-primary hover:underline">

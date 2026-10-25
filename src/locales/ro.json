@@ -609,9 +609,9 @@
   },
   "dev": {
     "menu": "Meniu dev",
-    "role": "Rol demo",
-    "roleBuyer": "Cumpărător · {{name}}",
-    "roleProducer": "Producător · {{name}}",
+    "company": "Companie",
+    "buyerIdentity": "Identitate cumpărător",
+    "producerIdentity": "Identitate producător",
     "simulateErrors": "Simulează erori API",
     "latency": "Latență API",
     "latencyValue": "{{ms}} ms",
@@ -1296,9 +1296,6 @@
       "empty": "Niciun lot aici",
       "emptyBody": "Creați primul lot pentru a vinde paleți, baloturi sau camioane.",
       "emptyFiltered": "Niciun lot nu corespunde filtrelor.",
-      "producerOnly": "Stoc și loturi este pentru producători",
-      "producerOnlyBody": "Comutați demonstrația pe vizualizarea de producător (Oțelăria Dunării) pentru a gestiona loturile.",
-      "switchRole": "Comută pe vizualizarea de producător",
       "created": "Lotul {{number}} a fost creat.",
       "saved": "Lotul {{number}} a fost salvat.",
       "duplicated": "Copia {{number}} a fost creată ca întreruptă.",
@@ -1322,6 +1319,7 @@
   "dealsPage": {
     "subtitleBuyer": "Toate cererile, comenzile și livrările cu furnizorii dvs. Doar dvs. și producătorul vedeți aceste detalii.",
     "subtitleProducer": "Toate cererile și comenzile clienților. Doar dvs. și cumpărătorul vedeți aceste detalii.",
+    "subtitleCompany": "Toate cererile, comenzile și livrările — cumpărare și vânzare. Doar dvs. și partenerul vedeți aceste detalii.",
     "search": "Caută ID, partener, produs sau număr de lot",
     "filters": "Filtre",
     "statusFilter": "Filtrează după stare",
@@ -1572,9 +1570,6 @@
     "sending": "Se trimite…",
     "afterSubmit": "Se creează o tranzacție cu starea „Cerere de ofertă” și un chat. Veți fi notificat când sosește oferta.",
     "created": "Cererea {{id}} a fost trimisă. Producătorul răspunde de obicei în câteva ore.",
-    "buyerOnly": "Cererile de ofertă sunt trimise de cumpărători",
-    "buyerOnlyBody": "Comutați demonstrația înapoi pe vizualizarea de cumpărător.",
-    "switchRole": "Comută pe cumpărător",
     "errors": {
       "producer": "Alegeți un producător",
       "items": "Adăugați cel puțin o poziție",
@@ -1601,6 +1596,7 @@
   "partners": {
     "subtitleBuyer": "Toți partenerii cu care ați tranzacționat, cu notițele dvs. private. Producătorii nu văd această pagină.",
     "subtitleProducer": "Clienții dvs., fiabilitatea lor și notițele dvs. private.",
+    "subtitleCompany": "Toți furnizorii și clienții dvs., cu notițele private. Partenerii nu văd această pagină.",
     "viewLabel": "Arată parteneri",
     "views": {
       "all": "Toți",

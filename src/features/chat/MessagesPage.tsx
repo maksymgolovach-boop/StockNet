@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { MessagesSquare } from 'lucide-react'
-import { useActorId, useDevStore } from '@/features/dev/devStore'
+import { useCompanyIds } from '@/features/dev/devStore'
 import { chatTransport } from '@/services/chatTransport'
 import { useMyThreads } from '@/services/queries'
 import { cn } from '@/shared/lib/cn'
@@ -14,31 +14,31 @@ import { usePartners } from './usePartner'
 function useOpenFromQuery() {
   const [params] = useSearchParams()
   const navigate = useNavigate()
-  const role = useDevStore((s) => s.role)
-  const actorId = useActorId()
+  const { buyerId, producerId } = useCompanyIds()
   const started = useRef(false)
   const producer = params.get('producer')
   const buyer = params.get('buyer')
   const product = params.get('product') ?? undefined
-  const target = role === 'buyer' ? producer : buyer
+  const target = producer ?? buyer
   useEffect(() => {
     if (!target || started.current) return
     started.current = true
-    const input = role === 'buyer' ? { buyerId: actorId, producerId: target, productId: product } : { buyerId: target, producerId: actorId, productId: product }
+    const input = producer
+      ? { buyerId, producerId: producer, productId: product }
+      : { buyerId: buyer ?? '', producerId, productId: product }
     chatTransport
       .openThread(input)
       .then((thread) => navigate(`/messages/${thread.id}`, { replace: true }))
       .catch(() => navigate('/messages', { replace: true }))
-  }, [target, role, actorId, product, navigate])
+  }, [target, producer, buyer, buyerId, producerId, product, navigate])
   return !!target
 }
 
 export function MessagesPage() {
   const { t } = useTranslation()
   const { threadId } = useParams()
-  const role = useDevStore((s) => s.role)
   const threads = useMyThreads()
-  const partners = usePartners(role)
+  const partners = usePartners()
   const opening = useOpenFromQuery()
   const thread = threads.data?.find((x) => x.id === threadId)
 
@@ -64,7 +64,7 @@ export function MessagesPage() {
             <ErrorState compact error={threads.error} onRetry={() => void threads.refetch()} />
           </div>
         ) : (
-          <ThreadList threads={threads.data ?? []} role={role} activeId={threadId} resolve={partners.resolve} />
+          <ThreadList threads={threads.data ?? []} activeId={threadId} resolve={partners.resolve} />
         )}
       </aside>
       <div className={cn('min-h-0 min-w-0 flex-1 lg:flex', threadId ? 'flex' : 'hidden')}>

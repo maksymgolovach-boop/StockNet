@@ -431,7 +431,7 @@ const SPECS: ThreadSpec[] = [
   { id: 't19', buyerId: 'b07', producerId: 'p28', script: 'agriDelivery', buyerLang: 'ro', producerLang: 'ro', lastHoursAgo: 0.6, unread: 1, linkLatestDeal: true },
   { id: 't20', buyerId: 'b07', producerId: 'p26', script: 'machineHandover', buyerLang: 'ro', producerLang: 'ro', lastHoursAgo: 5, unread: 0, linkLatestDeal: true },
   { id: 't21', buyerId: 'b07', producerId: 'p29', script: 'agriNegotiation', buyerLang: 'en', producerLang: 'en', lastHoursAgo: 2, unread: 2, linkLatestDeal: true },
-  { id: 't22', buyerId: 'b07', producerId: 'p01', script: 'agriCert', buyerLang: 'ro', producerLang: 'ro', lastHoursAgo: 30, unread: 0, linkLatestDeal: true },
+  { id: 't22', buyerId: 'b06', producerId: 'p01', script: 'agriCert', buyerLang: 'ro', producerLang: 'ro', lastHoursAgo: 30, unread: 0, linkLatestDeal: true },
   { id: 't23', buyerId: 'b07', producerId: 'p27', script: 'agriPrice', buyerLang: 'en', producerLang: 'de', lastHoursAgo: 3.5, unread: 1, linkLatestDeal: true, vars: { qty: 1, days: 30 } },
   { id: 't24', buyerId: 'b07', producerId: 'p03', script: 'agriDispute', buyerLang: 'en', producerLang: 'en', lastHoursAgo: 52, unread: 0, linkLatestDeal: true },
   { id: 't25', buyerId: 'b07', producerId: 'p02', script: 'agriPrice', buyerLang: 'ro', producerLang: 'ro', lastHoursAgo: 220, unread: 0, vars: { days: 2 } },

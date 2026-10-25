@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Handshake, Search } from 'lucide-react'
+import type { Partnership } from '@/types/models'
 import { usePartners } from '@/features/chat/usePartner'
-import { useDevStore } from '@/features/dev/devStore'
+import { threadForPartnership } from '@/features/company/company'
+import { useCompanyIds } from '@/features/dev/devStore'
 import { useDealMutations, usePartnerships } from '@/features/deals/useDeals'
 import { normalize } from '@/features/search/normalize'
 import { Select } from '@/shared/ui/Select'
@@ -15,9 +17,9 @@ type Sort = 'last' | 'volume' | 'deals' | 'name'
 
 export function PartnersPage() {
   const { t } = useTranslation()
-  const role = useDevStore((s) => s.role)
+  const ids = useCompanyIds()
   const data = usePartnerships()
-  const partners = usePartners(role)
+  const partners = usePartners()
   const { setMeta } = useDealMutations()
   const [view, setView] = useState<View>('all')
   const [sort, setSort] = useState<Sort>('last')
@@ -28,13 +30,14 @@ export function PartnersPage() {
   }, [t])
 
   const list = data.data ?? []
-  const name = (id: string) => partners.resolve(role === 'buyer' ? { producerId: id, buyerId: '' } : { buyerId: id, producerId: '' })?.name ?? id
+  const threadFor = (p: Partnership) => threadForPartnership(p, ids)
+  const name = (p: Partnership) => partners.resolve(threadFor(p))?.name ?? p.counterpartyId
   const q = normalize(query)
   const visible = list
     .filter((p) => (view === 'favorites' ? p.favorite : view === 'active' ? p.status === 'active' : view === 'dormant' ? p.status === 'dormant' : true))
-    .filter((p) => !q || normalize(`${name(p.counterpartyId)} ${p.tag ? t(`partners.tags.${p.tag}`) : ''} ${p.privateNotes}`).includes(q))
+    .filter((p) => !q || normalize(`${name(p)} ${p.tag ? t(`partners.tags.${p.tag}`) : ''} ${p.privateNotes}`).includes(q))
     .sort((a, b) =>
-      sort === 'volume' ? b.totalVolumeEUR - a.totalVolumeEUR : sort === 'deals' ? b.dealCount - a.dealCount : sort === 'name' ? name(a.counterpartyId).localeCompare(name(b.counterpartyId)) : b.lastDealAt.localeCompare(a.lastDealAt),
+      sort === 'volume' ? b.totalVolumeEUR - a.totalVolumeEUR : sort === 'deals' ? b.dealCount - a.dealCount : sort === 'name' ? name(a).localeCompare(name(b)) : b.lastDealAt.localeCompare(a.lastDealAt),
     )
   const counts: Record<View, number> = {
     all: list.length,
@@ -50,7 +53,7 @@ export function PartnersPage() {
           <Handshake className="size-7" aria-hidden />
           {t('pages.partners')}
         </h1>
-        <p className="text-sm text-ink-muted">{t(role === 'buyer' ? 'partners.subtitleBuyer' : 'partners.subtitleProducer')}</p>
+        <p className="text-sm text-ink-muted">{t('partners.subtitleCompany')}</p>
       </div>
       <div className="flex flex-col gap-3 rounded-[var(--radius-card)] border border-line bg-surface p-3 md:flex-row md:items-center">
         <div role="group" aria-label={t('partners.viewLabel')} className="flex flex-wrap gap-1.5">
@@ -86,10 +89,10 @@ export function PartnersPage() {
             <li key={p.counterpartyId} className="min-w-0">
               <PartnerCard
                 p={p}
-                role={role}
-                partner={partners.resolve(role === 'buyer' ? { producerId: p.counterpartyId, buyerId: '' } : { buyerId: p.counterpartyId, producerId: '' })}
+                role={p.ownerRole}
+                partner={partners.resolve(threadFor(p))}
                 saving={setMeta.isPending && setMeta.variables?.counterpartyId === p.counterpartyId}
-                onMeta={(patch) => setMeta.mutate({ counterpartyId: p.counterpartyId, patch })}
+                onMeta={(patch) => setMeta.mutate({ counterpartyId: p.counterpartyId, patch, side: p.ownerRole })}
               />
             </li>
           ))}
