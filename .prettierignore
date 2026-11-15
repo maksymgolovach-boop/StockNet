@@ -5,3 +5,5 @@ package-lock.json
 *.md
 # Generated demo data: one record per line is easier to scan
 src/mocks
+test-results
+playwright-report

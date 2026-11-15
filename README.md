@@ -11,12 +11,18 @@ npm install
 npm run dev        # http://localhost:5173
 npm run check      # type-check + lint + format check + locale coverage + mock-data validation + search, deal and storage tests
 npm run format     # format all files with Prettier (Tailwind classes are sorted too)
+npm run test:e2e   # browser tests against the production build (first time: npx playwright install chromium)
 npm run build      # type-check and production build
 ```
 
 Code style is enforced by Prettier (`.prettierrc.json`) and oxlint. VS Code suggests both extensions (`.vscode/extensions.json`); turn on "Format on Save". Generated mock data in `src/mocks` is not formatted, so each record stays on one line.
 
-GitHub Actions (`.github/workflows/check.yml`) runs `npm run check` and `npm run build` on every push and pull request.
+GitHub Actions (`.github/workflows/check.yml`) runs `npm run check`, `npm run build` and the browser tests on every push and pull request. If a browser test fails there, its trace is attached to the run (open it with `npx playwright show-trace`).
+
+### Tests
+
+- `npm run check` covers the logic without a browser: search (`scripts/test-search.ts`), deal and lot rules (`test-deals.ts`), saved-data validation (`test-storage.ts`), plus translation coverage and mock-data validation.
+- `npm run test:e2e` runs Playwright tests from `e2e/` in Chromium against `vite preview`: every page renders, search and filters, the quote → order flow, chat, the lot form, language switching, crash screens and corrupted saved data, phone widths (no sideways scrolling), accessibility (axe-core, light and dark) and the dev-menu switch. Photo and map hosts are blocked in the tests, so they do not depend on the internet. Ids of demo records used by the tests are listed in `e2e/fixtures.ts`.
 
 ### Running the demo without internet
 
@@ -57,6 +63,7 @@ src/
   shared/              UI primitives, hooks, libs (geo, storage, random, dates)
   types/models.ts      Domain model
 scripts/               check-case.ts, check-locales.ts, validate-mocks.ts, test-search.ts, test-deals.ts, test-storage.ts, download-photos.ts
+e2e/                   Playwright browser tests (see Tests)
 ```
 
 ## Active industries
