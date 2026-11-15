@@ -36,7 +36,7 @@ export function StockTable({ rows, busyId, onEdit, onDuplicate, onStock, onStatu
   const lf = useLotFormat()
   const th = 'px-3 py-2 text-xs font-medium whitespace-nowrap text-ink-muted'
   return (
-    <div className="overflow-x-auto rounded-[var(--radius-card)] border border-line bg-surface">
+    <div className="relative overflow-x-auto rounded-[var(--radius-card)] border border-line bg-surface">
       <table className="w-full min-w-[64rem] text-sm">
         <caption className="sr-only">{t('lots.stock.tableCaption')}</caption>
         <thead className="bg-surface-2">

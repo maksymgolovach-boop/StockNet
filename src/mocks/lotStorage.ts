@@ -1,4 +1,5 @@
 import type { Lot, Product, SaleMode } from '@/types/models'
+import { isRecord, matches, type Shape } from '@/shared/lib/shape'
 import { safeStorage } from '@/shared/lib/storage'
 
 const KEY = 'sy-lots'
@@ -11,12 +12,46 @@ interface StoredLots {
 
 const empty = (): StoredLots => ({ version: 1, lots: {}, saleModes: {} })
 
+const LOT: Shape = {
+  id: 'string',
+  productId: 'string',
+  producerId: 'string',
+  lotNumber: 'string',
+  type: 'string',
+  condition: 'string',
+  status: 'string',
+  createdAt: 'string',
+  updatedAt: 'string',
+  content: { quantity: 'number', unit: 'string' },
+  pricePerLot: 'number',
+  stockCount: 'number',
+  reservedCount: 'number',
+  moqLots: 'number',
+  tiers: [{ minLots: 'number', pricePerLot: 'number' }],
+  divisibility: { kind: 'string' },
+  documents: 'array',
+  location: { label: 'string', city: 'string', country: 'string', point: { lat: 'number', lng: 'number' } },
+}
+const SALE_MODES: SaleMode[] = ['measure', 'lot']
+const isSaleModes = (value: unknown): value is SaleMode[] =>
+  Array.isArray(value) && value.every((mode) => SALE_MODES.includes(mode))
+
+/** Reads the saved lot edits, keeping only records that still have the expected shape. */
 function read(): StoredLots {
   try {
-    const raw = safeStorage.getItem(KEY)
-    if (!raw) return empty()
-    const parsed = JSON.parse(raw) as StoredLots
-    return parsed.version === 1 && parsed.lots && parsed.saleModes ? parsed : empty()
+    const parsed: unknown = JSON.parse(safeStorage.getItem(KEY) ?? 'null')
+    if (!isRecord(parsed) || parsed.version !== 1) return empty()
+    const lots = Object.entries(isRecord(parsed.lots) ? parsed.lots : {}).filter(
+      ([id, lot]) => matches(lot, LOT) && (lot as Lot).id === id,
+    )
+    const saleModes = Object.entries(isRecord(parsed.saleModes) ? parsed.saleModes : {}).filter(([, modes]) =>
+      isSaleModes(modes),
+    )
+    return {
+      version: 1,
+      lots: Object.fromEntries(lots) as Record<string, Lot>,
+      saleModes: Object.fromEntries(saleModes) as Record<string, SaleMode[]>,
+    }
   } catch {
     return empty()
   }

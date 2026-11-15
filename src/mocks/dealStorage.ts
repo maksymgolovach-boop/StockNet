@@ -1,4 +1,5 @@
 import type { Deal, Message, PartnershipMeta, Review, Thread } from '@/types/models'
+import { isRecord, matches, matching, type Shape } from '@/shared/lib/shape'
 import { safeStorage } from '@/shared/lib/storage'
 
 const KEY = 'sy-deals'
@@ -14,12 +15,76 @@ interface StoredDeals {
 
 const empty = (): StoredDeals => ({ version: 1, deals: {}, reviews: [], threads: [], messages: [], partnerMeta: [] })
 
+const DEAL: Shape = {
+  id: 'string',
+  buyerId: 'string',
+  producerId: 'string',
+  currency: 'string',
+  status: 'string',
+  incoterm: 'string',
+  requestedDeliveryDate: 'string',
+  notes: 'string',
+  createdAt: 'string',
+  updatedAt: 'string',
+  total: 'number',
+  deliveryAddress: { street: 'string', city: 'string', country: 'string' },
+  lineItems: [{ productId: 'string', productName: 'string', categorySlug: 'string', unit: 'string', quantity: 'number', unitPrice: 'number', subtotal: 'number' }],
+  events: [{ id: 'string', status: 'string', at: 'string', actor: 'string' }],
+  documents: 'array',
+}
+const REVIEW: Shape = {
+  id: 'string',
+  dealId: 'string',
+  producerId: 'string',
+  buyerId: 'string',
+  createdAt: 'string',
+  text: 'string',
+  contentLang: 'string',
+  productIds: 'array',
+  ratings: {},
+  overall: 'number',
+  photoCount: 'number',
+  helpfulVotes: 'number',
+}
+const THREAD: Shape = {
+  id: 'string',
+  buyerId: 'string',
+  producerId: 'string',
+  createdAt: 'string',
+  lastMessageAt: 'string',
+  unreadForBuyer: 'number',
+  unreadForProducer: 'number',
+}
+const MESSAGE: Shape = {
+  id: 'string',
+  threadId: 'string',
+  senderId: 'string',
+  senderRole: 'string',
+  kind: 'string',
+  text: 'string',
+  contentLang: 'string',
+  sentAt: 'string',
+  mockTranslations: {},
+  attachments: 'array',
+}
+const PARTNER_META: Shape = { ownerId: 'string', counterpartyId: 'string', privateNotes: 'string', favorite: 'boolean' }
+
+/** Reads the saved changes, keeping only records that still have the expected shape. */
 function read(): StoredDeals {
   try {
-    const raw = safeStorage.getItem(KEY)
-    if (!raw) return empty()
-    const parsed = JSON.parse(raw) as StoredDeals
-    return parsed.version === 1 ? { ...empty(), ...parsed } : empty()
+    const parsed: unknown = JSON.parse(safeStorage.getItem(KEY) ?? 'null')
+    if (!isRecord(parsed) || parsed.version !== 1) return empty()
+    const deals = Object.entries(isRecord(parsed.deals) ? parsed.deals : {}).filter(
+      ([id, deal]) => matches(deal, DEAL) && (deal as Deal).id === id && (deal as Deal).events.length > 0,
+    )
+    return {
+      version: 1,
+      deals: Object.fromEntries(deals) as Record<string, Deal>,
+      reviews: matching<Review>(parsed.reviews, REVIEW),
+      threads: matching<Thread>(parsed.threads, THREAD),
+      messages: matching<Message>(parsed.messages, MESSAGE),
+      partnerMeta: matching<PartnershipMeta>(parsed.partnerMeta, PARTNER_META),
+    }
   } catch {
     return empty()
   }

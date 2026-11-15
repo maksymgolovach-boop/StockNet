@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { Boxes, Plus, Search } from 'lucide-react'
 import type { LotStatus, Product } from '@/types/models'
 import { useCurrency } from '@/features/currency/useCurrency'
-import { useCompanyIds } from '@/features/dev/devStore'
+import { useCompany, useCompanyIds } from '@/features/dev/devStore'
 import { useFormat } from '@/features/i18n/useFormat'
 import { CITIES } from '@/mocks/cities'
 import { normalize } from '@/features/search/normalize'
@@ -34,6 +34,7 @@ export function StockPage() {
   const { t } = useTranslation()
   const fmt = useFormat()
   const { producerId } = useCompanyIds()
+  const company = useCompany()
   const [params, setParams] = useSearchParams()
   const lots = useProducerLots()
   const products = useProducerProducts()
@@ -132,7 +133,9 @@ export function StockPage() {
             <Boxes className="size-7" aria-hidden />
             {t('lots.stock.title')}
           </h1>
-          <p className="text-sm text-ink-muted">{t('lots.stock.subtitle', { name: producer.data?.name ?? '' })}</p>
+          <p className="text-sm text-ink-muted">
+            {t('lots.stock.subtitle', { company: company.name, name: producer.data?.name ?? '' })}
+          </p>
         </div>
         <Button icon={<Plus className="size-4" aria-hidden />} onClick={() => setCreatingFor('')}>
           {t('lots.stock.newLot')}

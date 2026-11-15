@@ -89,7 +89,12 @@
     "notFoundTitle": "Pagina nu a fost găsită",
     "notFoundBody": "Pagina căutată nu există sau a fost mutată.",
     "goHome": "Mergi la pagina principală",
-    "simulated": "Eroare API simulată (meniul dev)"
+    "simulated": "Eroare API simulată (meniul dev)",
+    "crashTitle": "Pagina a întâmpinat o problemă",
+    "crashBody": "De obicei, reîncărcarea rezolvă problema. Dacă persistă, resetați datele demo salvate în acest browser.",
+    "reload": "Reîncarcă pagina",
+    "resetData": "Resetează datele demo",
+    "details": "Detalii tehnice"
   },
   "empty": {
     "title": "Nimic aici deocamdată",
@@ -908,7 +913,8 @@
       "deliveryRadius": "Rază de livrare",
       "languages": "Limbi",
       "memberSince": "Membru din"
-    }
+    },
+    "ownProfile": "Acesta este profilul dvs. de vânzător. {{company}} vinde sub acest nume, iar cumpărătorii îl văd astfel."
   },
   "report": {
     "listing": "Raportează anunțul",
@@ -1270,7 +1276,7 @@
     },
     "stock": {
       "title": "Stoc și loturi",
-      "subtitle": "{{name}} · creați, stabiliți prețul și urmăriți loturile vândute.",
+      "subtitle": "{{company}} vinde ca {{name}} · creați, stabiliți prețul și urmăriți loturile vândute.",
       "newLot": "Lot nou",
       "newTitle": "Lot nou",
       "editTitle": "Editează lotul {{number}}",

@@ -45,17 +45,19 @@ export function VolumeChart({ data, label }: { data: { quarter: string; volumeEU
         <span>{data[0] ? quarter(data[0].quarter) : ''}</span>
         <span>{data.length ? quarter((data[data.length - 1] as { quarter: string }).quarter) : ''}</span>
       </div>
-      <table className="sr-only">
-        <caption>{label}</caption>
-        <tbody>
-          {data.map((d, i) => (
-            <tr key={d.quarter}>
-              <th scope="row">{quarter(d.quarter)}</th>
-              <td>{format(values[i] ?? 0, display)}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <div className="sr-only">
+        <table>
+          <caption>{label}</caption>
+          <tbody>
+            {data.map((d, i) => (
+              <tr key={d.quarter}>
+                <th scope="row">{quarter(d.quarter)}</th>
+                <td>{format(values[i] ?? 0, display)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </figure>
   )
 }

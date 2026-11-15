@@ -3,6 +3,7 @@ import { Outlet, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useChatConnection } from '@/features/chat/useChatConnection'
 import { DevMenu } from '@/features/dev/DevMenu'
+import { useDevMenuEnabled } from '@/features/dev/useDevMenuEnabled'
 import { Footer } from './Footer'
 import { Header } from './Header'
 
@@ -11,6 +12,7 @@ export function AppShell() {
   const { pathname } = useLocation()
   const mainRef = useRef<HTMLElement>(null)
   useChatConnection()
+  const devMenu = useDevMenuEnabled()
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -34,7 +36,7 @@ export function AppShell() {
         <Outlet />
       </main>
       <Footer />
-      <DevMenu />
+      {devMenu && <DevMenu />}
     </div>
   )
 }

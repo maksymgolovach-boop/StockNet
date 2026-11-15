@@ -14,12 +14,13 @@
     "typecheck": "tsc -b",
     "check:locales": "tsx --tsconfig tsconfig.app.json scripts/check-locales.ts",
     "check:mocks": "tsx --tsconfig tsconfig.app.json scripts/validate-mocks.ts",
-    "check": "npm run check:case && npm run typecheck && npm run lint && npm run format:check && npm run check:locales && npm run check:mocks && npm run test:search && npm run test:deals",
+    "check": "npm run check:case && npm run typecheck && npm run lint && npm run format:check && npm run check:locales && npm run check:mocks && npm run test:search && npm run test:deals && npm run test:storage",
     "test:search": "tsx --tsconfig tsconfig.app.json scripts/test-search.ts",
     "check:case": "tsx scripts/check-case.ts",
     "test:deals": "tsx --tsconfig tsconfig.app.json scripts/test-deals.ts",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "test:storage": "tsx --tsconfig tsconfig.app.json scripts/test-storage.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",

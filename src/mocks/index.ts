@@ -13,8 +13,8 @@ import { CURRENT_BUYER_ID as DEMO_BUYER_ID } from './buyers'
 import { BUYER_SEEDS, buildBuyer } from './buyers'
 import { TEMPLATE_KEY_BY_PRODUCT, buildProducts } from './products'
 import { attachLots, convertDealsToLots, refreshReservations } from './lots'
-import { applyStoredLots } from './lotStorage'
-import { applyStoredDeals } from './dealStorage'
+import { applyStoredLots, clearStoredLots } from './lotStorage'
+import { applyStoredDeals, clearStoredDeals } from './dealStorage'
 import { buildDeals } from './deals'
 import { buildReviews } from './reviews'
 import { buildThreads } from './threads'
@@ -185,7 +185,22 @@ function inScope(data: MockDatabase): MockDatabase {
   return { products, producers, buyers, deals, reviews, threads, messages, partnershipMeta }
 }
 
-export const db: MockDatabase = buildDatabase()
+/**
+ * Saved lot and deal edits are replayed while the data is built. If that replay ever fails (for example data saved
+ * by an older version), the saved edits are dropped and the data is rebuilt, so the app always starts.
+ */
+function buildDatabaseSafely(): MockDatabase {
+  try {
+    return buildDatabase()
+  } catch (error) {
+    console.error('[mocks] saved demo data could not be replayed and was reset', error)
+    clearStoredLots()
+    clearStoredDeals()
+    return buildDatabase()
+  }
+}
+
+export const db: MockDatabase = buildDatabaseSafely()
 
 /** Structural checks of the mock dataset against the category configs and the spec's volume targets. */
 export function validateMockData(data: MockDatabase = db): string[] {

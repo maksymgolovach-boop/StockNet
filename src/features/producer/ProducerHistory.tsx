@@ -43,7 +43,7 @@ export function ProducerHistory({ history }: { history: PartnerHistory }) {
           value={history.firstAt ? fmt.date(history.firstAt, { month: 'short', year: 'numeric' }) : '—'}
         />
       </dl>
-      <div className="overflow-x-auto rounded-[var(--radius-card)] border border-line bg-surface">
+      <div className="relative overflow-x-auto rounded-[var(--radius-card)] border border-line bg-surface">
         <table className="w-full min-w-[40rem] text-sm">
           <caption className="sr-only">{t('partner.dealsTable')}</caption>
           <thead className="bg-surface-2 text-xs text-ink-muted">

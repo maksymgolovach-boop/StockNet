@@ -9,7 +9,7 @@ Requires **Node.js 20.19+ or 22.12+** (Vite 8). `.nvmrc` pins Node 22 for nvm / 
 ```bash
 npm install
 npm run dev        # http://localhost:5173
-npm run check      # type-check + lint + format check + locale coverage + mock-data validation + search and deal tests
+npm run check      # type-check + lint + format check + locale coverage + mock-data validation + search, deal and storage tests
 npm run format     # format all files with Prettier (Tailwind classes are sorted too)
 npm run build      # type-check and production build
 ```
@@ -17,10 +17,6 @@ npm run build      # type-check and production build
 Code style is enforced by Prettier (`.prettierrc.json`) and oxlint. VS Code suggests both extensions (`.vscode/extensions.json`); turn on "Format on Save". Generated mock data in `src/mocks` is not formatted, so each record stays on one line.
 
 GitHub Actions (`.github/workflows/check.yml`) runs `npm run check` and `npm run build` on every push and pull request.
-
-The demo runs against a fixed date (**16 Oct 2026**, `src/shared/lib/dates.ts`) so expiry badges, document states and deal timelines stay coherent with the mock data.
-
-Fonts (Fraunces + IBM Plex Sans) load from Google Fonts. In sandboxed previews where they are blocked, system fallbacks are used. Storage falls back to memory when `localStorage` is unavailable.
 
 ## Folder structure
 
@@ -44,7 +40,7 @@ src/
                        + TanStack Query hooks
   shared/              UI primitives, hooks, libs (geo, storage, random, dates)
   types/models.ts      Domain model
-scripts/               check-case.ts, check-locales.ts, validate-mocks.ts, test-search.ts, test-deals.ts
+scripts/               check-case.ts, check-locales.ts, validate-mocks.ts, test-search.ts, test-deals.ts, test-storage.ts
 ```
 
 ## Active industries
@@ -163,11 +159,20 @@ Each service in `src/services` is an interface plus a mock implementation built 
 - Every page was scanned with axe-core (WCAG 2.1 A/AA) in light and dark mode: no violations. Contrast pairs were checked with a script (all text ≥ 4.5:1).
 - Keyboard: skip link, "/" focuses search, combobox and tab patterns, focus trap and focus return in modals, drawers and popovers, Esc closes them; map pins are focusable and the list is the map's accessible equivalent; charts have a screen-reader table.
 - `prefers-reduced-motion` disables animations and smooth scrolling.
+- No page scrolls sideways on phones (checked at 360, 390 and 768 px). Horizontally scrolling tables are `relative`, so screen-reader-only content inside them cannot widen the page.
+
+## Error handling
+
+The app should never show a blank page:
+
+- **Saved data is checked when it is read.** Lots, deals, reviews, threads and partner notes saved in the browser (`sy-lots`, `sy-deals`) are replayed only if each record still has the expected shape (`src/shared/lib/shape.ts`); anything else is skipped. Preferences fall back to defaults field by field. If the replay still fails, the saved edits are dropped and the mock data is rebuilt.
+- **Crash screen.** A page that throws while rendering, or whose code fails to load, shows a message with Reload, Home and "Reset demo data" inside the normal layout, so the header keeps working (`src/app/CrashScreen.tsx`, route `errorElement`s in `src/app/router.tsx`). An `ErrorBoundary` around the whole app covers everything outside the router.
+- **Start-up fallback.** `src/main.tsx` loads the app with a dynamic import; if that fails before React renders, a plain-HTML message offers to reset the saved data (`src/app/startupError.ts`).
 - Code splitting: home and search load first; every other page, the map (Leaflet) and the form library load on demand (see `src/app/router.tsx`).
 
 ## Assumptions
 
-- One company, Câmpia Moldovei Agro (a farming group and distributor in Iași), is "you". It buys as buyer `b07` and sells as producer `p01` (Cooperativa Agricolă Țara Bârsei), with one inbox, deal list, partner list and dashboard. The dev menu shows both identities read-only. There is no authentication. Saved demo settings from an older version (dev menu, saved items, recent searches, recommendation categories) are reset automatically.
+- One company, Câmpia Moldovei Agro (a farming group and distributor in Iași), is "you". It buys as buyer `b07` and sells as producer `p01` (Cooperativa Agricolă Țara Bârsei), with one inbox, deal list, partner list and dashboard. The Stock & lots page and the company's own producer page say which name it sells under. The dev menu shows both identities read-only. There is no authentication. Saved demo settings from an older version (dev menu, saved items, recent searches, recommendation categories) are reset automatically.
 - Product photos for agricultural machinery, fruit & vegetables and fertilizers & crop protection are free Pexels and Unsplash stock photos (`src/mocks/photos.ts`), loaded from images.pexels.com and images.unsplash.com; fertilizers show large stocks (big bags, pallets, bulk piles) and matched by product type; they are illustrative only. Other categories, and any photo that fails to load (e.g. offline), show the neutral category placeholder.
 - All companies, prices, documents and reviews are fictional. Exchange rates are fixed mock values; prices are indicative and converted for display only, while quotes and deals stay in their transaction currency.
 - "Today" is fixed at 16 Oct 2026 so expiry, document and deal states stay consistent. Distances are straight-line (road distance is approximated for time-limited deliveries).
@@ -187,5 +192,7 @@ Each service in `src/services` is an interface plus a mock implementation built 
 8. Testing: component tests (Testing Library), end-to-end tests (Playwright) for search → product → quote → deal, and axe checks in CI.
 
 ## Dev menu
+
+Always available with `npm run dev`. In a published build it is hidden; open any page with `?dev=1` to show it (remembered in that browser) and `?dev=0` to hide it again.
 
 Bottom-left button: shows the logged-in company with its buyer and producer identities (read-only), simulate API errors (exercises error states), change API latency (exercises skeletons), reset preferences.

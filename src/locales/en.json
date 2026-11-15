@@ -83,7 +83,12 @@
     "notFoundTitle": "Page not found",
     "notFoundBody": "The page you are looking for doesn't exist or has moved.",
     "goHome": "Go to the homepage",
-    "simulated": "Simulated API error (dev menu)"
+    "simulated": "Simulated API error (dev menu)",
+    "crashTitle": "This page ran into a problem",
+    "crashBody": "Reloading usually fixes it. If it keeps happening, reset the demo data saved in this browser.",
+    "reload": "Reload page",
+    "resetData": "Reset demo data",
+    "details": "Technical details"
   },
   "empty": {
     "title": "Nothing here yet",
@@ -884,7 +889,8 @@
       "deliveryRadius": "Delivery radius",
       "languages": "Languages",
       "memberSince": "Member since"
-    }
+    },
+    "ownProfile": "This is your seller profile. {{company}} sells under this name, and this is how buyers see it."
   },
   "report": {
     "listing": "Report listing",
@@ -1233,7 +1239,7 @@
     },
     "stock": {
       "title": "Stock & lots",
-      "subtitle": "{{name}} · create, price and track the lots you sell.",
+      "subtitle": "{{company}} sells as {{name}} · create, price and track the lots you sell.",
       "newLot": "New lot",
       "newTitle": "New lot",
       "editTitle": "Edit lot {{number}}",

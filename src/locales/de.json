@@ -83,7 +83,12 @@
     "notFoundTitle": "Seite nicht gefunden",
     "notFoundBody": "Die gesuchte Seite existiert nicht oder wurde verschoben.",
     "goHome": "Zur Startseite",
-    "simulated": "Simulierter API-Fehler (Dev-Menü)"
+    "simulated": "Simulierter API-Fehler (Dev-Menü)",
+    "crashTitle": "Auf dieser Seite ist ein Problem aufgetreten",
+    "crashBody": "Neu laden hilft meistens. Falls das Problem bleibt, setzen Sie die in diesem Browser gespeicherten Demodaten zurück.",
+    "reload": "Seite neu laden",
+    "resetData": "Demodaten zurücksetzen",
+    "details": "Technische Details"
   },
   "empty": {
     "title": "Noch nichts vorhanden",
@@ -884,7 +889,8 @@
       "deliveryRadius": "Lieferradius",
       "languages": "Sprachen",
       "memberSince": "Mitglied seit"
-    }
+    },
+    "ownProfile": "Das ist Ihr Verkäuferprofil. {{company}} verkauft unter diesem Namen; so sehen es Käufer."
   },
   "report": {
     "listing": "Angebot melden",
@@ -1233,7 +1239,7 @@
     },
     "stock": {
       "title": "Bestand & Lose",
-      "subtitle": "{{name}} · Lose anlegen, bepreisen und verfolgen.",
+      "subtitle": "{{company}} verkauft als {{name}} · Lose anlegen, bepreisen und verfolgen.",
       "newLot": "Neues Los",
       "newTitle": "Neues Los",
       "editTitle": "Los {{number}} bearbeiten",

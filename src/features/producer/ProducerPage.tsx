@@ -2,7 +2,7 @@ import { useParams, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Boxes, Heart, MapPin, MessageSquare, Star } from 'lucide-react'
 import { NotFoundPage } from '@/app/NotFoundPage'
-import { useIsOwnProducer } from '@/features/dev/devStore'
+import { useCompany, useIsOwnProducer } from '@/features/dev/devStore'
 import { useFormat } from '@/features/i18n/useFormat'
 import { ProductCard } from '@/features/product/ProductCard'
 import { useSaved } from '@/features/saved/savedStore'
@@ -69,6 +69,7 @@ export function ProducerPage() {
   const saved = useSaved((s) => s.producerIds.includes(id))
   const toggleSaved = useSaved((s) => s.toggleProducer)
   const isOwn = useIsOwnProducer(id)
+  const company = useCompany()
 
   if (producer.error instanceof NotFoundError) return <NotFoundPage />
   if (producer.isPending)
@@ -115,6 +116,11 @@ export function ProducerPage() {
   return (
     <div className="mx-auto flex max-w-[90rem] flex-col gap-6 px-4 py-6 lg:px-6">
       <Breadcrumbs items={[{ label: t('nav.home'), to: '/' }, { label: t('pages.producer') }, { label: p.name }]} />
+      {isOwn && (
+        <p className="rounded-[var(--radius-card)] border border-line bg-surface-2 px-4 py-3 text-sm">
+          {t('producer.ownProfile', { company: company.name })}
+        </p>
+      )}
       <header className="flex flex-col gap-4 rounded-[var(--radius-card)] border border-line bg-surface p-5 md:flex-row md:items-start">
         <ProducerAvatar producer={p} size="lg" />
         <div className="flex min-w-0 flex-1 flex-col gap-2">

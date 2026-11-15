@@ -7,6 +7,8 @@ import { safeStorage } from '@/shared/lib/storage'
 
 interface DevState {
   companyId: string
+  /** Whether the dev menu button is shown. Always on in development; in a published build only after ?dev=1. */
+  menuEnabled: boolean
   simulateErrors: boolean
   latencyMs: number
   setSimulateErrors: (on: boolean) => void
@@ -18,6 +20,7 @@ export const useDevStore = create<DevState>()(
   persist(
     (set) => ({
       companyId: currentCompany.id,
+      menuEnabled: false,
       simulateErrors: false,
       latencyMs: 350,
       setSimulateErrors: (simulateErrors) => set({ simulateErrors }),
@@ -31,6 +34,7 @@ export const useDevStore = create<DevState>()(
         const prev = s as Partial<DevState>
         return {
           companyId: currentCompany.id,
+          menuEnabled: prev.menuEnabled ?? false,
           simulateErrors: prev.simulateErrors ?? false,
           latencyMs: prev.latencyMs ?? 350,
         } as DevState

@@ -48,7 +48,7 @@ export function DealsTable({ rows }: { rows: DealRow[] }) {
   const th = 'px-3 py-2 text-xs font-medium whitespace-nowrap text-ink-muted'
   return (
     <>
-      <div className="hidden overflow-x-auto rounded-[var(--radius-card)] border border-line bg-surface md:block">
+      <div className="relative hidden overflow-x-auto rounded-[var(--radius-card)] border border-line bg-surface md:block">
         <table className="w-full text-sm">
           <caption className="sr-only">{t('dealsPage.tableCaption')}</caption>
           <thead className="bg-surface-2">

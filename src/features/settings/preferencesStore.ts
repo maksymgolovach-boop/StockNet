@@ -8,7 +8,9 @@ import type {
   UserLocation,
   UserPreferences,
 } from '@/types/models'
+import { isCurrencyCode } from '@/config/currencies'
 import { DEFAULT_LANGUAGE, LANGUAGES, isLanguageCode } from '@/config/languages'
+import { isRecord, matches } from '@/shared/lib/shape'
 import { safeStorage } from '@/shared/lib/storage'
 
 function detectLanguage(): LanguageCode {
@@ -51,6 +53,47 @@ export const DEFAULT_PREFERENCES: UserPreferences = {
   },
 }
 
+/**
+ * The fields of saved preferences that still hold a valid value. Anything else falls back to the default,
+ * so preferences saved by an older version (or edited by hand) can never break a page.
+ */
+function validPreferences(saved: unknown): Partial<UserPreferences> {
+  if (!isRecord(saved)) return {}
+  const { language, currency, units, theme, location, radiusKm, notifications, privacy, recommendations } = saved
+  const valid: Partial<UserPreferences> = {}
+  if (isLanguageCode(language)) valid.language = language
+  if (currency === null || isCurrencyCode(currency)) valid.currency = currency
+  if (units === 'metric' || units === 'imperial') valid.units = units
+  if (theme === 'light' || theme === 'dark' || theme === 'system') valid.theme = theme
+  if (matches(location, { label: 'string', source: 'string', point: { lat: 'number', lng: 'number' } }))
+    valid.location = location as UserLocation
+  if (typeof radiusKm === 'number' && radiusKm >= 0) valid.radiusKm = radiusKm
+  if (
+    matches(notifications, {
+      newMessages: 'boolean',
+      quoteUpdates: 'boolean',
+      dealStatus: 'boolean',
+      expiringDocuments: 'boolean',
+      priceDrops: 'boolean',
+      emailDigest: 'string',
+    })
+  )
+    valid.notifications = notifications as UserPreferences['notifications']
+  if (matches(privacy, { showReferenceCustomers: 'boolean', showDealCountPublicly: 'boolean' }))
+    valid.privacy = privacy as UserPreferences['privacy']
+  if (
+    matches(recommendations, {
+      categories: 'array',
+      volumeEUR: { min: 'number', max: 'number' },
+      certifications: 'array',
+      preferVerified: 'boolean',
+      preferPastPartners: 'boolean',
+    })
+  )
+    valid.recommendations = recommendations as UserPreferences['recommendations']
+  return valid
+}
+
 interface PreferencesActions {
   setLanguage: (language: LanguageCode) => void
   setCurrency: (currency: CurrencyCode | null) => void
@@ -79,13 +122,14 @@ export const usePreferences = create<UserPreferences & PreferencesActions>()(
       name: 'sy-preferences',
       version: 2,
       migrate: (s) => {
-        const prev = s as UserPreferences
+        const prev = (isRecord(s) ? s : {}) as Partial<UserPreferences>
         return {
           ...prev,
           recommendations: DEFAULT_PREFERENCES.recommendations,
           location: prev.location?.source === 'default' ? DEFAULT_LOCATION : prev.location,
         } as UserPreferences & PreferencesActions
       },
+      merge: (saved, current) => ({ ...current, ...validPreferences(saved) }),
       storage: createJSONStorage(() => safeStorage),
       partialize: ({
         setLanguage: _a,
