@@ -1,6 +1,7 @@
 import type { PartyRole, Recommendation, RecommendationReason, RecommendationTuning } from '@/types/models'
 import { CURRENCIES, CURRENCY_CODES } from '@/config/currencies'
 import { getAllCategories, getDescendantSlugs } from '@/config/categories'
+import { loadedTranslations } from '@/config/languages'
 import { db } from '@/mocks'
 import { runSearch } from '@/features/search/engine'
 import { emptyFilters } from '@/features/search/filtersCodec'
@@ -15,8 +16,13 @@ import type {
 } from '@/features/search/types'
 import { mockRequest } from './client'
 
-let index: ProductSearchIndex | null = null
-const getIndex = () => (index ??= new ProductSearchIndex(db.products, db.producers))
+let index: { languages: number; value: ProductSearchIndex } | null = null
+/** The index contains category names per language, so it is rebuilt when another language finishes loading. */
+function getIndex() {
+  const languages = loadedTranslations().size
+  if (index?.languages !== languages) index = { languages, value: new ProductSearchIndex(db.products, db.producers) }
+  return index.value
+}
 
 export interface SearchRequestContext {
   location: { lat: number; lng: number }

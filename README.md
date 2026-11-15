@@ -75,9 +75,9 @@ The site currently shows three industries: Agricultural Machinery, Fertilizers &
 ## Add a language
 
 1. Add `src/locales/<code>.json` (copy `en.json`; use the plural suffixes `Intl.PluralRules` gives that language).
-2. Add one entry to `LANGUAGES` in `src/config/languages.ts` (native name, Intl locale, default currency).
+2. Add one entry to `LANGUAGES` in `src/config/languages.ts` (native name, Intl locale, default currency, and a `load` function that imports the file).
 
-Missing keys fall back to English and log a dev warning.
+Only the active language is downloaded before the first render; the others follow once the browser is idle (and immediately when the user switches). Missing keys fall back to English and log a dev warning.
 
 ## Add a currency
 
@@ -184,7 +184,7 @@ The app should never show a blank page:
 - **Saved data is checked when it is read.** Lots, deals, reviews, threads and partner notes saved in the browser (`sy-lots`, `sy-deals`) are replayed only if each record still has the expected shape (`src/shared/lib/shape.ts`); anything else is skipped. Preferences fall back to defaults field by field. If the replay still fails, the saved edits are dropped and the mock data is rebuilt.
 - **Crash screen.** A page that throws while rendering, or whose code fails to load, shows a message with Reload, Home and "Reset demo data" inside the normal layout, so the header keeps working (`src/app/CrashScreen.tsx`, route `errorElement`s in `src/app/router.tsx`). An `ErrorBoundary` around the whole app covers everything outside the router.
 - **Start-up fallback.** `src/main.tsx` loads the app with a dynamic import; if that fails before React renders, a plain-HTML message offers to reset the saved data (`src/app/startupError.ts`).
-- Code splitting: home and search load first; every other page, the map (Leaflet) and the form library load on demand (see `src/app/router.tsx`).
+- Code splitting: home and search load first; every other page, the map (Leaflet), the form library and the inactive languages load on demand (see `src/app/router.tsx`, `src/config/languages.ts`). `vite.config.ts` adds preload hints for the app's start-up files, so they download in parallel.
 
 ## Assumptions
 

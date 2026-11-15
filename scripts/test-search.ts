@@ -1,9 +1,17 @@
+import { LANGUAGE_CODES, loadTranslations, loadedTranslations } from '../src/config/languages'
 import { db } from '../src/mocks'
 import { ProductSearchIndex, searchCategories, searchProducers } from '../src/features/search/searchIndex'
 import { runSearch } from '../src/features/search/engine'
 import { emptyFilters } from '../src/features/search/filtersCodec'
 import { normalize } from '../src/features/search/normalize'
 
+let fail = 0
+const early = new ProductSearchIndex(db.products, db.producers)
+const earlyOk = loadedTranslations().size === 0 && (early.search('tractor')?.size ?? 0) > 0
+if (!earlyOk) fail++
+console.log(earlyOk ? 'PASS' : 'FAIL', 'index built before any language has loaded still finds products')
+
+await Promise.all(LANGUAGE_CODES.map(loadTranslations))
 const idx = new ProductSearchIndex(db.products, db.producers)
 const name = (id: string) => db.products.find((p) => p.id === id)!.name
 const cases: [string, (names: string[]) => boolean][] = [
@@ -19,7 +27,6 @@ const cases: [string, (names: string[]) => boolean][] = [
   ['erbicid', (n) => n.some((x) => /herbicide|Herbizid|Erbicid/i.test(x))],
   ['cupru', (n) => n.some((x) => /cupru|copper|Kupfer/i.test(x))],
 ]
-let fail = 0
 for (const [q, ok] of cases) {
   const res = idx.search(q)!
   const names = [...res].sort((a, b) => a[1] - b[1]).map(([id]) => name(id))

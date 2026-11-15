@@ -2,7 +2,7 @@ import Fuse from 'fuse.js'
 import type { Producer, Product } from '@/types/models'
 import { CERTIFICATIONS } from '@/config/certifications'
 import { getAllCategories, getCategory } from '@/config/categories'
-import { LANGUAGES, LANGUAGE_CODES } from '@/config/languages'
+import { loadedTranslations } from '@/config/languages'
 import { hasDigit, normalize, tokenize } from './normalize'
 
 interface Doc {
@@ -23,11 +23,10 @@ const FIELD_PENALTY: Record<Exclude<keyof Doc, 'id' | 'all'>, number> = {
   producer: 0.18,
 }
 
+/** The category's name in every language downloaded so far, so a search matches it whatever language it is typed in. */
 function categoryNames(slug: string): string[] {
-  return LANGUAGE_CODES.map((l) => {
-    const cats = LANGUAGES[l].resources.categories as Record<string, string>
-    return cats[slug] ?? slug
-  })
+  const names = [...loadedTranslations().values()].map((tree) => (tree.categories as Record<string, string>)?.[slug])
+  return names.some(Boolean) ? names.filter((name): name is string => !!name) : [slug]
 }
 
 function productDoc(p: Product, producer: Producer | undefined): Doc {

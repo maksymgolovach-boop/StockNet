@@ -5,7 +5,7 @@ import { usePreferences } from '@/features/settings/preferencesStore'
 import { App } from '@/app/App'
 
 const language = usePreferences.getState().language
-initI18n(language)
+await initI18n(language)
 setDocumentLanguage(language)
 
 const root = document.getElementById('root')

@@ -9,18 +9,9 @@ import type {
   UserPreferences,
 } from '@/types/models'
 import { isCurrencyCode } from '@/config/currencies'
-import { DEFAULT_LANGUAGE, LANGUAGES, isLanguageCode } from '@/config/languages'
+import { LANGUAGES, detectLanguage, isLanguageCode } from '@/config/languages'
 import { isRecord, matches } from '@/shared/lib/shape'
 import { safeStorage } from '@/shared/lib/storage'
-
-function detectLanguage(): LanguageCode {
-  if (typeof navigator === 'undefined') return DEFAULT_LANGUAGE
-  for (const tag of navigator.languages ?? [navigator.language]) {
-    const base = tag.slice(0, 2).toLowerCase()
-    if (isLanguageCode(base)) return base
-  }
-  return DEFAULT_LANGUAGE
-}
 
 export const DEFAULT_LOCATION: UserLocation = {
   label: 'Iași, RO',
