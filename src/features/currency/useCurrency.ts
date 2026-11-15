@@ -4,6 +4,7 @@ import { CURRENCIES, type CurrencyConfig } from '@/config/currencies'
 import { useFormat } from '@/features/i18n/useFormat'
 import { useDisplayCurrency } from '@/features/settings/preferencesStore'
 import { convertAmount } from '@/services/fxService'
+import { numberFormat } from '@/shared/lib/intlCache'
 import { useFxRates } from '@/services/queries'
 
 export interface FormatMoneyOptions {
@@ -22,7 +23,7 @@ export function useCurrency() {
     const format = (amount: number, currency: CurrencyCode, opts: FormatMoneyOptions = {}) => {
       const config = CURRENCIES[currency]
       const decimals = opts.compact ? config.compactDecimals : config.decimals
-      return new Intl.NumberFormat(locale, {
+      return numberFormat(locale, {
         style: 'currency',
         currency,
         currencyDisplay: opts.narrow ? 'narrowSymbol' : 'symbol',
@@ -42,8 +43,8 @@ export function useCurrency() {
       const digits = amount < 10 ? 2 : amount < 100 ? 1 : 0
       const local = (CURRENCIES[currency] as CurrencyConfig).localSymbol
       if (local)
-        return `${new Intl.NumberFormat(locale, { maximumFractionDigits: digits, minimumFractionDigits: amount < 10 ? 2 : 0 }).format(amount)} ${local}`
-      return new Intl.NumberFormat(locale, {
+        return `${numberFormat(locale, { maximumFractionDigits: digits, minimumFractionDigits: amount < 10 ? 2 : 0 }).format(amount)} ${local}`
+      return numberFormat(locale, {
         style: 'currency',
         currency,
         currencyDisplay: 'narrowSymbol',

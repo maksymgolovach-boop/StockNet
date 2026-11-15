@@ -38,8 +38,25 @@ function preloadApp(): Plugin {
   }
 }
 
+/**
+ * Without grouping, the bundler emits dozens of files under 2 kB (one per icon and shared helper). These groups
+ * merge them: fewer requests, and the libraries get a file whose name only changes when a dependency does, so
+ * returning visitors keep it cached across deployments. Libraries used by single pages (map, forms) stay lazy.
+ */
+const chunkGroups = [
+  {
+    name: 'vendor',
+    test: /node_modules[\\/](react|react-dom|scheduler|react-router|react-router-dom|i18next|react-i18next|@tanstack|zustand|cookie|set-cookie-parser)[\\/]/,
+    priority: 30,
+  },
+  { name: 'icons', test: /node_modules[\\/]lucide-react[\\/]/, priority: 20 },
+  { name: 'shared', test: /[\\/]src[\\/](shared|config)[\\/]/, priority: 10 },
+  { name: 'common', test: /[\\/]src[\\/]features[\\/]/, minShareCount: 3, priority: 5 },
+]
+
 export default defineConfig({
   base,
   plugins: [react(), tailwindcss(), preloadApp()],
   resolve: { alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) } },
+  build: { rolldownOptions: { output: { codeSplitting: { groups: chunkGroups } } } },
 })

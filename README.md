@@ -191,7 +191,9 @@ The app should never show a blank page:
 - **Saved data is checked when it is read.** Lots, deals, reviews, threads and partner notes saved in the browser (`sy-lots`, `sy-deals`) are replayed only if each record still has the expected shape (`src/shared/lib/shape.ts`); anything else is skipped. Preferences fall back to defaults field by field. If the replay still fails, the saved edits are dropped and the mock data is rebuilt.
 - **Crash screen.** A page that throws while rendering, or whose code fails to load, shows a message with Reload, Home and "Reset demo data" inside the normal layout, so the header keeps working (`src/app/CrashScreen.tsx`, route `errorElement`s in `src/app/router.tsx`). An `ErrorBoundary` around the whole app covers everything outside the router.
 - **Start-up fallback.** `src/main.tsx` loads the app with a dynamic import; if that fails before React renders, a plain-HTML message offers to reset the saved data (`src/app/startupError.ts`).
-- Code splitting: home and search load first; every other page, the map (Leaflet), the form library and the inactive languages load on demand (see `src/app/router.tsx`, `src/config/languages.ts`). `vite.config.ts` adds preload hints for the app's start-up files, so they download in parallel.
+- Code splitting: home and search load first; every other page, the map (Leaflet), the form library and the inactive languages load on demand (see `src/app/router.tsx`, `src/config/languages.ts`). `vite.config.ts` adds preload hints for the app's start-up files, so they download in parallel, and groups the build into a few files (libraries, icons, shared code) instead of dozens of tiny ones; the library file keeps its name between deployments, so returning visitors keep it cached.
+- `index.html` shows the logo from the first paint until the app has loaded (measured on slow 4G: logo at about 0.8 s instead of a blank page until 2.3 s).
+- Number, price and date formatters are created once per locale and option set and then reused (`src/shared/lib/intlCache.ts`); creating one costs about 0.1 ms and a results page formats hundreds of values.
 
 ## Assumptions
 
