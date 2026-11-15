@@ -2,8 +2,8 @@ import { useId, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { MapPinned } from 'lucide-react'
 import type { GeoPoint } from '@/types/models'
-import { CITIES } from '@/mocks'
-import { normalize } from '@/features/search/normalize'
+import { CITIES } from '@/config/cities'
+import { normalize } from '@/domain/search/normalize'
 
 const label = (c: (typeof CITIES)[number]) => `${c.name}, ${c.postcode} ${c.country}`
 

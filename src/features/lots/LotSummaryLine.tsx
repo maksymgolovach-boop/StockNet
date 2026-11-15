@@ -3,7 +3,7 @@ import { Boxes } from 'lucide-react'
 import type { Lot, Product } from '@/types/models'
 import { Price } from '@/features/currency/Price'
 import { cn } from '@/shared/lib/cn'
-import { normalizedLotPrice } from './lotMath'
+import { normalizedLotPrice } from '@/domain/lotMath'
 import { useLotFormat } from './useLotFormat'
 
 /** "Lot · Pallet: 80 crates × 12 kg · 12 lots available · €1,150 per lot (approx. €1.20 / kg)" */

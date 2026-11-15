@@ -1,7 +1,7 @@
 import { Suspense, lazy, useCallback, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Loader2, LocateFixed, RotateCcw, Search } from 'lucide-react'
-import type { SearchResponse, MapPin } from '@/features/search/types'
+import type { SearchResponse, MapPin } from '@/domain/search/types'
 import type { FiltersApi } from '@/features/search/useFilters'
 import { useCurrency } from '@/features/currency/useCurrency'
 import { useFormat } from '@/features/i18n/useFormat'

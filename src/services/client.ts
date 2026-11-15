@@ -1,4 +1,4 @@
-import { useDevStore } from '@/features/dev/devStore'
+import { useDevStore } from './devStore'
 
 export class ApiError extends Error {
   readonly status: number

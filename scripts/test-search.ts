@@ -1,9 +1,9 @@
 import { LANGUAGE_CODES, loadTranslations, loadedTranslations } from '../src/config/languages'
 import { db } from '../src/mocks'
-import { ProductSearchIndex, searchCategories, searchProducers } from '../src/features/search/searchIndex'
-import { runSearch } from '../src/features/search/engine'
-import { emptyFilters } from '../src/features/search/filtersCodec'
-import { normalize } from '../src/features/search/normalize'
+import { ProductSearchIndex, searchCategories, searchProducers } from '../src/domain/search/searchIndex'
+import { runSearch } from '../src/domain/search/engine'
+import { emptyFilters } from '../src/domain/search/filtersCodec'
+import { normalize } from '../src/domain/search/normalize'
 
 let fail = 0
 const early = new ProductSearchIndex(db.products, db.producers)

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { CERTIFICATIONS, type CertificationCode } from '@/config/certifications'
 import { useFormat } from '@/features/i18n/useFormat'
 import { Checkbox } from '@/shared/ui/form'
-import type { FacetCount } from '../types'
+import type { FacetCount } from '@/domain/search/types'
 import type { FiltersApi } from '../useFilters'
 
 const toggle = <T,>(list: T[], v: T) => (list.includes(v) ? list.filter((x) => x !== v) : [...list, v])

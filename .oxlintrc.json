@@ -4,5 +4,75 @@
   "rules": {
     "react/rules-of-hooks": "error",
     "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
+  },
+  "overrides": [
+    {
+      "files": ["src/features/**", "src/app/**", "src/main.tsx", "src/boot.tsx"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["@/mocks", "@/mocks/**"],
+                "message": "Screens get their data from src/services, never from the mock data directly."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["src/domain/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["@/features/**", "@/app/**", "@/services/**", "@/mocks", "@/mocks/**"],
+                "message": "Business rules in src/domain may only use src/types, src/config and src/shared."
+              },
+              {
+                "group": ["react", "react-*", "react-dom/**", "zustand", "zustand/**", "@tanstack/**"],
+                "message": "Business rules in src/domain are plain functions: no React, no stores, no data fetching."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["src/services/**", "src/mocks/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["@/features/**", "@/app/**"],
+                "message": "Services and mock data must not depend on screens. Shared rules belong in src/domain."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["src/config/**", "src/shared/**", "src/types/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["@/features/**", "@/app/**", "@/domain/**", "@/mocks", "@/mocks/**"],
+                "message": "src/config, src/shared and src/types are the foundation: they must not depend on the layers above."
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
 }

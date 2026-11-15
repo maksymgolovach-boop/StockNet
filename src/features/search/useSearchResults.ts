@@ -1,8 +1,8 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
-import { useCompanyIds } from '@/features/dev/devStore'
+import { useCompanyIds } from '@/services/session'
 import { useDisplayCurrency, usePreferences } from '@/features/settings/preferencesStore'
 import { searchService } from '@/services/searchService'
-import type { SearchParams } from './types'
+import type { SearchParams } from '@/domain/search/types'
 
 export function useSearchResults(params: SearchParams) {
   const location = usePreferences((s) => s.location.point)

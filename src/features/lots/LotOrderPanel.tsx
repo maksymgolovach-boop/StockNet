@@ -4,7 +4,7 @@ import { FileSignature, Info, Minus, Plus } from 'lucide-react'
 import type { Lot, Product } from '@/types/models'
 import { Price } from '@/features/currency/Price'
 import { useFormat } from '@/features/i18n/useFormat'
-import { useIsOwnProducer } from '@/features/dev/devStore'
+import { useIsOwnProducer } from '@/services/session'
 import { ButtonLink } from '@/shared/ui/Button'
 import {
   availableLots,
@@ -13,7 +13,7 @@ import {
   lotQuantityRule,
   normalizedLotPrice,
   pricePerLotFor,
-} from './lotMath'
+} from '@/domain/lotMath'
 import { useLotFormat } from './useLotFormat'
 
 export function LotOrderPanel({ product, lot }: { product: Product; lot: Lot }) {

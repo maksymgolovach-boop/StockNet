@@ -1,5 +1,5 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
-import { useCompanyIds } from '@/features/dev/devStore'
+import { useCompanyIds } from '@/services/session'
 import { useSaved } from '@/features/saved/savedStore'
 import { useSearchHistory } from '@/features/search/searchHistoryStore'
 import { useDisplayCurrency, usePreferences } from '@/features/settings/preferencesStore'

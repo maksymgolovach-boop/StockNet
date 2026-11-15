@@ -5,9 +5,9 @@ import { MapSyncItem } from '@/features/map/MapSyncItem'
 import { Button } from '@/shared/ui/Button'
 import { EmptyState, ErrorState, LoadingRegion, Skeleton } from '@/shared/ui/states'
 import { cn } from '@/shared/lib/cn'
-import type { SearchResponse } from './types'
+import type { SearchResponse } from '@/domain/search/types'
 import type { FiltersApi } from './useFilters'
-import { activeFilterCount } from './filtersCodec'
+import { activeFilterCount } from '@/domain/search/filtersCodec'
 
 interface ResultsListProps {
   api: FiltersApi

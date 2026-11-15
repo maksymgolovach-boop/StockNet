@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import type { Incoterm, Product } from '@/types/models'
-import { availableLots, isSellable, lotQuantityRule } from '@/features/lots/lotMath'
+import { availableLots, isSellable, lotQuantityRule } from '@/domain/lotMath'
 import { liveNow } from '@/shared/lib/dates'
 
 export interface RfqItemValues {

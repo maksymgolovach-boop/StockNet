@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import type { Product } from '@/types/models'
 import { getCategory } from '@/config/categories'
-import { emptyFilters } from '@/features/search/filtersCodec'
+import { emptyFilters } from '@/domain/search/filtersCodec'
 import { useSearchResults } from '@/features/search/useSearchResults'
 import { ErrorState, LoadingRegion, Skeleton } from '@/shared/ui/states'
 import { ProductCard } from './ProductCard'

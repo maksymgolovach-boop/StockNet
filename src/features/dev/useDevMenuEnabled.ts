@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
-import { useDevStore } from './devStore'
+import { useDevStore } from '@/services/devStore'
 
 /**
  * The dev menu is always available in development. In a published build it is hidden until the address contains

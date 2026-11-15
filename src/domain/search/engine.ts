@@ -3,16 +3,9 @@ import { getCategoryConfig, getCategoryChildren, getDescendantSlugs, getCategory
 import { convertQuantity, type UnitCode } from '@/config/units'
 import { distanceKm, isInBounds, roadDistanceKm } from '@/shared/lib/geo'
 import { daysFromNow } from '@/shared/lib/dates'
-import { meetsVerification } from '@/features/trust/trustScore'
-import { documentStatus, hasValidCertificates } from '@/features/trust/documentStatus'
-import {
-  availableLots,
-  hasLotOffer,
-  isLotOnly,
-  lotMeasure,
-  normalizedLotPrice,
-  sellableLots,
-} from '@/features/lots/lotMath'
+import { meetsVerification } from '@/domain/trustScore'
+import { documentStatus, hasValidCertificates } from '@/domain/documentStatus'
+import { availableLots, hasLotOffer, isLotOnly, lotMeasure, normalizedLotPrice, sellableLots } from '@/domain/lotMath'
 import type {
   FacetCount,
   LotSummary,

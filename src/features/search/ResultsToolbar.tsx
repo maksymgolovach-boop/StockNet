@@ -4,7 +4,7 @@ import type { SortOption } from '@/types/models'
 import { getCategoryConfig } from '@/config/categories'
 import { Select } from '@/shared/ui/Select'
 import { cn } from '@/shared/lib/cn'
-import { SORT_OPTIONS, activeFilterCount } from './filtersCodec'
+import { SORT_OPTIONS, activeFilterCount } from '@/domain/search/filtersCodec'
 import type { FiltersApi } from './useFilters'
 
 interface ResultsToolbarProps {

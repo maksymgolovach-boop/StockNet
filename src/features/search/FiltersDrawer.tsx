@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '@/shared/ui/Button'
 import { Drawer } from '@/shared/ui/Drawer'
 import { FilterPanel } from './filters/FilterPanel'
-import type { SearchResponse } from './types'
+import type { SearchResponse } from '@/domain/search/types'
 import type { FiltersApi } from './useFilters'
 
 interface FiltersDrawerProps {

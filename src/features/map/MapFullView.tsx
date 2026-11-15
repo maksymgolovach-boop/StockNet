@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import type { SearchResponse } from '@/features/search/types'
+import type { SearchResponse } from '@/domain/search/types'
 import type { FiltersApi } from '@/features/search/useFilters'
 import { ActiveFilterChips } from '@/features/search/ActiveFilterChips'
 import { ResultsToolbar } from '@/features/search/ResultsToolbar'

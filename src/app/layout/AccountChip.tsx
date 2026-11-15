@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { useCompany } from '@/features/dev/devStore'
+import { useCompany } from '@/services/session'
 
 const initials = (name: string) =>
   name

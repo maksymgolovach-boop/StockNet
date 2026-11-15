@@ -51,20 +51,37 @@ src/
     languages.ts       Language registry (en, de, ro) → locale files
     units.ts           Units, dimensions, imperial equivalents
     certifications.ts  Certifications and standards
+    cities.ts          Cities for addresses, warehouses and the location pickers
+  domain/              Business rules as plain functions: deal steps, lot maths, pricing, trust score, search engine
   features/            Feature modules: search, map, product, producer, trust, lots (+ stock), chat,
                        deals, rfq, partners, recommendations, dashboard, settings, home, i18n, currency, dev
   locales/             en.json, de.json, ro.json
-  mocks/               Seeded generators: cities, producers, buyers, catalog templates, deals, reviews, threads
+  mocks/               Seeded generators: producers, buyers, catalog templates, deals, reviews, threads
                        (370 products and 129 producers in total, of which 223 products and 80 producers are in the active industries; catalog/extra.ts adds 100 products, mostly fruit & vegetables,
                        farm machinery and fertilizers & crop protection, about 85% sold by lot; regional.ts adds
                        100 producers in 100 different towns across Romania, Hungary and Bulgaria, one product each)
   services/            API layer (mockRequest, catalog, search + recommendations, deals, lots, chat transport, FX)
-                       + TanStack Query hooks
+                       + TanStack Query hooks, the logged-in company (session.ts), demo controls (devStore.ts)
   shared/              UI primitives, hooks, libs (geo, storage, random, dates)
   types/models.ts      Domain model
 scripts/               check-case.ts, check-locales.ts, validate-mocks.ts, test-search.ts, test-deals.ts, test-storage.ts, download-photos.ts
 e2e/                   Playwright browser tests (see Tests)
 ```
+
+### Layers
+
+Each folder may only import from the folders below it:
+
+```
+features, app      screens: get their data from services
+services           the API: the only code that touches the mock data
+mocks              generated demo data
+domain             business rules: plain functions, no React, no data fetching
+config, shared,    foundation
+types
+```
+
+`npm run lint` fails on an import that breaks this (`no-restricted-imports` in `.oxlintrc.json`). When the real back-end arrives, `src/mocks` is deleted and only `src/services` changes; screens and business rules stay as they are.
 
 ## Active industries
 
@@ -96,7 +113,7 @@ Each service in `src/services` is an interface plus a mock implementation built 
 
 ## Search
 
-- Matching (`src/features/search/searchIndex.ts`) is diacritic-insensitive and folds ß→ss, ×→x, ²→2 and decimal commas, so "otel" finds "oțel", "Strasse" finds "Straße" and "3x2.5 mm2" finds "3×2,5 mm²".
+- Matching (`src/domain/search/searchIndex.ts`) is diacritic-insensitive and folds ß→ss, ×→x, ²→2 and decimal commas, so "otel" finds "oțel", "Strasse" finds "Straße" and "3x2.5 mm2" finds "3×2,5 mm²".
 - Words with digits (specs and grades like `NPK 16-16-16`, `FAO 380`, `20-20-20`) must match exactly. Other words fall back to fuzzy matching for typos ("tractr" → tractor).
 - Filters, facets and sorting are pure functions in `engine.ts`, called by `services/searchService.ts`.
 - All search state lives in the URL:
@@ -153,7 +170,7 @@ Each service in `src/services` is an interface plus a mock implementation built 
 
 - **Two sale modes per listing:** by measure (unit price tiers and MOQ) and/or by lot (`product.saleModes`). Each category declares `lots: { allowedSaleModes, lotTypes, requiresExpiry, requiresBatch, requiresCertificate }`; the form, validation and filters read it, so a new category needs no UI changes.
 - **Lot model** (`Lot` in `src/types/models.ts`): lot/batch number, type, content (`40 coils × 500 m`), weight/volume, price per lot plus optional tiers by number of lots, stock count, divisibility (indivisible, or splittable in steps with a minimum), condition, production and expiry dates **per lot**, documents **per lot**, and its own warehouse location.
-- **Maths** (`src/features/lots/lotMath.ts`): lot size in the listing unit (via content, item size, weight or volume), approximate normalized price for comparison, status (available / reserved / sold / expired / paused / archived), quantity rules.
+- **Maths** (`src/domain/lotMath.ts`): lot size in the listing unit (via content, item size, weight or volume), approximate normalized price for comparison, status (available / reserved / sold / expired / paused / archived), quantity rules.
 - **Buyers:** "Lot" badge and lot line on cards and map popups, pins show "€2,400 / lot", clusters show the lowest per-unit price only when units match. Product page: lot table, selection in the URL (`?lot=`), quantity in lots with indivisible/divisible messaging, lot tiers and total. Filters: sale mode, lot price, lot size (when a category is selected), lots available, indivisible only, condition, production dates (`mode`, `lprice`, `lsize`, `lots`, `indiv`, `lcond`, `prod`). Sorts: lot price and price per unit. The home page "Deals" block shows surplus and clearance lots.
 - **Stock (sell):** `/stock` ("Stock & lots") manages the producer identity's lots (`p01`): stats, status filters, create/edit (react-hook-form + zod), duplicate, stock +/−, pause/resume, archive/restore, "Add lot" from your product page. Lots in confirmed, undelivered deals count as reserved. Edits are saved in the browser (`sy-lots`); "Reset lots" in the dev menu restores the mock data.
 - **Deals and reviews:** lot line items store lot ID, lot number and type; reviews of those deals show the lot number. The quote form (next phase) receives `?product=&lot=&lots=`.

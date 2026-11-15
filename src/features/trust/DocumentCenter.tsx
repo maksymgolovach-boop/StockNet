@@ -6,7 +6,7 @@ import { useFormat } from '@/features/i18n/useFormat'
 import { daysFromNow } from '@/shared/lib/dates'
 import { Badge, type BadgeTone } from '@/shared/ui/Badge'
 import { EmptyState } from '@/shared/ui/states'
-import { documentStatus } from './documentStatus'
+import { documentStatus } from '@/domain/documentStatus'
 
 const TONE: Record<DocumentStatus, BadgeTone> = { valid: 'verified', expiring_soon: 'expiring', expired: 'expired' }
 

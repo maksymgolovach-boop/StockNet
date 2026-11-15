@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import type { Deal, PartyRole } from '@/types/models'
 import { CURRENCIES } from '@/config/currencies'
-import { useCompanyIds } from '@/features/dev/devStore'
+import { useCompanyIds } from '@/services/session'
 import { useMyDeals } from '@/services/queries'
 
 export interface PartnerHistory {

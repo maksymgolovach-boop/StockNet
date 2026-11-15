@@ -3,15 +3,15 @@ import { useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from '@tanstack/react-query'
 import { Wrench } from 'lucide-react'
-import { db } from '@/mocks'
 import { usePreferences } from '@/features/settings/preferencesStore'
 import { safeStorage } from '@/shared/lib/storage'
 import { cn } from '@/shared/lib/cn'
 import { Button } from '@/shared/ui/Button'
 import { Drawer } from '@/shared/ui/Drawer'
 import { Select } from '@/shared/ui/Select'
-import { resetDemoData } from '@/services/demoData'
-import { useCompany, useCompanyIds, useDevStore } from './devStore'
+import { demoDataCounts, partyName, resetDemoData } from '@/services/demoData'
+import { useDevStore } from '@/services/devStore'
+import { useCompany, useCompanyIds } from '@/services/session'
 
 const LATENCIES = [0, 150, 350, 800, 1500]
 
@@ -24,18 +24,8 @@ export function DevMenu() {
   const company = useCompany()
   const { buyerId, producerId } = useCompanyIds()
   const resetPrefs = usePreferences((s) => s.reset)
-  const buyerName = db.buyers.find((b) => b.id === buyerId)?.name ?? buyerId
-  const producerName = db.producers.find((p) => p.id === producerId)?.name ?? producerId
 
   const refresh = () => void qc.invalidateQueries()
-  const counts: [string, number][] = [
-    ['products', db.products.length],
-    ['producers', db.producers.length],
-    ['buyers', db.buyers.length],
-    ['deals', db.deals.length],
-    ['reviews', db.reviews.length],
-    ['threads', db.threads.length],
-  ]
 
   return (
     <>
@@ -69,13 +59,13 @@ export function DevMenu() {
               <div className="flex justify-between gap-3">
                 <dt className="text-ink-muted">{t('dev.buyerIdentity')}</dt>
                 <dd className="text-end">
-                  {buyerName} <span className="text-ink-subtle">({buyerId})</span>
+                  {partyName(buyerId)} <span className="text-ink-subtle">({buyerId})</span>
                 </dd>
               </div>
               <div className="flex justify-between gap-3">
                 <dt className="text-ink-muted">{t('dev.producerIdentity')}</dt>
                 <dd className="text-end">
-                  {producerName} <span className="text-ink-subtle">({producerId})</span>
+                  {partyName(producerId)} <span className="text-ink-subtle">({producerId})</span>
                 </dd>
               </div>
             </dl>
@@ -102,7 +92,7 @@ export function DevMenu() {
           <div>
             <p className="mb-1 text-xs font-semibold tracking-wide text-ink-subtle uppercase">{t('dev.dataset')}</p>
             <dl className="tabular grid grid-cols-2 gap-x-4 gap-y-1">
-              {counts.map(([k, v]) => (
+              {demoDataCounts().map(([k, v]) => (
                 <div key={k} className="flex justify-between border-b border-line py-1">
                   <dt className="text-ink-muted">{k}</dt>
                   <dd>{v}</dd>

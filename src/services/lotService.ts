@@ -1,7 +1,7 @@
 import type { Document, Lot, LotRecordStatus, Product } from '@/types/models'
 import { getCategoryConfig } from '@/config/categories'
 import { db, syncLotOnlyFields } from '@/mocks'
-import { cityById } from '@/mocks/cities'
+import { cityById } from '@/config/cities'
 import { refreshReservations } from '@/mocks/lots'
 import { persistLot, persistSaleModes } from '@/mocks/lotStorage'
 import { liveNow } from '@/shared/lib/dates'

@@ -9,7 +9,7 @@ import type { ProducerLotRow } from '@/services/lotService'
 import { Badge, type BadgeTone } from '@/shared/ui/Badge'
 import { IconButton } from '@/shared/ui/Button'
 import { LotConditionBadge } from '../LotBadge'
-import { availableLots, lotStatus } from '../lotMath'
+import { availableLots, lotStatus } from '@/domain/lotMath'
 import { useLotFormat } from '../useLotFormat'
 
 const STATUS_TONE: Record<LotStatus, BadgeTone> = {

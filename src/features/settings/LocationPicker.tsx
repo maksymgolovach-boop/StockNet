@@ -1,7 +1,7 @@
 import { useId, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { LocateFixed, MapPin } from 'lucide-react'
-import { CITIES } from '@/mocks'
+import { CITIES } from '@/config/cities'
 import { usePreferences } from '@/features/settings/preferencesStore'
 import { useGeolocation } from '@/shared/hooks/useGeolocation'
 import { Button } from '@/shared/ui/Button'

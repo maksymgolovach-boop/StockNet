@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { LotRecordStatus } from '@/types/models'
-import { useCompanyIds } from '@/features/dev/devStore'
+import { useCompanyIds } from '@/services/session'
 import { lotService, type LotInput } from '@/services/lotService'
 
 export function useProducerLots() {

@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { ChevronLeft } from 'lucide-react'
 import { getCategory } from '@/config/categories'
-import type { FacetCount } from '../types'
+import type { FacetCount } from '@/domain/search/types'
 import type { FiltersApi } from '../useFilters'
 
 export function CategoryFilter({ api, facets }: { api: FiltersApi; facets: FacetCount[] }) {

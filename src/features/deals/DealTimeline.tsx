@@ -3,7 +3,7 @@ import { Check, CircleDashed, OctagonAlert, X } from 'lucide-react'
 import type { Deal } from '@/types/models'
 import { useFormat } from '@/features/i18n/useFormat'
 import { cn } from '@/shared/lib/cn'
-import { LIFECYCLE } from './dealRules'
+import { LIFECYCLE } from '@/domain/dealRules'
 
 /** Events that happened (with timestamps and actor), then the steps still ahead. */
 export function DealTimeline({ deal }: { deal: Deal }) {

@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { getCategoryConfig } from '@/config/categories'
 import { NumberField, RadioChips, Switch } from '@/shared/ui/form'
-import { EXPIRY_PRESETS, LEAD_TIME_PRESETS } from '../filtersCodec'
+import { EXPIRY_PRESETS, LEAD_TIME_PRESETS } from '@/domain/search/filtersCodec'
 import type { FiltersApi } from '../useFilters'
 
 export function OrderFilters({ api }: { api: FiltersApi }) {

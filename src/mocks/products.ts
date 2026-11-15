@@ -5,7 +5,7 @@ import { getAnyCategory as getCategory, getCategoryConfig, getLogisticsFor } fro
 import { LANGUAGE_CODES } from '@/config/languages'
 import { addDays, now } from '@/shared/lib/dates'
 import { createRng, type Rng } from '@/shared/lib/random'
-import { cityById } from './cities'
+import { cityById } from '@/config/cities'
 import { PRODUCER_SEEDS, type ProducerSeed } from './producers'
 import { productDocuments } from './documents'
 import { stockPhotos } from './photos'

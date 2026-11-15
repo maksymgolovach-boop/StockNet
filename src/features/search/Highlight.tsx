@@ -1,5 +1,5 @@
 import { Fragment } from 'react'
-import { matchRanges } from './normalize'
+import { matchRanges } from '@/domain/search/normalize'
 
 /** Highlights query matches inside `text`, diacritic- and case-insensitively. */
 export function Highlight({ text, query }: { text: string; query: string }) {

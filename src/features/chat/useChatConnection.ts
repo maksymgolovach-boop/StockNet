@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import type { Message } from '@/types/models'
-import { useCompanyIds } from '@/features/dev/devStore'
+import { useCompanyIds } from '@/services/session'
 import { chatTransport } from '@/services/chatTransport'
 import { queryKeys } from '@/services/queries'
 import { useChatUi } from './chatStore'

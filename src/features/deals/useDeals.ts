@@ -1,8 +1,8 @@
 import { useMutation, useQueries, useQueryClient } from '@tanstack/react-query'
 import type { Partnership, PartnershipMeta, PartyRole } from '@/types/models'
-import { useCompanyIds } from '@/features/dev/devStore'
+import { useCompanyIds } from '@/services/session'
 import { dealService, type DisputeInput, type QuoteRequestInput, type ReviewInput } from '@/services/dealService'
-import type { DealActionId } from './dealRules'
+import type { DealActionId } from '@/domain/dealRules'
 
 export function useDeal(dealId: string) {
   const { buyerId, producerId } = useCompanyIds()

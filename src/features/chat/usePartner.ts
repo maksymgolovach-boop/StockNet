@@ -1,7 +1,7 @@
 import { useCallback } from 'react'
 import type { Buyer, Producer, Thread } from '@/types/models'
-import { sideForThread } from '@/features/company/company'
-import { useCompanyIds } from '@/features/dev/devStore'
+import { sideForThread } from '@/domain/company'
+import { useCompanyIds } from '@/services/session'
 import { useBuyers, useProducers } from '@/services/queries'
 
 export type Partner =

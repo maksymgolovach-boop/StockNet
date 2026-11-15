@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Handshake } from 'lucide-react'
-import type { SearchResultItem } from '@/features/search/types'
+import type { SearchResultItem } from '@/domain/search/types'
 import { useFormat } from '@/features/i18n/useFormat'
 import { ProductMedia } from '@/features/product/ProductMedia'
 import { ProductPrice } from '@/features/product/ProductPrice'

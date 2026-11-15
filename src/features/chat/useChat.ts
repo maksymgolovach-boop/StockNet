@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { Attachment, Message, PartyRole } from '@/types/models'
-import { useCompanyIds } from '@/features/dev/devStore'
+import { useCompanyIds } from '@/services/session'
 import { useFormat } from '@/features/i18n/useFormat'
 import { chatTransport } from '@/services/chatTransport'
 import { queryKeys, useThreadMessages } from '@/services/queries'

@@ -7,7 +7,7 @@ import { CategoryIcon } from '@/features/categories/CategoryIcon'
 import { getCategoryConfig } from '@/config/categories'
 import { useFormat } from '@/features/i18n/useFormat'
 import { useBuyers } from '@/services/queries'
-import { useCompanyIds } from '@/features/dev/devStore'
+import { useCompanyIds } from '@/services/session'
 import { usePreferences } from '@/features/settings/preferencesStore'
 
 export function ProducerOverview({ producer }: { producer: Producer }) {

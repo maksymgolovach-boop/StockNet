@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { useCurrency } from '@/features/currency/useCurrency'
 import { useFormat } from '@/features/i18n/useFormat'
-import { ACTIVE_STATUSES } from './dealRules'
+import { ACTIVE_STATUSES } from '@/domain/dealRules'
 import type { DealRow } from './useDealRows'
 
 export function DealsSummary({ rows }: { rows: DealRow[] }) {

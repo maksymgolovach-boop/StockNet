@@ -2,9 +2,9 @@ import type { CurrencyCode, Deal, DealDocument, DealEvent, DealLineItem, DealSta
 import { CURRENCIES } from '@/config/currencies'
 import { addDays, now } from '@/shared/lib/dates'
 import { createRng, type Rng } from '@/shared/lib/random'
-import { tierFor } from '@/features/product/pricing'
+import { tierFor } from '@/domain/pricing'
 import { BUYER_SEEDS } from './buyers'
-import { cityById } from './cities'
+import { cityById } from '@/config/cities'
 import { PRODUCER_SEEDS } from './producers'
 import { roundPrice } from './products'
 

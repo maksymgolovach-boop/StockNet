@@ -1,5 +1,5 @@
 import type { Buyer } from '@/types/models'
-import { cityById } from './cities'
+import { cityById } from '@/config/cities'
 
 interface BuyerSeed extends Omit<Buyer, 'address' | 'location' | 'completedDeals' | 'verification'> {
   cityId: string

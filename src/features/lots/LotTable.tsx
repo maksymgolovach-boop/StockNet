@@ -8,7 +8,7 @@ import { usePreferences } from '@/features/settings/preferencesStore'
 import { cn } from '@/shared/lib/cn'
 import { distanceKm } from '@/shared/lib/geo'
 import { LotConditionBadge } from './LotBadge'
-import { availableLots, normalizedLotPrice } from './lotMath'
+import { availableLots, normalizedLotPrice } from '@/domain/lotMath'
 import { useLotFormat } from './useLotFormat'
 
 export function LotTable({

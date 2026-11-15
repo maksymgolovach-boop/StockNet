@@ -2,12 +2,12 @@ import type { Buyer, Deal, DealDispute, Message, PartnershipMeta, Producer, Prod
 import { getAnyCategory as getCategory, getCategoryConfig, isActiveRoot } from '@/config/categories'
 import { ACTIVE_ROOT_CATEGORIES } from '@/config/scope'
 import { CURRENCIES } from '@/config/currencies'
-import { computeTrustScore } from '@/features/trust/trustScore'
-import { validateAttributes } from '@/features/categories/attributeSchema'
+import { computeTrustScore } from '@/domain/trustScore'
+import { validateAttributes } from '@/domain/attributeSchema'
 import { monthsBetween, now } from '@/shared/lib/dates'
 import { avg, round1 } from '@/shared/lib/math'
 import { createRng } from '@/shared/lib/random'
-import { cityById } from './cities'
+import { cityById } from '@/config/cities'
 import { PRODUCER_SEEDS, verificationChecks } from './producers'
 import { CURRENT_BUYER_ID as DEMO_BUYER_ID } from './buyers'
 import { BUYER_SEEDS, buildBuyer } from './buyers'
@@ -23,8 +23,6 @@ import { currentCompany } from './companies'
 
 export { CURRENT_BUYER_ID } from './buyers'
 export { COMPANY_SEEDS, CURRENT_COMPANY_ID, currentCompany } from './companies'
-export { CITIES, DEFAULT_CITY_ID, cityById } from './cities'
-export type { City } from './cities'
 
 export interface MockDatabase {
   products: Product[]

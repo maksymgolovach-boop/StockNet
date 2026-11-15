@@ -3,17 +3,11 @@ import { CURRENCIES, CURRENCY_CODES } from '@/config/currencies'
 import { getAllCategories, getDescendantSlugs } from '@/config/categories'
 import { loadedTranslations } from '@/config/languages'
 import { db } from '@/mocks'
-import { runSearch } from '@/features/search/engine'
-import { emptyFilters } from '@/features/search/filtersCodec'
-import { meetsVerification } from '@/features/trust/trustScore'
-import { ProductSearchIndex, searchCategories, searchProducers } from '@/features/search/searchIndex'
-import type {
-  SearchContext,
-  SearchParams,
-  SearchResponse,
-  SearchResultItem,
-  Suggestions,
-} from '@/features/search/types'
+import { runSearch } from '@/domain/search/engine'
+import { emptyFilters } from '@/domain/search/filtersCodec'
+import { meetsVerification } from '@/domain/trustScore'
+import { ProductSearchIndex, searchCategories, searchProducers } from '@/domain/search/searchIndex'
+import type { SearchContext, SearchParams, SearchResponse, SearchResultItem, Suggestions } from '@/domain/search/types'
 import { mockRequest } from './client'
 
 let index: { languages: number; value: ProductSearchIndex } | null = null

@@ -9,8 +9,8 @@ import {
   serializeSearchState,
   type MapUrlState,
   type SearchState,
-} from './filtersCodec'
-import type { ResultsView } from './types'
+} from '@/domain/search/filtersCodec'
+import type { ResultsView } from '@/domain/search/types'
 
 /**
  * Search state lives entirely in the URL: /category/:slug carries the category, the query

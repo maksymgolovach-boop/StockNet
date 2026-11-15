@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next'
 import { getCategoryConfig } from '@/config/categories'
 import { useDisplayCurrency } from '@/features/settings/preferencesStore'
 import { Checkbox, NumberField, RadioChips, RangeInputs, Switch } from '@/shared/ui/form'
-import { LOT_CONDITIONS, SALE_MODE_FILTERS } from '../filtersCodec'
-import type { SearchResponse } from '../types'
+import { LOT_CONDITIONS, SALE_MODE_FILTERS } from '@/domain/search/filtersCodec'
+import type { SearchResponse } from '@/domain/search/types'
 import type { FiltersApi } from '../useFilters'
 
 export function LotFilters({

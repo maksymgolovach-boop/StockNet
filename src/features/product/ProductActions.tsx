@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { Boxes, FileSignature, Heart, MessageSquare } from 'lucide-react'
 import type { Product } from '@/types/models'
-import { useIsOwnProducer } from '@/features/dev/devStore'
+import { useIsOwnProducer } from '@/services/session'
 import { useSaved } from '@/features/saved/savedStore'
 import { ReportButton } from '@/features/trust/ReportDialog'
 import { ButtonLink, Button } from '@/shared/ui/Button'

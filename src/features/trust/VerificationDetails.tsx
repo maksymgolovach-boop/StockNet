@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { CheckCircle2, Circle } from 'lucide-react'
 import type { Verification, VerificationCheckKind } from '@/types/models'
 import { useFormat } from '@/features/i18n/useFormat'
-import { VERIFICATION_ORDER } from './trustScore'
+import { VERIFICATION_ORDER } from '@/domain/trustScore'
 import { VerificationBadge } from './VerificationBadge'
 
 const ALL_CHECKS: VerificationCheckKind[] = [

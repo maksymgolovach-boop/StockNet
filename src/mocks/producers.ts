@@ -1,6 +1,6 @@
 import type { LanguageCode, Producer, ProducerType, VerificationCheck, VerificationLevel } from '@/types/models'
 import type { CertificationCode } from '@/config/certifications'
-import { cityById } from './cities'
+import { cityById } from '@/config/cities'
 import { REGIONAL_PRODUCERS } from './regional'
 
 export interface ProducerSeed {
