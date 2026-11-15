@@ -39,7 +39,7 @@ export function ProductGallery({
                 i === index ? 'border-primary' : 'border-transparent opacity-70 hover:opacity-100',
               )}
             >
-              <ProductMedia media={m} categorySlug={categorySlug} className="h-14 w-20" />
+              <ProductMedia media={m} categorySlug={categorySlug} sizes="80px" className="h-14 w-20" />
             </button>
           ))}
         </div>

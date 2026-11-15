@@ -9,5 +9,6 @@ Fill the folder once, on a computer with internet access:
 npm run photos:download
 ```
 
-File names are derived from the photo's address (`pexels-<id>.jpg`, `unsplash-<id>.jpg`). Photos that are missing here
-keep loading from the internet, and fall back to the category icon if that fails.
+Each photo is saved in two widths, 320 px for thumbnails and cards and 800 px for the product gallery
+(`pexels-<id>-320.jpg`, `pexels-<id>-800.jpg`, `unsplash-<id>-…`). Photos that are missing here keep loading from the
+internet, and fall back to the category icon if that fails.

@@ -6,19 +6,25 @@ import { cn } from '@/shared/lib/cn'
 import { sizedPhotoUrl } from '@/shared/lib/photoFile'
 import { localPhoto } from './localPhotos'
 
+/** Used when a caller does not say how wide the photo is shown: the product gallery. */
+const GALLERY_SIZES = '(min-width: 1024px) 40vw, 100vw'
+
 export function ProductMedia({
   media,
   categorySlug,
   className,
+  sizes = GALLERY_SIZES,
 }: {
   media: MediaRef | undefined
   categorySlug: string
   className?: string
+  /** How wide the photo is displayed (an <img sizes> value, e.g. "64px"), for browsers that cannot measure it themselves. */
+  sizes?: string
 }) {
   const icon = getCategoryConfig(categorySlug)?.icon ?? 'Package'
   const [failed, setFailed] = useState<string | null>(null)
   const url = media?.url && failed !== media.url ? media.url : undefined
-  const local = url && localPhoto(url)
+  const local = url ? localPhoto(url) : undefined
   return (
     <div
       aria-hidden
@@ -28,13 +34,12 @@ export function ProductMedia({
       <CategoryIcon name={icon} className="size-1/3 max-h-14 max-w-14 opacity-70" />
       {url && (
         <img
-          src={local ?? sizedPhotoUrl(url, 640)}
+          src={local?.src ?? sizedPhotoUrl(url, 640)}
           srcSet={
-            local
-              ? undefined
-              : `${sizedPhotoUrl(url, 320)} 320w, ${sizedPhotoUrl(url, 640)} 640w, ${sizedPhotoUrl(url, 1200)} 1200w`
+            local?.srcSet ??
+            `${sizedPhotoUrl(url, 320)} 320w, ${sizedPhotoUrl(url, 640)} 640w, ${sizedPhotoUrl(url, 1200)} 1200w`
           }
-          sizes={local ? undefined : '(min-width: 1024px) 40vw, 100vw'}
+          sizes={`auto, ${sizes}`}
           alt=""
           loading="lazy"
           decoding="async"

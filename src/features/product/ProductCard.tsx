@@ -51,6 +51,7 @@ export function ProductCard({ item, view, query = '' }: ProductCardProps) {
         <ProductMedia
           media={p.media[0]}
           categorySlug={p.categorySlug}
+          sizes="(min-width: 640px) 360px, 100vw"
           className={list ? 'h-32 @xl:h-auto @xl:w-40 @xl:shrink-0' : 'h-36'}
         />
         <div className={cn('flex min-w-0 flex-1 gap-3 p-4', list ? 'flex-col @3xl:flex-row' : 'flex-col')}>

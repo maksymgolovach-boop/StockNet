@@ -27,7 +27,7 @@ GitHub Actions (`.github/workflows/check.yml`) runs `npm run check`, `npm run bu
 ### Running the demo without internet
 
 - **Fonts** are bundled, so they always work.
-- **Product photos** load from Pexels and Unsplash. Run `npm run photos:download` once on a computer with internet access: it saves every photo of the catalogue (about 150 files) into `src/assets/photos`. Photos found there are used instead of the online ones, in `npm run dev` and in builds. Commit the folder if the whole team and the published demo should have them. Without it, a photo that cannot load shows the category icon.
+- **Product photos** load from Pexels and Unsplash. Run `npm run photos:download` once on a computer with internet access: it saves every photo of the catalogue in two widths (about 300 files, 320 px and 800 px) into `src/assets/photos`. Photos found there are used instead of the online ones, in `npm run dev` and in builds. Commit the folder if the whole team and the published demo should have them. Without it, a photo that cannot load shows the category icon.
 - **Map tiles** come from OpenStreetMap and cannot be bundled. Offline, the map shows a plain grid with the pins; the result list still works.
 
 ### Public demo (GitHub Pages)
