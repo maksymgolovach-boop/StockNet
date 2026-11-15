@@ -18,6 +18,16 @@ Code style is enforced by Prettier (`.prettierrc.json`) and oxlint. VS Code sugg
 
 GitHub Actions (`.github/workflows/check.yml`) runs `npm run check` and `npm run build` on every push and pull request.
 
+### Public demo (GitHub Pages)
+
+`.github/workflows/deploy.yml` publishes the demo after every push to `main`, at `https://<owner>.github.io/<repository>/`. A repository admin has to switch it on once: **Settings → Pages → Source → GitHub Actions**. Until then the workflow finishes with a notice and publishes nothing.
+
+The app can be served from a sub-folder: set `BASE_PATH` when building (`BASE_PATH=/StockNet/ npm run build`). The deploy workflow does this and copies `index.html` to `404.html`, so deep links such as `/product/pr-214` open the app.
+
+The demo runs against a fixed date (**16 Oct 2026**, `src/shared/lib/dates.ts`) so expiry badges, document states and deal timelines stay coherent with the mock data.
+
+Fonts (Fraunces + IBM Plex Sans) load from Google Fonts. In sandboxed previews where they are blocked, system fallbacks are used. Storage falls back to memory when `localStorage` is unavailable.
+
 ## Folder structure
 
 ```

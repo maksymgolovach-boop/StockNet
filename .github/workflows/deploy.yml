@@ -1,0 +1,59 @@
+name: Deploy demo
+
+# Publishes the demo to GitHub Pages after every push to main.
+# One-time setup by a repository admin: Settings → Pages → Source → "GitHub Actions".
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Check that GitHub Pages is switched on
+        id: pages
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh api "repos/${{ github.repository }}/pages" --silent 2>/dev/null; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::GitHub Pages is not enabled, so nothing was published. Enable it under Settings → Pages → Source → GitHub Actions, then re-run this workflow."
+          fi
+      - uses: actions/checkout@v4
+        if: steps.pages.outputs.enabled == 'true'
+      - uses: actions/setup-node@v4
+        if: steps.pages.outputs.enabled == 'true'
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+        if: steps.pages.outputs.enabled == 'true'
+      - name: Build for the repository sub-path
+        if: steps.pages.outputs.enabled == 'true'
+        run: npm run build
+        env:
+          BASE_PATH: /${{ github.event.repository.name }}/
+      - name: Serve the app for deep links (single-page app fallback)
+        if: steps.pages.outputs.enabled == 'true'
+        run: cp dist/index.html dist/404.html
+      - uses: actions/upload-pages-artifact@v3
+        if: steps.pages.outputs.enabled == 'true'
+        with:
+          path: dist
+      - uses: actions/deploy-pages@v4
+        if: steps.pages.outputs.enabled == 'true'
+        id: deployment
