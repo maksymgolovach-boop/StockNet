@@ -56,6 +56,9 @@ const SETS = {
   seeds: P(38453523, 9854639, 30498561),
 } satisfies Record<string, string[]>
 
+/** Every stock photo the catalogue can show, for `npm run photos:download`. */
+export const ALL_PHOTO_URLS: string[] = [...new Set(Object.values(SETS).flat())]
+
 type Topic = keyof typeof SETS | 'none'
 
 const FRESH_RULES: [RegExp, Topic][] = [

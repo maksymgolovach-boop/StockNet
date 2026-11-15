@@ -3,11 +3,8 @@ import type { MediaRef } from '@/types/models'
 import { getCategoryConfig } from '@/config/categories'
 import { CategoryIcon } from '@/features/categories/CategoryIcon'
 import { cn } from '@/shared/lib/cn'
-
-const sized = (url: string, w: number) =>
-  url.includes('images.unsplash.com')
-    ? `${url}?auto=format&fit=crop&w=${w}&q=70`
-    : `${url}?auto=compress&cs=tinysrgb&w=${w}`
+import { sizedPhotoUrl } from '@/shared/lib/photoFile'
+import { localPhoto } from './localPhotos'
 
 export function ProductMedia({
   media,
@@ -21,6 +18,7 @@ export function ProductMedia({
   const icon = getCategoryConfig(categorySlug)?.icon ?? 'Package'
   const [failed, setFailed] = useState<string | null>(null)
   const url = media?.url && failed !== media.url ? media.url : undefined
+  const local = url && localPhoto(url)
   return (
     <div
       aria-hidden
@@ -30,9 +28,13 @@ export function ProductMedia({
       <CategoryIcon name={icon} className="size-1/3 max-h-14 max-w-14 opacity-70" />
       {url && (
         <img
-          src={sized(url, 640)}
-          srcSet={`${sized(url, 320)} 320w, ${sized(url, 640)} 640w, ${sized(url, 1200)} 1200w`}
-          sizes="(min-width: 1024px) 40vw, 100vw"
+          src={local ?? sizedPhotoUrl(url, 640)}
+          srcSet={
+            local
+              ? undefined
+              : `${sizedPhotoUrl(url, 320)} 320w, ${sizedPhotoUrl(url, 640)} 640w, ${sizedPhotoUrl(url, 1200)} 1200w`
+          }
+          sizes={local ? undefined : '(min-width: 1024px) 40vw, 100vw'}
           alt=""
           loading="lazy"
           decoding="async"

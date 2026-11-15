@@ -18,6 +18,12 @@ Code style is enforced by Prettier (`.prettierrc.json`) and oxlint. VS Code sugg
 
 GitHub Actions (`.github/workflows/check.yml`) runs `npm run check` and `npm run build` on every push and pull request.
 
+### Running the demo without internet
+
+- **Fonts** are bundled, so they always work.
+- **Product photos** load from Pexels and Unsplash. Run `npm run photos:download` once on a computer with internet access: it saves every photo of the catalogue (about 150 files) into `src/assets/photos`. Photos found there are used instead of the online ones, in `npm run dev` and in builds. Commit the folder if the whole team and the published demo should have them. Without it, a photo that cannot load shows the category icon.
+- **Map tiles** come from OpenStreetMap and cannot be bundled. Offline, the map shows a plain grid with the pins; the result list still works.
+
 ### Public demo (GitHub Pages)
 
 `.github/workflows/deploy.yml` publishes the demo after every push to `main`, at `https://<owner>.github.io/<repository>/`. A repository admin has to switch it on once: **Settings → Pages → Source → GitHub Actions**. Until then the workflow finishes with a notice and publishes nothing.
@@ -26,7 +32,7 @@ The app can be served from a sub-folder: set `BASE_PATH` when building (`BASE_PA
 
 The demo runs against a fixed date (**16 Oct 2026**, `src/shared/lib/dates.ts`) so expiry badges, document states and deal timelines stay coherent with the mock data.
 
-Fonts (Fraunces + IBM Plex Sans) load from Google Fonts. In sandboxed previews where they are blocked, system fallbacks are used. Storage falls back to memory when `localStorage` is unavailable.
+Fonts (Fraunces, IBM Plex Sans and Mono) are bundled with the app (`@fontsource` packages, imported in `src/index.css`), so nothing loads from Google Fonts. Storage falls back to memory when `localStorage` is unavailable.
 
 ## Folder structure
 
@@ -50,7 +56,7 @@ src/
                        + TanStack Query hooks
   shared/              UI primitives, hooks, libs (geo, storage, random, dates)
   types/models.ts      Domain model
-scripts/               check-case.ts, check-locales.ts, validate-mocks.ts, test-search.ts, test-deals.ts, test-storage.ts
+scripts/               check-case.ts, check-locales.ts, validate-mocks.ts, test-search.ts, test-deals.ts, test-storage.ts, download-photos.ts
 ```
 
 ## Active industries

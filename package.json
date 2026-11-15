@@ -20,9 +20,13 @@
     "test:deals": "tsx --tsconfig tsconfig.app.json scripts/test-deals.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "photos:download": "tsx --tsconfig tsconfig.app.json scripts/download-photos.ts",
     "test:storage": "tsx --tsconfig tsconfig.app.json scripts/test-storage.ts"
   },
   "dependencies": {
+    "@fontsource-variable/fraunces": "^5.3.0",
+    "@fontsource/ibm-plex-mono": "^5.3.0",
+    "@fontsource/ibm-plex-sans": "^5.3.0",
     "@hookform/resolvers": "^5.9.1",
     "@tanstack/react-query": "^5.104.3",
     "fuse.js": "^7.5.0",
