@@ -11,11 +11,16 @@ import { IconButton } from '@/shared/ui/Button'
 import { cn } from '@/shared/lib/cn'
 import { SearchBox } from '@/features/search/SearchBox'
 import { CategoryMegaMenu } from '@/features/categories/CategoryMegaMenu'
+import { useCompany } from '@/services/session'
 import { Logo } from './Logo'
 import { MobileNav } from './MobileNav'
 import { navItemsFor } from './navItems'
 import { useUnreadCount } from './useUnreadCount'
 import { AccountChip } from './AccountChip'
+import { useHeaderFit } from './useHeaderFit'
+
+const navLinkClass =
+  'relative flex h-10 shrink-0 items-center gap-2 rounded-[var(--radius-control)] px-3 text-sm font-medium whitespace-nowrap transition-colors'
 
 function UnreadDot({ count }: { count: number }) {
   if (count === 0) return null
@@ -34,6 +39,12 @@ export function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
   const unread = useUnreadCount()
   const headerRef = useRef<HTMLElement>(null)
+  const rowRef = useRef<HTMLDivElement>(null)
+  const navRef = useRef<HTMLElement>(null)
+  const rightRef = useRef<HTMLDivElement>(null)
+  const ghostRef = useRef<HTMLDivElement>(null)
+  const fit = useHeaderFit({ row: rowRef, nav: navRef, right: rightRef, ghost: ghostRef })
+  const company = useCompany()
 
   useLayoutEffect(() => {
     const el = headerRef.current
@@ -55,7 +66,7 @@ export function Header() {
       ref={headerRef}
       className="sticky top-0 z-[500] border-b border-line bg-surface/95 backdrop-blur supports-[backdrop-filter]:bg-surface/85"
     >
-      <div className="mx-auto flex h-16 max-w-[90rem] items-center gap-3 px-4 lg:gap-5 lg:px-6">
+      <div ref={rowRef} className="mx-auto flex h-16 max-w-[90rem] items-center gap-3 px-4 lg:gap-5 lg:px-6">
         <IconButton
           label={t('nav.openMenu')}
           className="lg:hidden"
@@ -65,8 +76,8 @@ export function Header() {
           <Menu className="size-5" aria-hidden />
         </IconButton>
         <Logo />
-        <SearchBox className="hidden max-w-xl flex-1 md:block" shortcut />
-        <nav aria-label={t('nav.primary')} className="ms-auto hidden items-center gap-1 lg:flex">
+        <SearchBox className="hidden max-w-xl min-w-48 flex-1 md:block" shortcut />
+        <nav ref={navRef} aria-label={t('nav.primary')} className="ms-auto hidden shrink-0 items-center gap-1 lg:flex">
           {navItemsFor().map((item) => {
             const label = t(item.labelKey)
             const showBadge = item.badge === 'unread' && unread > 0
@@ -75,9 +86,10 @@ export function Header() {
                 key={item.to}
                 to={item.to}
                 aria-label={showBadge ? `${label}, ${t('header.unreadMessages', { count: unread })}` : undefined}
+                title={fit.labels ? undefined : label}
                 className={({ isActive }) =>
                   cn(
-                    'relative flex h-10 items-center gap-2 rounded-[var(--radius-control)] px-3 text-sm font-medium transition-colors',
+                    navLinkClass,
                     isActive ? 'bg-primary-soft text-primary' : 'text-ink-muted hover:bg-surface-2 hover:text-ink',
                   )
                 }
@@ -86,13 +98,13 @@ export function Header() {
                   <item.icon className="size-[1.125rem]" aria-hidden />
                   {item.badge === 'unread' && <UnreadDot count={unread} />}
                 </span>
-                <span className="hidden xl:inline">{label}</span>
+                <span className={fit.labels ? undefined : 'sr-only'}>{label}</span>
               </NavLink>
             )
           })}
         </nav>
-        <div className="ms-auto flex items-center gap-1.5 lg:ms-0">
-          <div className="hidden items-center gap-1.5 sm:flex">
+        <div ref={rightRef} className="ms-auto flex shrink-0 items-center gap-1.5 lg:ms-0">
+          <div className="hidden shrink-0 items-center gap-1.5 sm:flex">
             <LanguageSwitcher />
             <CurrencySwitcher />
           </div>
@@ -121,8 +133,33 @@ export function Header() {
               </span>
             )}
           </NavLink>
-          <AccountChip />
+          <AccountChip showName={fit.name} />
         </div>
+      </div>
+      {/* Invisible copies that give the natural widths of the menu and the name (see useHeaderFit) */}
+      <div
+        ref={ghostRef}
+        aria-hidden
+        className="pointer-events-none invisible absolute start-0 top-0 h-0 overflow-hidden"
+      >
+        <div data-ghost="full" className="flex w-max items-center gap-1">
+          {navItemsFor().map((item) => (
+            <span key={item.to} className={navLinkClass}>
+              <item.icon className="size-[1.125rem]" />
+              <span>{t(item.labelKey)}</span>
+            </span>
+          ))}
+        </div>
+        <div data-ghost="compact" className="flex w-max items-center gap-1">
+          {navItemsFor().map((item) => (
+            <span key={item.to} className={navLinkClass}>
+              <item.icon className="size-[1.125rem]" />
+            </span>
+          ))}
+        </div>
+        <span data-ghost="name" className="block w-max max-w-32 truncate text-[0.8125rem] font-medium">
+          {company.name}
+        </span>
       </div>
       <div className="px-4 pb-3 md:hidden">
         <SearchBox />

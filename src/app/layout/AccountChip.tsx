@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useCompany } from '@/services/session'
+import { cn } from '@/shared/lib/cn'
 
 const initials = (name: string) =>
   name
@@ -10,8 +11,8 @@ const initials = (name: string) =>
     .map((w) => w[0])
     .join('')
 
-/** Shows the logged-in company. */
-export function AccountChip() {
+/** Shows the logged-in company: avatar and name, or the avatar alone when the header is short of room. */
+export function AccountChip({ showName = true }: { showName?: boolean }) {
   const { t } = useTranslation()
   const company = useCompany()
   const name = company.name
@@ -21,7 +22,11 @@ export function AccountChip() {
       to="/dashboard"
       aria-label={label}
       title={label}
-      className="hidden items-center gap-2 rounded-full border border-line py-1 ps-1 pe-3 hover:bg-surface-2 md:flex"
+      data-account-chip
+      className={cn(
+        'hidden shrink-0 items-center gap-2 rounded-full border border-line py-1 ps-1 hover:bg-surface-2 md:flex',
+        showName ? 'pe-3' : 'pe-1',
+      )}
     >
       <span
         className="grid size-7 place-items-center rounded-full bg-ink text-[0.6875rem] font-semibold text-bg"
@@ -29,7 +34,11 @@ export function AccountChip() {
       >
         {name ? initials(name) : '·'}
       </span>
-      <span className="max-w-32 truncate text-[0.8125rem] font-medium">{name ?? '…'}</span>
+      {showName && (
+        <span data-account-name className="max-w-32 truncate text-[0.8125rem] font-medium">
+          {name ?? '…'}
+        </span>
+      )}
     </Link>
   )
 }
