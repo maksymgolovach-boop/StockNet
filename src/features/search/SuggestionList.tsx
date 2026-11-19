@@ -29,7 +29,7 @@ export function SuggestionList({ id, options, active, query, onPick, onHover }: 
 
   return (
     <div
-      className="absolute inset-x-0 top-full z-[600] mt-1.5 max-h-[min(70vh,32rem)] overflow-y-auto rounded-[var(--radius-card)] border border-line bg-surface py-1.5 shadow-overlay"
+      className="absolute inset-x-0 top-full z-[600] mt-1.5 max-h-[min(70vh,32rem)] min-w-[min(24rem,calc(100vw-2rem))] overflow-y-auto rounded-[var(--radius-card)] border border-line bg-surface py-1.5 shadow-overlay"
       onMouseDown={(e) => e.preventDefault()}
     >
       <ul id={id} role="listbox" aria-label={t('header.searchLabel')}>

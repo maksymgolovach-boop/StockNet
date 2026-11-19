@@ -7,6 +7,10 @@
   },
   "overrides": [
     {
+      "files": ["src/test/**", "src/**/*.test.tsx"],
+      "rules": { "react/only-export-components": "off" }
+    },
+    {
       "files": ["src/features/**", "src/app/**", "src/main.tsx", "src/boot.tsx"],
       "rules": {
         "no-restricted-imports": [

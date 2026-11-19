@@ -6,7 +6,7 @@ const EXTRA = [
   `/messages/${DATA.thread}`,
 ]
 
-for (const width of [360, 390, 768]) {
+for (const width of [360, 390, 768, 1024, 1280]) {
   test(`no page scrolls sideways at ${width} px`, async ({ page }) => {
     test.slow()
     await page.setViewportSize({ width, height: 844 })

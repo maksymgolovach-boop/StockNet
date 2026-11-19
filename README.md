@@ -9,7 +9,8 @@ Requires **Node.js 20.19+ or 22.12+** (Vite 8). `.nvmrc` pins Node 22 for nvm / 
 ```bash
 npm install
 npm run dev        # http://localhost:5173
-npm run check      # type-check + lint + format check + locale coverage + mock-data validation + search, deal and storage tests
+npm run check      # type-check + lint + format check + locale coverage + mock-data validation + search, deal, storage and component tests
+npm run test:components  # component tests only (Vitest + Testing Library); add --watch while working
 npm run format     # format all files with Prettier (Tailwind classes are sorted too)
 npm run test:e2e   # browser tests against the production build (first time: npx playwright install chromium)
 npm run build      # type-check and production build
@@ -22,7 +23,8 @@ GitHub Actions (`.github/workflows/check.yml`) runs `npm run check`, `npm run bu
 ### Tests
 
 - `npm run check` covers the logic without a browser: search (`scripts/test-search.ts`), deal and lot rules (`test-deals.ts`), saved-data validation (`test-storage.ts`), plus translation coverage and mock-data validation.
-- `npm run test:e2e` runs Playwright tests from `e2e/` in Chromium against `vite preview`: every page renders, search and filters, the quote → order flow, chat, the lot form, language switching, crash screens and corrupted saved data, phone widths (no sideways scrolling), accessibility (axe-core, light and dark) and the dev-menu switch. Photo and map hosts are blocked in the tests, so they do not depend on the internet. Ids of demo records used by the tests are listed in `e2e/fixtures.ts`.
+- `npm run test:components` renders single components in jsdom with Vitest and Testing Library and drives them like a user: the search box (suggestions, keyboard, recent searches, "/" shortcut), tabs, price tiers, the language switcher and the account chip. Tests sit next to their component as `*.test.tsx`; `src/test/render.tsx` wraps a component in the router and data fetching. It is part of `npm run check`.
+- `npm run test:e2e` runs Playwright tests from `e2e/` in Chromium against `vite preview`: every page renders, search and filters, the quote → order flow, chat, the lot form, language switching, crash screens and corrupted saved data, phone and desktop widths (no sideways scrolling), the header at 768–1920 px in every language (`header.spec.ts`), accessibility (axe-core, light and dark) and the dev-menu switch. Photo and map hosts are blocked in the tests, so they do not depend on the internet. Ids of demo records used by the tests are listed in `e2e/fixtures.ts`.
 
 ### Running the demo without internet
 
@@ -66,6 +68,7 @@ src/
   types/models.ts      Domain model
 scripts/               check-case.ts, check-locales.ts, validate-mocks.ts, test-search.ts, test-deals.ts, test-storage.ts, download-photos.ts
 e2e/                   Playwright browser tests (see Tests)
+src/test/              Component-test setup and render helper (tests themselves sit next to their components)
 ```
 
 ### Layers
@@ -199,7 +202,8 @@ Each service in `src/services` is an interface plus a mock implementation built 
 - Every page was scanned with axe-core (WCAG 2.1 A/AA) in light and dark mode: no violations. Contrast pairs were checked with a script (all text ≥ 4.5:1).
 - Keyboard: skip link, "/" focuses search, combobox and tab patterns, focus trap and focus return in modals, drawers and popovers, Esc closes them; map pins are focusable and the list is the map's accessible equivalent; charts have a screen-reader table.
 - `prefers-reduced-motion` disables animations and smooth scrolling.
-- No page scrolls sideways on phones (checked at 360, 390 and 768 px). Horizontally scrolling tables are `relative`, so screen-reader-only content inside them cannot widen the page.
+- No page scrolls sideways (checked at 360, 390, 768, 1024 and 1280 px).
+- The header decides what fits in its top row instead of using fixed breakpoints, because menu labels differ in length per language (`src/app/layout/useHeaderFit.ts`). The search box keeps at least 288 px on desktop; when room runs out the company name goes first (avatar only, name in its tooltip), then the menu labels (icons with tooltips; the labels stay for screen readers). Pickers and menu items never shrink or wrap. Horizontally scrolling tables are `relative`, so screen-reader-only content inside them cannot widen the page.
 
 ## Error handling
 
@@ -230,8 +234,8 @@ The app should never show a blank page:
 4. Payments and logistics: escrow or invoicing integration, freight quotes, delivery tracking feeding the deal timeline.
 5. Trust and moderation: verification back-office, dispute mediation tools, review moderation and report handling.
 6. Data quality: live FX and commodity indices (LME), geocoding for any address, road-distance routing.
-7. Performance: load non-active languages on demand and split the mock catalogue out of the main bundle once the API exists.
-8. Testing: component tests (Testing Library), end-to-end tests (Playwright) for search → product → quote → deal, and axe checks in CI.
+7. Performance: split the mock catalogue out of the main bundle once the API exists (languages already load on demand).
+8. Testing: component tests for the forms (quote request, lot editor), the deal timeline and chat; visual regression screenshots. (Playwright flows, axe checks in CI and the first component tests are in place.)
 
 ## Dev menu
 
